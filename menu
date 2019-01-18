@@ -1,0 +1,43 @@
+#!/bin/bash
+source /etc/profile
+source ~/.bashrc
+
+#if [[ $EUID -ne 0 ]]; then
+    echo ''
+	echo -e "${COLOR_GREEN} ====Главное меню==== ${COLOR_NC}"
+
+	echo '1: Управление сайтами'
+	echo '2: Управление пользователями'
+	echo '3: Управление базами данных'
+	echo '4: Управление бэкапами'
+	echo '5: Git'
+	echo '0: Выход'
+	echo ''
+	echo -n 'Выберите пункт меню:'
+	read item
+	case "$item" in
+			1) $MENU/menu_site.sh
+				;;
+			2) $MENU/menu_user.sh
+				;;
+			3) $MENU/menu_sql.sh
+				;;
+			4) $MENU/menu_backup.sh
+				;;
+			5) $MENU/menu_git.sh
+				;;
+			0) echo "Выход."
+				exit 0
+				;;
+			*) echo "Команда не введена. "
+				$0
+				;;
+	esac
+#  exit 1
+#else
+#  echo "Необходимо запустить от имени пользователя. Смена пользователя на $USERLAMER"
+#  su $USERLAMER
+#fi
+
+
+	
