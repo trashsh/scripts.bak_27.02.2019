@@ -46,6 +46,8 @@ then
 
         a2ensite $2_$1.conf
         systemctl reload apache2
+		
+		cp -rf $TEMPLATES/laravel/.gitignore $3/.gitignore
 
         echo -e "\033[32m" Применение прав к папкам и каталогам. Немного подождите "\033[0;39m"
 
