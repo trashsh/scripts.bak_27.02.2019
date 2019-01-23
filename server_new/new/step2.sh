@@ -12,7 +12,9 @@ tar -czvf $BACKUPFOLDER_INSTALLED/apache2.tar.gz /etc/apache2
 echo "install php"
 apt -y install php libapache2-mod-php php-mysql php-fpm
 apt -y install php-pear php7.2-curl php7.2-dev php7.2-gd php7.2-mbstring php7.2-zip php7.2-mysql php7.2-xml
-apt -y install php php-zip php-gd php-mysql
+apt -y install libapache2-mod-php7.2 php7.2-cli php7.2-pgsql php7.2-imagick php7.2-intl
+
+apt -y install php php-zip php-gd php-mysql php-memcache php-memcached
 a2enmod proxy_fcgi setenvif
 a2enconf php7.2-fpm
 a2enmod proxy_http
@@ -129,4 +131,9 @@ a2enmod cache
 
 service webmin restart
 
+echo "git-etc"
+cd /etc
+git init
+git add .
+git commit -m "initial commit etc"
 

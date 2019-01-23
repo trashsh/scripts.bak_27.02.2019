@@ -21,7 +21,7 @@ echo -e "$COLOR_YELLOW"Создание пользователя базы дан
 				} > $HOMEPATHWEBUSERS/$1/.my.cnf
 				chmod 600 $HOMEPATHWEBUSERS/$1/.my.cnf
 				chown $1:users $HOMEPATHWEBUSERS/$1/.my.cnf
-				echo -e "\nПользователь базы данных mysql $COLOR_YELLOW " $1"$COLOR_NCуспешно добавлен"
+				echo -e "\nПользователь базы данных mysql $COLOR_YELLOW " $1"$COLOR_NC успешно добавлен"
 				;;
         *) echo 'Отмена операции добавления пользователя'
 			echo ''

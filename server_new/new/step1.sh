@@ -98,8 +98,6 @@ tar -czvf $BACKUPFOLDER_EMPTY/_null/etc_null.tar.gz /etc
 #cp /etc/profile $BACKUPFOLDER_EMPTY/profile
 #cp /etc/sudoers $BACKUPFOLDER_EMPTY/sudoers
 
-/my/scripts/server_new/step1/step1.sh
-
 echo "set locale"
 sudo locale-gen "ru_RU.UTF-8"
 dpkg-reconfigure locales
@@ -143,14 +141,3 @@ chown $USERLAMER:users $HOMEPATHWEBUSERS/$USERLAMER/.ssh
 chown $USERLAMER:users $HOMEPATHWEBUSERS/$USERLAMER/.ssh/authorized_keys
   service ssh restart
   
-touch $HOMEPATHWEBUSERS/$USERLAMER/.my.cnf
-echo -n -e "$COLOR_BLUEВведите пароль для пользователя$COLOR_NC $COLOR_YELLOW" $USERLAMER "$COLOR_NC $COLOR_BLUEбазы данных mysql$COLOR_NC:"
-read PASSWORD
-cat $HOMEPATHWEBUSERS/$USERLAMER/.my.cnf | grep $HOMEPATHWEBUSERS
-{
-echo '[client]'
-echo 'user='$USERLAMER
-echo 'password='$PASSWORD
-} > $HOMEPATHWEBUSERS/$USERLAMER/.my.cnf
-chmod 600 $HOMEPATHWEBUSERS/$USERLAMER/.my.cnf
-chown $USERLAMER:users $HOMEPATHWEBUSERS/$USERLAMER/.my.cnf

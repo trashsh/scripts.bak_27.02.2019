@@ -13,18 +13,8 @@ systemctl restart webmin
 #a2ensite wm.mmgx.ru
 systemctl restart apache2
 
-echo "git-etc"
-cd /etc
-git init
-git add .
-git commit -m "initial commit etc"
 
 #apt-get install automysqlbackup
 #info
 ##wm.mmgx.ru:7000
 
-
-
-
-apt install bacula
-apt-get -y install quota quotatool
