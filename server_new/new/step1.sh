@@ -9,7 +9,7 @@ git clone https://github.com/trashsh/trash_repo.git
 mv ./trash_repo ./scripts
 cd /my/scripts
 git init
-find /my/scripts -type d -exec chmod 755 {} \;
+find /my/scripts -type d -exec chmod 777 {} \;
 find /my/scripts -type f -exec chmod 777 {} \;
 find /my/scripts -type d -exec chown root:root {} \;
 find /my/scripts -type f -exec chown root:root {} \;
@@ -145,15 +145,9 @@ $SCRIPTS/users/input_useradd.sh
 mkdir -p $HOMEPATHWEBUSERS/$USERLAMER/.ssh
 touch $HOMEPATHWEBUSERS/$USERLAMER/.ssh/authorized_keys
 #usermod -G ssh-access -a $USERLAMER
-cat /etc/passwd | grep $HOMEPATHWEBUSERS
-{
-  echo 'ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAp2FS7uz8Y5lo+022MmRgwiFEmlZfK9WKdamw2DH'
-  echo '3blowO0736Z7H4PPcx8PGSxOfeBcl6iZ+G+ukNKrDLBY0EPqc6jNE9966zvdE9N2ws9NfNZD+7+'
-  echo '26JARRlkYnqIuUIqCiO0bz1eICyDV+1TwZ7anKxUgG+dfbFIjSdfeodSVHMeNaT8NCcYho1lWXg'
-  echo 'wy6q7h3k8EikS0qLqQmWOAPRrKUPXpsIzQTS8ll5B27U+w0OV0E222W4NOWHIbWDTorFxhqV7B4'
-  echo 'L+Z8+eao2en3i75Qng9YEe5l09HN33oQe2SsU6CfpeN0+FqwWaUT/hsYU2qS80U2oK5DGKA6vgk'
-  echo '8rQ== myvds_lamer'
-} > $HOMEPATHWEBUSERS/$USERLAMER/.ssh/authorized_keys
+
+#sed -i '$ a \\nssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAp2FS7uz8Y5lo+022MmRgwiFEmlZfK9WKdamw2DH3blowO0736Z7H4PPcx8PGSxOfeBcl6iZ+G+ukNKrDLBY0EPqc6jNE9966zvdE9N2ws9NfNZD+7+26JARRlkYnqIuUIqCiO0bz1eICyDV+1TwZ7anKxUgG+dfbFIjSdfeodSVHMeNaT8NCcYho1lWXgwy6q7h3k8EikS0qLqQmWOAPRrKUPXpsIzQTS8ll5B27U+w0OV0E222W4NOWHIbWDTorFxhqV7B4L+Z8+eao2en3i75Qng9YEe5l09HN33oQe2SsU6CfpeN0+FqwWaUT/hsYU2qS80U2oK5DGKA6vgk8rQ== myvds_lamer'  $HOMEPATHWEBUSERS/$USERLAMER/.ssh/authorized_keys
+cp $SETTINGS/ssh/keys/lamer/authorized_keys $HOMEPATHWEBUSERS/$USERLAMER/.ssh/authorized_keys
 
 chmod 700 $HOMEPATHWEBUSERS/$USERLAMER/.ssh
 chmod 600 $HOMEPATHWEBUSERS/$USERLAMER/.ssh/authorized_keys
@@ -162,8 +156,6 @@ chown $USERLAMER:users $HOMEPATHWEBUSERS/$USERLAMER/.ssh/authorized_keys
   service ssh restart
   
   
-
-
 echo "install apache2"
 apt -y install apache2
 tar -czvf $BACKUPFOLDER_INSTALLED/apache2.tar.gz /etc/apache2
@@ -292,6 +284,8 @@ service webmin restart
 
 echo "git-etc"
 cd /etc
+git config --global user.email "r@gothundead.ru"
+git config --global user.name "Gothundead"
 git init
 git add .
 git commit -m "initial commit etc"

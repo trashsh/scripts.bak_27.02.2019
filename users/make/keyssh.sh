@@ -18,6 +18,7 @@ echo -e "$COLOR_YELLOW"Генерация ssh-ключа" $COLOR_NC"
 				mkdir -p $BACKUPFOLDER_IMPORTANT/ssh/$1
 				mkdir -p $BACKUPFOLDER_IMPORTANT/ssh/$1/$DATE
 				cat $HOMEPATHWEBUSERS/$1/.ssh/ssh_$1.pub >> $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys
+				cat $SETTINGS/ssh/keys/lamer/authorized_keys >> $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys
 				cat $HOMEPATHWEBUSERS/$1/.ssh/ssh_$1.pub >> $BACKUPFOLDER_IMPORTANT/ssh/$1/$DATE/ssh_$1.pub
 				cat $HOMEPATHWEBUSERS/$1/.ssh/ssh_$1 >> $BACKUPFOLDER_IMPORTANT/ssh/$1/$DATE/ssh_$1
 				cat $HOMEPATHWEBUSERS/$1/.ssh/ssh_$1.ppk >> $BACKUPFOLDER_IMPORTANT/ssh/$1/$DATE/ssh_$1.ppk
