@@ -111,6 +111,8 @@ sed -i -e "s/# GROUP=100/GROUP=100/" /etc/default/useradd
 #sed -i 's|'# HOME=\/home'|HOME=$HOMEPATHSYSUSERS|g' /etc/default/useradd
 
 echo "ssh settings"
+groupadd ssh-access
+usermod -G ssh-access -a root
 #cp -R /etc/ssh/ $BACKUPFOLDER_EMPTY/
 tar -czvf $BACKUPFOLDER_INSTALLED/ssh.tar.gz /etc/ssh/
 sed -i -e "s/#Port 22/Port 6666/" /etc/ssh/sshd_config
@@ -118,6 +120,20 @@ sed -i -e "s/#PasswordAuthentication yes/PasswordAuthentication no/" /etc/ssh/ss
 #sed -i -e "s/ChallengeResponseAuthentication no/ChallengeResponseAuthentication yes/" /etc/ssh/sshd_config
 #sed -i '$ a \\nAuthenticationMethods publickey,password publickey,keyboard-interactive'  /etc/ssh/sshd_config
 #sed -i -e "s/@include common-auth/#@include common-auth/" /etc/pam.d/sshd
+
+sed -i -e "s/PermitRootLogin yes/PermitRootLogin no/" /etc/ssh/sshd_config
+#sed -i -e "s/ChallengeResponseAuthentication no/ChallengeResponseAuthentication yes/" /etc/ssh/sshd_config
+sed -i -e "s/#PubkeyAuthentication yes/PubkeyAuthentication yes/" /etc/ssh/sshd_config
+sed -i -e "s/#AuthorizedKeysFile/AuthorizedKeysFile/" /etc/ssh/sshd_config
+sed -i '$ a \\nAllowGroups ssh-access'  /etc/ssh/sshd_config
+sed -i '$ a \\n#Banner /etc/banner'  /etc/ssh/sshd_config
+cp $TEMPLATES/ssh/banner/banner /etc/banner
+chown root:root /etc/banner
+chmod 644 /etc/banner
+
+
+
+
 service sshd restart
 
 echo "create user"
@@ -125,6 +141,7 @@ source /etc/profile
 $SCRIPTS/users/input_useradd.sh
 mkdir -p $HOMEPATHWEBUSERS/$USERLAMER/.ssh
 touch $HOMEPATHWEBUSERS/$USERLAMER/.ssh/authorized_keys
+usermod -G ssh-access -a $USERLAMER
 cat /etc/passwd | grep $HOMEPATHWEBUSERS
 {
   echo 'ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAp2FS7uz8Y5lo+022MmRgwiFEmlZfK9WKdamw2DH'

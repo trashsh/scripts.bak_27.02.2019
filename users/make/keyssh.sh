@@ -30,6 +30,7 @@ echo -e "$COLOR_YELLOW"Генерация ssh-ключа" $COLOR_NC"
 				chown $1:users $HOMEPATHWEBUSERS/$1/.ssh/ssh_$1
 				chown $1:users $HOMEPATHWEBUSERS/$1/.ssh/ssh_$1.ppk
 				chown $1:users $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys
+				usermod -G ssh-access -a $1
 				;;
         *) echo 'Отмена операции добавления пользователя'
 			echo ''
