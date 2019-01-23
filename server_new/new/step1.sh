@@ -122,7 +122,7 @@ sed -i -e "s/#PasswordAuthentication yes/PasswordAuthentication no/" /etc/ssh/ss
 #sed -i -e "s/@include common-auth/#@include common-auth/" /etc/pam.d/sshd
 
 sed -i -e "s/PermitRootLogin yes/PermitRootLogin no/" /etc/ssh/sshd_config
-#sed -i -e "s/ChallengeResponseAuthentication no/ChallengeResponseAuthentication yes/" /etc/ssh/sshd_config
+sed -i '$ a \\nAuthenticationMethods publickey'  /etc/ssh/sshd_config
 sed -i -e "s/#PubkeyAuthentication yes/PubkeyAuthentication yes/" /etc/ssh/sshd_config
 sed -i -e "s/#AuthorizedKeysFile/AuthorizedKeysFile/" /etc/ssh/sshd_config
 sed -i '$ a \\nAllowGroups ssh-access'  /etc/ssh/sshd_config
@@ -130,18 +130,21 @@ sed -i '$ a \\n#Banner /etc/banner'  /etc/ssh/sshd_config
 cp $TEMPLATES/ssh/banner/banner /etc/banner
 chown root:root /etc/banner
 chmod 644 /etc/banner
-
-
-
-
 service sshd restart
+
+echo "install mysql"
+apt -y install mysql-server
+#apt -y install mariadb-server mariadb-client
+tar -czvf $BACKUPFOLDER_INSTALLED/mysql.tar.gz /etc/mysql
+mysql_secure_installation
+service mysql restart
 
 echo "create user"
 source /etc/profile
 $SCRIPTS/users/input_useradd.sh
 mkdir -p $HOMEPATHWEBUSERS/$USERLAMER/.ssh
 touch $HOMEPATHWEBUSERS/$USERLAMER/.ssh/authorized_keys
-usermod -G ssh-access -a $USERLAMER
+#usermod -G ssh-access -a $USERLAMER
 cat /etc/passwd | grep $HOMEPATHWEBUSERS
 {
   echo 'ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAp2FS7uz8Y5lo+022MmRgwiFEmlZfK9WKdamw2DH'
@@ -159,12 +162,7 @@ chown $USERLAMER:users $HOMEPATHWEBUSERS/$USERLAMER/.ssh/authorized_keys
   service ssh restart
   
   
-echo "install mysql"
-apt -y install mysql-server
-#apt -y install mariadb-server mariadb-client
-tar -czvf $BACKUPFOLDER_INSTALLED/mysql.tar.gz /etc/mysql
-mysql_secure_installation
-service mysql restart
+
 
 echo "install apache2"
 apt -y install apache2

@@ -13,6 +13,7 @@ echo -e "$COLOR_YELLOW"Создание пользователя базы дан
 				touch $HOMEPATHWEBUSERS/$1/.my.cnf
 				echo -n -e "$COLOR_BLUEВведите пароль для пользователя$COLOR_NC $COLOR_YELLOW" $1 "$COLOR_NC $COLOR_BLUEбазы данных mysql$COLOR_NC:"
 				read PASSWORD
+				mysql -e "CREATE USER '$1'@'localhost' IDENTIFIED BY '$PASSWORD';"
 				cat $HOMEPATHWEBUSERS/$1/.my.cnf | grep $HOMEPATHWEBUSERS
 						{
 				echo '[client]'
@@ -20,7 +21,7 @@ echo -e "$COLOR_YELLOW"Создание пользователя базы дан
 				echo 'password='$PASSWORD
 				} > $HOMEPATHWEBUSERS/$1/.my.cnf
 				chmod 600 $HOMEPATHWEBUSERS/$1/.my.cnf
-				chown $1:users $HOMEPATHWEBUSERS/$1/.my.cnf
+				chown $1:users $HOMEPATHWEBUSERS/$1/.my.cnf				
 				echo -e "\nПользователь базы данных mysql $COLOR_YELLOW " $1"$COLOR_NC успешно добавлен"
 				;;
         *) echo 'Отмена операции добавления пользователя'
