@@ -5,10 +5,10 @@ source ~/.bashrc
 
 if [ -n "$1" ] 
 then
-	echo -e "$COLOR_YELLOW"Создание пользователя MYSQL с правами пользователя" $COLOR_NC"
-	mysql -e "CREATE USER '$1'@'localhost' IDENTIFIED BY '$2';"
+	echo -e "$COLOR_YELLOW"Создание пользователя MYSQL с правами администратора сервера" $COLOR_NC"
+	mysql -e "GRANT ALL PRIVILEGES ON *.* To '$1'@'localhost' IDENTIFIED BY '$2';"
 	mysql -e "FLUSH PRIVILEGES;"
-	echo -e "$COLOR_YELLOW"Пользователь $1 создан" $COLOR_NC"
+	echo -e "$COLOR_YELLOW"Пользователь $1 с правами администратора создан" $COLOR_NC"
 else
        echo "--------------------------------------"
     echo "Параметры запуска не найдены. Необходимы параметры: имя пользователя mysql, пароль"
@@ -22,6 +22,3 @@ else
             ;;
     esac
 fi
-
-
-

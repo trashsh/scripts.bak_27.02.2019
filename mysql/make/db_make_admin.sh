@@ -1,17 +1,16 @@
 #!/bin/bash
-#$1-user; $2-pass
+#$1-user, $2-db
 source /etc/profile
 source ~/.bashrc
 
-if [ -n "$1" ] 
+if [ -n "$1" ] && [ -n "$2" ] 
 then
-	echo -e "$COLOR_YELLOW"Создание пользователя MYSQL с правами пользователя" $COLOR_NC"
-	mysql -e "CREATE USER '$1'@'localhost' IDENTIFIED BY '$2';"
+	mysql -e "GRANT ALL ON $2.* TO '$1'@'localhost';"
 	mysql -e "FLUSH PRIVILEGES;"
-	echo -e "$COLOR_YELLOW"Пользователь $1 создан" $COLOR_NC"
+	echo -e "$COLOR_YELLOW"Права администратора для пользователя $1 на базу $2 добавлены" $COLOR_NC"
 else
        echo "--------------------------------------"
-    echo "Параметры запуска не найдены. Необходимы параметры: имя пользователя mysql, пароль"
+    echo "Параметры запуска не найдены. Необходимы параметры: Имя пользователя, Название базы данных"
     echo -n "Для запуска меню управление mysql напишите \"y\", для выхода - любой другой символ: "
     read item
     case "$item" in
@@ -22,6 +21,5 @@ else
             ;;
     esac
 fi
-
 
 
