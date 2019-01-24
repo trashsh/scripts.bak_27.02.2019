@@ -5,7 +5,7 @@ source ~/.bashrc
 
 if [ -n "$1" ] 
 then
-	mysql -e "GRANT ALL PRIVILEGES ON *.* To '$1'@'localhost' IDENTIFIED BY '$2';"
+	mysql -e "GRANT ALL PRIVILEGES ON *.* To '$1'@'localhost' IDENTIFIED BY '$2' WITH GRANT OPTION;"
 	mysql -e "FLUSH PRIVILEGES;"
 	echo -e "$COLOR_LIGHT_PURPLEПользователь баз данных mysql $COLOR_YELLOW$1$COLOR_LIGHT_PURPLE с правами администратора создан$COLOR_NC"
 else
