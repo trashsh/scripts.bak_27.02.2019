@@ -5,9 +5,8 @@ source ~/.bashrc
 
 if [ -n "$1" ] 
 then
-	echo -e "$COLOR_YELLOW"Создание базы данных $1 с кодировкой utf8_general_ci" $COLOR_NC"
 	mysql -e "CREATE DATABASE IF NOT EXISTS $1 DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;"
-	echo -e "$COLOR_YELLOW"База данных $1 создана" $COLOR_NC"
+	echo -e "$COLOR_LIGHT_PURPLEБаза данных $COLOR_YELLOW$1$COLOR_LIGHT_PURPLE с кодировкой $COLOR_YELLOW utf8_general_ci $COLOR_NC $COLOR_LIGHT_PURPLEсоздана $COLOR_NC"
 else
        echo "--------------------------------------"
     echo "Параметры запуска не найдены. Необходимы параметры: Название базы данных"

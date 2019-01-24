@@ -5,9 +5,8 @@ source ~/.bashrc
 
 if [ -n "$1" ] 
 then
-	echo -e "$COLOR_YELLOW"Удаление базы данных $1" $COLOR_NC"
 	mysql -e "DROP DATABASE IF EXISTS $1;"
-	echo -e "$COLOR_YELLOW"База данных $1 удалена" $COLOR_NC"
+	echo -e "$COLOR_LIGHT_PURPLEБаза данных $COLOR_YELLOW$1$COLOR_LIGHT_PURPLE удалена $COLOR_NC"
 else
        echo "--------------------------------------"
     echo "Параметры запуска не найдены. Необходимы параметры: имя пользователя mysql"

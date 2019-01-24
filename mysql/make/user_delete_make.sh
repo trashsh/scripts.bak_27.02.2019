@@ -5,9 +5,8 @@ source ~/.bashrc
 
 if [ -n "$1" ] 
 then
-	echo -e "$COLOR_YELLOW"Удаление пользователя $1" $COLOR_NC"
 	mysql -e "DROP USER '$1'@'localhost';"
-	echo -e "$COLOR_YELLOW"Пользователь $1 удален" $COLOR_NC"
+	echo -e "$COLOR_LIGHT_PURPLEПользователь $COLOR_YELLOW$1$COLOR_LIGHT_PURPLE удален $COLOR_NC"
 else
        echo "--------------------------------------"
     echo "Параметры запуска не найдены. Необходимы параметры: имя пользователя mysql"

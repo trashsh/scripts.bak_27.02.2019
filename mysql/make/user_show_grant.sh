@@ -5,7 +5,7 @@ source ~/.bashrc
 
 if [ -n "$1" ] 
 then
-	echo -e "$COLOR_YELLOW"Список прав доступа к базам mysql пользователя $1" $COLOR_NC"
+	echo -e "$COLOR_LIGHT_PURPLEСписок прав доступа к базам mysql пользователя $COLOR_YELLOW$1$COLOR_LIGHT_PURPLE : $COLOR_NC"
 	mysql -e "SHOW GRANTS FOR '$1'@'localhost';"
 else
        echo "--------------------------------------"
