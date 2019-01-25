@@ -19,13 +19,13 @@ case "$item" in
         1) sudo $SCRIPTS/users/input_useradd.sh
            $MENU/menu_user.sh
             ;;
-		2) sudo $SCRIPTS/users/my_useradd_web.sh
+		2) sudo $SCRIPTS/users/useradd_web.sh
            $MENU/menu_user.sh
             ;;
-        3) sudo $SCRIPTS/users/my_removeusesystem.sh
+        3) sudo $SCRIPTS/users/userdel_system.sh
             $MENU/menu_user.sh
             ;;
-        4) sudo $SCRIPTS/users/my_userview.sh
+        4) sudo $SCRIPTS/users/usersview.sh
             $MENU/menu_user.sh
             ;;
 

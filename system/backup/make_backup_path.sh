@@ -3,8 +3,8 @@ source /etc/profile
 source ~/.bashrc
 #$1-path
 
-DATE=$(date +%Y-%m-%d)
-TIME=$(date +%H-%M)
+DATE=$(date +%Y%m%d)
+TIME=$(date +%H%M)
 
 echo  "$D" "$T"
 echo ''

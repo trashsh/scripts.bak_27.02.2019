@@ -3,7 +3,7 @@ source /etc/profile
 source ~/.bashrc
 
 echo ''
-echo -e -n "$COLOR_BLUE"Укажите дату в формате yyyy-mm-dd:" $COLOR_NC"
+echo -e -n "$COLOR_BLUE"Укажите дату в формате yyyymmdd:" $COLOR_NC"
 
 read DATE
 
