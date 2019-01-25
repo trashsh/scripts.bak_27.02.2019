@@ -1,5 +1,6 @@
 #!/bin/bash
 #просмотр удаленных репозиториев
+#$1-$USERNAME
 source /etc/profile
 source ~/.bashrc
 
@@ -11,4 +12,4 @@ sudo git remote add bitbucket https://gothundead@bitbucket.org/gothundead/myserv
 sudo git push origin master
 sudo git push bitbucket master
 echo ""
-$SCRIPTS/.menu/menu_git.sh
+$SCRIPTS/.menu/menu_git.sh $1

@@ -1,5 +1,6 @@
 #!/bin/bash
 #ввод параметров удаляемого сайта
+#$1-$USERNAME
 source /etc/profile
 source ~/.bashrc
 user=$USER
@@ -17,5 +18,5 @@ user=$USER
 #    getent group www-data
 #	echo ''
     
-    sudo $SCRIPTS/webserver/remove/site_remove_make.sh $domain $path $user
+    sudo $SCRIPTS/webserver/remove/site_remove_make.sh $1 $domain $path $user
 

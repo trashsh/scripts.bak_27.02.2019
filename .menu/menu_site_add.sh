@@ -16,17 +16,17 @@ echo ''
 echo -n 'Выберите пункт меню:'
 read item
 case "$item" in
-        1) $SCRIPTS/webserver/site/input_site_php_easy.sh
+        1) $SCRIPTS/webserver/site/input_site_php_easy.sh $1
             ;;
-		2) $SCRIPTS/webserver/site/input_site_php_full.sh
+		2) $SCRIPTS/webserver/site/input_site_php_full.sh $1
             ;;
-        3) $SCRIPTS/webserver/site/input_site_laravel_easy.sh
+        3) $SCRIPTS/webserver/site/input_site_laravel_easy.sh $1
             ;;
-		4) $SCRIPTS/webserver/site/input_site_laravel_full.sh
+		4) $SCRIPTS/webserver/site/input_site_laravel_full.sh $1
             ;;
 
         0)  echo ''
-            $MENU/menu_site.sh
+            $MENU/menu_site.sh $1
             ;;
         /) echo "Выход..."
             exit 0

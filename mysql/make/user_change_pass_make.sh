@@ -1,19 +1,19 @@
 #!/bin/bash
-#$1-user; $2-pass
+#$1-$USERNAME $2-user; $3-pass
 source /etc/profile
 source ~/.bashrc
 
-if [ -n "$1" ] 
+if [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ] 
 then
-	mysql -e "ALTER USER '$1'@'localhost' IDENTIFIED WITH mysql_native_password BY '$2';"
-	echo -e "$COLOR_LIGHT_PURPLEПароль пользователя $1 изменен $COLOR_NC"
+	mysql -e "ALTER USER '$2'@'localhost' IDENTIFIED WITH mysql_native_password BY '$3';"
+	echo -e "$COLOR_LIGHT_PURPLEПароль пользователя $2 изменен $COLOR_NC"
 else
        echo "--------------------------------------"
     echo "Параметры запуска не найдены. Необходимы параметры: имя пользователя mysql, пароль"
     echo -n "Для запуска меню управление mysql напишите \"y\", для выхода - любой другой символ: "
     read item
     case "$item" in
-        y|Y) $MENU/menu_sql.sh
+        y|Y) $MENU/menu_sql.sh $1
             ;;
         *) echo "Выход..."
             exit 0

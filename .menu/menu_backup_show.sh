@@ -17,24 +17,24 @@ echo ''
 echo -n 'Выберите пункт меню:'
 read item
 case "$item" in
-        1) $SCRIPTS/system/backup/show/show_today.sh
-           $MENU/menu_backup.sh
+        1) $SCRIPTS/system/backup/show/show_today.sh $1
+           $MENU/menu_backup.sh $1
             ;;
-		2) $SCRIPTS/system/backup/show/show_yestoday.sh
-           $MENU/menu_backup.sh
+		2) $SCRIPTS/system/backup/show/show_yestoday.sh $1
+           $MENU/menu_backup.sh $1
             ;;
-		3) $SCRIPTS/system/backup/show/show_week.sh
-           $MENU/menu_backup.sh
+		3) $SCRIPTS/system/backup/show/show_week.sh $1
+           $MENU/menu_backup.sh $1
             ;;
-		4) $SCRIPTS/system/backup/show/show_range.sh
-           $MENU/menu_backup.sh
+		4) $SCRIPTS/system/backup/show/show_range.sh $1
+           $MENU/menu_backup.sh $1
             ;;
-		5) $SCRIPTS/system/backup/show/show_range_input.sh
-           $MENU/menu_backup.sh
+		5) $SCRIPTS/system/backup/show/show_range_input.sh $1
+           $MENU/menu_backup.sh $1
             ;;
         
         0)  echo ''
-            $MYFOLDER/scripts/menu
+            $MYFOLDER/scripts/menu $1
             ;;
         /) echo "Выход..."
             exit 0

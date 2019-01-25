@@ -16,19 +16,19 @@ echo ''
 echo -n 'Выберите пункт меню:'
 read item
 case "$item" in
-        1) $MENU/menu_site_add.sh
+        1) $MENU/menu_site_add.sh $1
             ;;
-        2) $SCRIPTS/webserver/remove/site_remove_input.sh
+        2) $SCRIPTS/webserver/remove/site_remove_input.sh $1
             ;;
-        3) $SCRIPTS/webserver/view/site_view_all.sh
+        3) $SCRIPTS/webserver/view/site_view_all.sh $1
             ;;
-		4) $MENU/menu_site_cert.sh
+		4) $MENU/menu_site_cert.sh $1
             ;;
-        9) $SCRIPTS/webserver/server/restart_webserver.sh
+        9) $SCRIPTS/webserver/server/restart_webserver.sh $1
             ;;
 
         0)  echo ''
-            $MYFOLDER/scripts/menu
+            $MYFOLDER/scripts/menu $1
             ;;
         /) echo "Выход..."
             exit 0

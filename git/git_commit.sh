@@ -1,7 +1,9 @@
 #!/bin/bash
 #просмотр удаленных репозиториев
+#$1-$USERNAME
 source /etc/profile
 source ~/.bashrc
+
 
 
 echo -n -e "Для создания коммита $COLOR_YELLOW" $SCRIPTS "$COLOR_NC введите $COLOR_BLUE\"y\"$COLOR_NC, для выхода - любой символ: "
@@ -13,7 +15,7 @@ echo -n -e "Для создания коммита $COLOR_YELLOW" $SCRIPTS "$COL
 			dt=$(date '+%d/%m/%Y %H:%M:%S');
 			sudo git add .
 			sudo git commit -m "$dt"
-			$SCRIPTS/.menu/menu_git.sh
+			$MENU/menu_git.sh $1
             ;;
         *) echo 'Отмена создания коммита'
 			echo ''

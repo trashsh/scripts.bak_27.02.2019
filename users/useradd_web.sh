@@ -2,7 +2,7 @@
 #создать веб-пользователя
 source /etc/profile
 source ~/.bashrc
-# $1 - домен, $2 - имя пользователя
+#$1-$USERNAME
 
 read -p "Введите домен: " DOMAIN
 read -p "Введите имя пользователя: " MYUSER

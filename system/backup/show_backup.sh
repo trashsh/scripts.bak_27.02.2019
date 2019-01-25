@@ -1,4 +1,5 @@
 #!/bin/bash
+#$1-$USERNAME
 source /etc/profile
 source ~/.bashrc
 echo ''
@@ -16,21 +17,21 @@ echo ''
 echo -n 'Выберите пункт меню:'
 read item
 case "$item" in
-        1) sudo $SCRIPTS/system/backup/show/show_today.sh
-           $MENU/menu_backup.sh
+        1) sudo $SCRIPTS/system/backup/show/show_today.sh $1
+           $MENU/menu_backup.sh $1
             ;;
-		2) sudo $SCRIPTS/system/backup/restore_backup.sh
-           $MENU/menu_backup.sh
+		2) sudo $SCRIPTS/system/backup/restore_backup.sh $1
+           $MENU/menu_backup.sh $1
             ;;
-		3) sudo $SCRIPTS/system/backup/show_backup.sh
-           $MENU/menu_backup.sh
+		3) sudo $SCRIPTS/system/backup/show_backup.sh $1
+           $MENU/menu_backup.sh $1
             ;;
-		4) sudo $SCRIPTS/system/backup/show_backup.sh
-           $MENU/menu_backup.sh
+		4) sudo $SCRIPTS/system/backup/show_backup.sh $1
+           $MENU/menu_backup.sh $1
             ;;
         
         0)  echo ''
-            $MYFOLDER/scripts/menu
+            $MYFOLDER/scripts/menu $1
             ;;
         /) echo "Выход..."
             exit 0

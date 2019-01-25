@@ -2,7 +2,7 @@
 #ввод параметров добавления сайта php/html
 source /etc/profile
 source ~/.bashrc
-# $1 - домен ($DOMAIN), $2 - имя пользователя ($MYUSER), $3 - путь к папке с сайтом,  $4 - шаблон виртуального хоста apache, $5 - шаблон виртуального хоста nginx
+#$1-$USERNAME 
 
 #Ввод параметров сайта для добавления виртуального хоста
 	user=$USER
@@ -39,7 +39,7 @@ source ~/.bashrc
     read item
     case "$item" in
         y|Y) echo
-            sudo $MYFOLDER/scripts/webserver/site/make_site_php.sh $domain $user $site_path $apache_config $nginx_config
+            sudo $MYFOLDER/scripts/webserver/site/make_site_php.sh $1 $domain $user $site_path $apache_config $nginx_config
             exit 0
             ;;
         *) echo "Выход..."

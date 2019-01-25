@@ -1,4 +1,5 @@
 #!/bin/bash
+#$1-$USERNAME
 source /etc/profile
 source ~/.bashrc
 
@@ -11,10 +12,10 @@ echo -n -e "Для добавления системного пользоват�
     read item
     case "$item" in
         y|Y) 		
-		$SCRIPTS/users/make/user.sh $username
-		$SCRIPTS/users/make/sudo.sh $username
-		$SCRIPTS/users/make/keyssh.sh $username
-		$SCRIPTS/users/make/mysql.sh $username
+		$SCRIPTS/users/make/user.sh $1 $username
+		$SCRIPTS/users/make/sudo.sh $1 $username
+		$SCRIPTS/users/make/keyssh.sh $1 $username
+		$SCRIPTS/users/make/mysql.sh $1 $username
             ;;
         *) echo 'Отмена операции добавления пользователя'
 			echo ''

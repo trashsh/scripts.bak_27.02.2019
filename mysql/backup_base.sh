@@ -1,7 +1,7 @@
 #!/bin/bash
 source /etc/profile
 source ~/.bashrc
-
+#$1-$USERNAME
 #создание резервной копии конкретной базы данных
 
 d=`date +%Y%m%d`;
@@ -17,7 +17,7 @@ echo -n -e "От какого пользователя базы данных mys
     read item
     case "$item" in
         1) echo
-            $SCRIPTS/mysql/make/backup_base.sh $BACKUPPATH $item
+            $SCRIPTS/mysql/make/backup_base.sh $1 $BACKUPPATH $item
             exit 0
             ;;
 		2) echo
@@ -27,7 +27,7 @@ echo -n -e "От какого пользователя базы данных mys
 				echo -n -e "${COLOR_BLUE}Введите пароль пользователя mysql: ${COLOR_NC}"
 				read -p ": " PASSWORD
 		
-            $SCRIPTS/mysql/make/backup_base.sh $BACKUPPATH $item $USER $PASSWORD
+            $SCRIPTS/mysql/make/backup_base.sh $1 $BACKUPPATH $item $USER $PASSWORD
             exit 0
             ;;
         *) echo "Выход..."

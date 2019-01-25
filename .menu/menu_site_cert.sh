@@ -13,14 +13,14 @@ echo ''
 echo -n 'Выберите пункт меню:'
 read item
 case "$item" in
-        1) sudo certbot certificates
-			$MENU/menu_site_cert.sh
+        1) sudo certbot certificates $1
+			$MENU/menu_site_cert.sh $1
             ;;
-        2) sudo letsencrypt
-			$MENU/menu_site_cert.sh
+        2) sudo letsencrypt $1
+			$MENU/menu_site_cert.sh $1
             ;;
         0)  echo ''
-            $MENU/menu_site.sh
+            $MENU/menu_site.sh $1
             ;;
         /) echo "Выход..."
             exit 0

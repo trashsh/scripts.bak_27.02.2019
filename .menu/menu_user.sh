@@ -16,21 +16,21 @@ echo ''
 echo -n 'Выберите пункт меню:'
 read item
 case "$item" in
-        1) sudo $SCRIPTS/users/input_useradd.sh
-           $MENU/menu_user.sh
+        1) sudo $SCRIPTS/users/input_useradd.sh $1
+           $MENU/menu_user.sh $1
             ;;
-		2) sudo $SCRIPTS/users/useradd_web.sh
-           $MENU/menu_user.sh
+		2) sudo $SCRIPTS/users/useradd_web.sh $1
+           $MENU/menu_user.sh $1
             ;;
-        3) sudo $SCRIPTS/users/userdel_system.sh
-            $MENU/menu_user.sh
+        3) sudo $SCRIPTS/users/userdel_system.sh $1
+            $MENU/menu_user.sh $1
             ;;
-        4) sudo $SCRIPTS/users/usersview.sh
-            $MENU/menu_user.sh
+        4) sudo $SCRIPTS/users/usersview.sh $1
+            $MENU/menu_user.sh $1
             ;;
 
         0)  echo ''
-            $MYFOLDER/scripts/menu
+            $MYFOLDER/scripts/menu $1
             ;;
         /) echo "Выход..."
             exit 0

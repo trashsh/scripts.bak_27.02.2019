@@ -2,7 +2,7 @@
 #ввод параметров добавления сайта на laravel
 source /etc/profile
 source ~/.bashrc
-# $1 - домен, $2 - имя пользователя
+#$1-$USERNAME
 
 echo "Список имеющихся доменов на сервере: "
 ls $HOMEPATHWEBUSERS
@@ -33,7 +33,7 @@ site_path=$HOMEPATHWEBUSERS/$domain
     read item
     case "$item" in
         y|Y) echo
-            $SCRIPTS/webserver/make/my_site_add_laravel.sh $domain $user $site_path $apache_config $nginx_config
+            $SCRIPTS/webserver/make/my_site_add_laravel.sh $1 $domain $user $site_path $apache_config $nginx_config
             exit 0
             ;;
         *) echo "Выход..."

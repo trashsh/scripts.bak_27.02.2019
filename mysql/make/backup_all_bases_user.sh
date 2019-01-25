@@ -37,7 +37,7 @@ then
 			
 		fi		
 done
-$MENU/menu_sql_backup.sh
+$MENU/menu_sql_backup.sh $1
   
 fi
 

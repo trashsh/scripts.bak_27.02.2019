@@ -14,14 +14,14 @@ echo ''
 echo -n 'Выберите пункт меню:'
 read item
 case "$item" in
-        1) $SCRIPTS/sql/db_create.sh
+        1) $SCRIPTS/sql/db_create.sh $1
             ;;
 
-		2) $MENU/menu_sql_users.sh
+		2) $MENU/menu_sql_users.sh $1
             ;;
 
         0)  echo ''
-            $SCRIPTS/menu
+            $SCRIPTS/menu $1
             ;;
         /) echo "Выход..."
             exit 0

@@ -2,6 +2,8 @@
 source /etc/profile
 source ~/.bashrc
 
+USERNAME=$(whoami)
+
 #if [[ $EUID -ne 0 ]]; then
     echo ''
 	echo -e "${COLOR_GREEN} ====Главное меню==== ${COLOR_NC}"
@@ -16,15 +18,15 @@ source ~/.bashrc
 	echo -n 'Выберите пункт меню:'
 	read item
 	case "$item" in
-			1) $MENU/menu_site.sh
+			1) $MENU/menu_site.sh $USERNAME
 				;;
-			2) $MENU/menu_user.sh
+			2) $MENU/menu_user.sh $USERNAME
 				;;
-			3) $MENU/menu_sql.sh
+			3) $MENU/menu_sql.sh $USERNAME
 				;;
-			4) $MENU/menu_backup.sh
+			4) $MENU/menu_backup.sh $USERNAME
 				;;
-			5) $MENU/menu_git.sh
+			5) $MENU/menu_git.sh $USERNAME
 				;;
 			0) echo "Выход."
 				exit 0

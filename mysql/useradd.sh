@@ -2,6 +2,8 @@
 source /etc/profile
 source ~/.bashrc
 
+#$1-$USERNAME
+
 echo -e "\n${COLOR_GREEN}Добавление Пользователя в базу данных MySQL:${COLOR_NC}"
 
 echo -e "${COLOR_YELLOW}Перечень пользователей mysql ${COLOR_YELLOW}"
@@ -18,7 +20,7 @@ echo ''
     read item
     case "$item" in
         y|Y) echo
-            sudo $SCRIPTS/mysql/make/useradd_make.sh $USER_$user $pass
+            sudo $SCRIPTS/mysql/make/useradd_make.sh $1 $USER_$user $pass
 			echo -e "Пользователь mysql ${COLOR_YELLOW}$user${COLOR_NC} с паролем "${COLOR_YELLOW}$pass${COLOR_NC}" создан"
 			echo ""
 			$MENU/menu_sql.sh

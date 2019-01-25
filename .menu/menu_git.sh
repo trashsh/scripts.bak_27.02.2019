@@ -14,14 +14,14 @@ echo ''
 echo -n 'Выберите пункт меню:'
 read item
 case "$item" in
-        1) $SCRIPTS/git/git_remote_push.sh
+        1) $SCRIPTS/git/git_remote_push.sh $1
             ;;
-        2) $SCRIPTS/git/git_remote_view.sh
+        2) $SCRIPTS/git/git_remote_view.sh $1
             ;;
-		3) $SCRIPTS/git/git_commit.sh
+		3) $SCRIPTS/git/git_commit.sh $1
             ;;
         0)  echo ''
-            $MYFOLDER/scripts/menu
+            $MYFOLDER/scripts/menu $1
             ;;
         /) echo "Выход..."
             exit 0

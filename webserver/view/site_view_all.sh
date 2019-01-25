@@ -1,5 +1,6 @@
 #!/bin/bash
 #Вывод всех папок в каталоге $HOMEPATHWEBUSERS
+#$1-$USERNAME
 source /etc/profile
 source ~/.bashrc
 
@@ -20,4 +21,4 @@ echo  -n "Nginx - sites-enabled: "
 ls $NGINXENABLED
 echo ''
 
-$MENU/menu_site.sh
+$MENU/menu_site.sh $1

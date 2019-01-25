@@ -2,9 +2,10 @@
 #ввод параметров добавления сайта на laravel
 source /etc/profile
 source ~/.bashrc
-# $1 - домен, $2 - имя пользователя
+#$1-$USERNAME
 
 clear
+echo $1
 echo -e "\n${COLOR_GREEN}Добавление сайта на фреймворке Laravel ${COLOR_NC}"
 echo -e "${COLOR_YELLOW}Список имеющихся доменов на сервере: ${COLOR_NC}"
 user=$USER

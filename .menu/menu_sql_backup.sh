@@ -17,21 +17,21 @@ echo ''
 echo -n 'Выберите пункт меню:'
 read item
 case "$item" in
-        1) $SCRIPTS/mysql/backup_all_bases.sh
+        1) $SCRIPTS/mysql/backup_all_bases.sh $1
             ;;
-        2) $SCRIPTS/mysql/backup_all_bases_user.sh
+        2) $SCRIPTS/mysql/backup_all_bases_user.sh $1
             ;;
-		3) $SCRIPTS/mysql/mysql_backup_base.sh
+		3) $SCRIPTS/mysql/mysql_backup_base.sh $1
             ;;
-		4) $SCRIPTS/mysql/
+		4) $SCRIPTS/mysql/ $1
             ;;
-		5) $SCRIPTS/mysql/
+		5) $SCRIPTS/mysql/ $1
             ;;
-		6) $SCRIPTS/mysql/
+		6) $SCRIPTS/mysql/ $1
             ;;
 
         0)  echo ''
-            $MENU/menu_sql.sh
+            $MENU/menu_sql.sh $1
             ;;
         /) echo "Выход..."
             exit 0

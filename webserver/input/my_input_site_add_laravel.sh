@@ -2,8 +2,7 @@
 #ввод параметров добавления сайта на laravel
 source /etc/profile
 source ~/.bashrc
-# $1 - домен, $2 - имя пользователя
-
+#$1_$USERNAME
 echo "Список имеющихся доменов на сервере: "
 ls $HOMEPATHWEBUSERS
 echo ""
