@@ -2,13 +2,13 @@
 source /etc/profile
 source ~/.bashrc
 #Создание бэкапа всех баз на сервере
-# $_1 - BACKUPPATH, $2-type, $3-$USER $4-$PASSWORD
+# $1-$USERNAME $2 - BACKUPPATH, $3-type, $4-$USER $5-$PASSWORD
 
 
 if [ -n "$1" ] && [ -n "$2" ] 
 then
 
-		mysql -e "show databases;"
+		mysql -e -u$1"show databases;"
 		d=`date +%Y%m%d`;
 		dt=`date +%Y%m%d_%H%M`;
 
@@ -21,14 +21,14 @@ then
 		if [[ "$db" != "information_schema" ]] && [[ "$db" != "performance_schema" ]] && [[ "$db" != "mysql" ]] && [[ "$db" != _* ]] ; then
 			echo -e "Dumping database: $COLOR_YELLOW$db$COLOR_NC"
 			
-		case $2 in
+		case $3 in
 			1)
-				mysqldump --databases $db > $1$db.$dt.sql
-				tar -czvf $1$db.$dt.sql.tar.gz $1$db.$dt.sql --remove-files
+				mysqldump --databases $db > $2$db.$dt.sql
+				tar -czvf $2$db.$dt.sql.tar.gz $2$db.$dt.sql --remove-files
 				;;
 			2)
-				mysqldump -u$3 -p$4 --databases $db > $1$db.$dt.sql
-				tar -czvf $1$db.$dt.sql.tar.gz $1$db.$dt.sql --remove-files
+				mysqldump -u$4 -p$5 --databases $db > $2$db.$dt.sql
+				tar -czvf $2$db.$dt.sql.tar.gz $2$db.$dt.sql --remove-files
 				;;
 			*)
 				echo "Ошибка передачи параметров"

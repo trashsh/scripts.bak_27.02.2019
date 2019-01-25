@@ -13,7 +13,7 @@ do
 	DATE=$(date --date=''$i' days ago' "+%Y%m%d");
 	if [ -d "$BACKUPFOLDER_DAYS"/"$DATE" ] ; then
 		echo -e "$COLOR_BROWN"$DATE:" $COLOR_NC"
-		ls -l $BACKUPFOLDER_DAYS/$DATE
+		ls -l $BACKUPFOLDER_DAYS/$DATE/mysql
 	fi
 done
 

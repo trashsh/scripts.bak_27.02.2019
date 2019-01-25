@@ -18,19 +18,14 @@ echo -n 'Выберите пункт меню:'
 read item
 case "$item" in
         1) sudo $SCRIPTS/system/backup/input_backup.sh $1
-           $MENU/menu_backup.sh $1
             ;;
 		2) sudo $SCRIPTS/system/backup/input_backup.sh $1
-           $MENU/menu_backup.sh $1
             ;;
 		3) $MENU/menu_sql_backup.sh $1
-           $MENU/menu_backup.sh $1
             ;;
 		4) sudo $SCRIPTS/system/backup/restore_backup.sh $1
-           $MENU/menu_backup.sh $1
             ;;
 		5) $SCRIPTS/.menu/menu_backup_show.sh $1
-           $MENU/menu_backup.sh $1
             ;;
         
         0)  echo ''

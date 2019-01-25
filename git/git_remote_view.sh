@@ -4,8 +4,7 @@
 source /etc/profile
 source ~/.bashrc
 
-clear
 echo -e "\n ${COLOR_YELLOW} Список удаленных репозиториев:${COLOR_NC}"
 git remote -v
 echo ""
-$MENU/menu_git.sh# $1
+$MENU/menu_git.sh $1

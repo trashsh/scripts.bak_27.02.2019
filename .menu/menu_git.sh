@@ -6,7 +6,7 @@ echo -e "${COLOR_GREEN} ===Управление Git===${COLOR_NC}"
 
 echo '1: Git commit'
 echo '2: Push remote'
-echo '2: Git remote view'
+echo '3: Git remote view'
 
 
 echo '0: Назад'

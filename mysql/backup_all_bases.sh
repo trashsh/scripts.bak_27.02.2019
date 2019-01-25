@@ -18,7 +18,7 @@ echo -n -e "От какого пользователя базы данных mys
     read item
     case "$item" in
         1) echo
-            $SCRIPTS/mysql/make/backup_all_bases.sh $1 $BACKUPPATH $item
+           sudo $SCRIPTS/mysql/make/backup_all_bases.sh $1 $BACKUPPATH $item
             exit 0
             ;;
 		2) echo
@@ -28,7 +28,7 @@ echo -n -e "От какого пользователя базы данных mys
 				echo -n -e "${COLOR_BLUE}Введите пароль пользователя mysql: ${COLOR_NC}"
 				read -p ": " PASSWORD
 		
-            $SCRIPTS/mysql/make/backup_all_bases.sh $1 $BACKUPPATH $item $USER $PASSWORD
+           sudo $SCRIPTS/mysql/make/backup_all_bases.sh $1 $BACKUPPATH $item $USER $PASSWORD
             exit 0
             ;;
         *) echo "Выход..."

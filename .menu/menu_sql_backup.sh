@@ -4,7 +4,7 @@ source ~/.bashrc
 echo ''
 echo -e "${COLOR_GREEN} ===Резервное копирование баз данных===${COLOR_NC}"
 
-echo '1: +Создать копию всех баз всего сервера'
+echo '+1: Создать копию всех баз всего сервера'
 echo '2: Создать копию всех баз конкретного пользователя'
 echo '3: Создать копию одной базы'
 echo '4: Восстановить из бэкапа сервер баз данных'
@@ -17,7 +17,7 @@ echo ''
 echo -n 'Выберите пункт меню:'
 read item
 case "$item" in
-        1) $SCRIPTS/mysql/backup_all_bases.sh $1
+        1) sudo $SCRIPTS/mysql/backup_all_bases.sh $1
             ;;
         2) $SCRIPTS/mysql/backup_all_bases_user.sh $1
             ;;
