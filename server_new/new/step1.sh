@@ -183,7 +183,8 @@ echo "install soft"
 apt -y install mc git git-core composer  wget zip unzip unrar arj putty-tools nano  ufw proftpd  
 tar -czvf $BACKUPFOLDER_INSTALLED/proftpd.tar.gz /etc/proftpd/
 tar -czvf $BACKUPFOLDER_INSTALLED/ufw.tar.gz /etc/ufw/
-apt -y install curl build-essential software-properties-common
+apt -y install curl build-essential software-properties-common net-tools
+
 
 echo "letsencrypt"
 add-apt-repository -y ppa:nilarimogard/webupd8

@@ -2,78 +2,78 @@
 #добавление сайта на laravel
 source /etc/profile
 source ~/.bashrc
-# $1 - домен ($DOMAIN), $2 - имя пользователя, $3 - путь к папке с сайтом,  $4 - шаблон виртуального хоста apache, $5 - шаблон виртуального хоста nginx
+# $1-$USERNAME $2 - домен ($DOMAIN), $3 - имя пользователя, $4 - путь к папке с сайтом,  $5 - шаблон виртуального хоста apache, $6 - шаблон виртуального хоста nginx
 
 #проверка на наличие параметров запуска
-if [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ] && [ -n "$4" ] && [ -n "$5" ]
+if [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ] && [ -n "$4" ] && [ -n "$5" ] && [ -n "$6" ]
 then
 
-        cd $HOMEPATHWEBUSERS/$2
-        composer create-project --prefer-dist laravel/laravel $1
+        cd $HOMEPATHWEBUSERS/$3
+        composer create-project --prefer-dist laravel/laravel $2
 
         #make user
-        echo "Добавление веб пользователя $2 с домашним каталогом: $3 для домена $1"
-        mkdir -p $3
-        useradd $2_$1 -N -d $3 -m -s /bin/false
-        adduser $2_$1 www-data
-        passwd $2_$1
-        cp -R /etc/skel/* $3
-        rm -rf $3/public_html
+        echo "Добавление веб пользователя $3_$2 с домашним каталогом: $4 для домена $2"
+        sudo mkdir -p $4
+        sudo useradd $3_$2 -N -d $4 -m -s /bin/false
+        sudo adduser $3_$2 www-data
+        sudo passwd $3_$2
+        sudo R /etc/skel/* $4
+        sudo rm -rf $4/public_html
 		
-		cd $3 
-		cp -a $3/.env.example $3/.env
-		php artisan key:generate
-		php artisan config:cache
+		sudo cd $4
+		sudo cp -a $4/.env.example $4/.env
+		sudo php artisan key:generate
+		sudo php artisan config:cache
 
 
        #nginx
-       cp -rf $TEMPLATES/nginx/$5 /etc/nginx/sites-available/$2_$1.conf
-       echo "Замена переменных в файле /etc/nginx/sites-available/$2_$1.conf"
-       grep '#__DOMAIN' -P -R -I -l  /etc/nginx/sites-available/$2_$1.conf | xargs sed -i 's/#__DOMAIN/'$1'/g' /etc/nginx/sites-available/$2_$1.conf
-	   grep '#__USER' -P -R -I -l  /etc/nginx/sites-available/$2_$1.conf | xargs sed -i 's/#__USER/'$2'/g' /etc/nginx/sites-available/$2_$1.conf
-       grep '#__PORT' -P -R -I -l  /etc/nginx/sites-available/$2_$1.conf | xargs sed -i 's/#__PORT/'$HTTPNGINXPORT'/g' /etc/nginx/sites-available/$2_$1.conf
-       grep '#__HOMEPATHWEBUSERS' -P -R -I -l  /etc/nginx/sites-available/$2_$1.conf | xargs sed -i 's/'#__HOMEPATHWEBUSERS'/\/home\/webusers/g' /etc/nginx/sites-available/$2_$1.conf
+       sudo cp -rf $TEMPLATES/nginx/$6 /etc/nginx/sites-available/$3_$2.conf
+       sudo echo "Замена переменных в файле /etc/nginx/sites-available/$3_$2.conf"
+       sudo grep '#__DOMAIN' -P -R -I -l  /etc/nginx/sites-available/$3_$2.conf | xargs sed -i 's/#__DOMAIN/'$2'/g' /etc/nginx/sites-available/$3_$2.conf
+	   sudo grep '#__USER' -P -R -I -l  /etc/nginx/sites-available/$3_$2.conf | xargs sed -i 's/#__USER/'$3'/g' /etc/nginx/sites-available/$3_$2.conf
+       sudo grep '#__PORT' -P -R -I -l  /etc/nginx/sites-available/$3_$2.conf | xargs sed -i 's/#__PORT/'$HTTPNGINXPORT'/g' /etc/nginx/sites-available/$3_$2.conf
+       sudo grep '#__HOMEPATHWEBUSERS' -P -R -I -l  /etc/nginx/sites-available/$3_$2.conf | xargs sed -i 's/'#__HOMEPATHWEBUSERS'/\/home\/webusers/g' /etc/nginx/sites-available/$3_$2.conf
 
-        ln -s /etc/nginx/sites-available/$2_$1.conf /etc/nginx/sites-enabled/$2_$1.conf
-        systemctl reload nginx
+       sudo ln -s /etc/nginx/sites-available/$3_$2.conf /etc/nginx/sites-enabled/$3_$2.conf
+       sudo  systemctl reload nginx
 
         #apache2 
-        cp -rf $TEMPLATES/apache2/$4 /etc/apache2/sites-available/$2_$1.conf
-        grep '#__DOMAIN' -P -R -I -l  /etc/apache2/sites-available/$2_$1.conf | xargs sed -i 's/#__DOMAIN/'$1'/g' /etc/apache2/sites-available/$2_$1.conf
-		grep '#__USER' -P -R -I -l  /etc/apache2/sites-available/$2_$1.conf | xargs sed -i 's/#__USER/'$2'/g' /etc/apache2/sites-available/$2_$1.conf
-        grep '#__HOMEPATHWEBUSERS' -P -R -I -l  /etc/apache2/sites-available/$2_$1.conf | xargs sed -i 's/#__HOMEPATHWEBUSERS/\/home\/webusers/g' /etc/apache2/sites-available/$2_$1.conf
-        grep '#__PORT' -P -R -I -l  /etc/apache2/sites-available/$2_$1.conf | xargs sed -i 's/#__PORT/'$HTTPAPACHEPORT'/g' /etc/apache2/sites-available/$2_$1.conf
+       sudo  cp -rf $TEMPLATES/apache2/$5 /etc/apache2/sites-available/$3_$2.conf
+       sudo  grep '#__DOMAIN' -P -R -I -l  /etc/apache2/sites-available/$3_$2.conf | xargs sed -i 's/#__DOMAIN/'$2'/g' /etc/apache2/sites-available/$3_$2.conf
+	   sudo grep '#__USER' -P -R -I -l  /etc/apache2/sites-available/$3_$2.conf | xargs sed -i 's/#__USER/'$3'/g' /etc/apache2/sites-available/$3_$2.conf
+       sudo  grep '#__HOMEPATHWEBUSERS' -P -R -I -l  /etc/apache2/sites-available/$3_$2.conf | xargs sed -i 's/#__HOMEPATHWEBUSERS/\/home\/webusers/g' /etc/apache2/sites-available/$3_$2.conf
+       sudo  grep '#__PORT' -P -R -I -l  /etc/apache2/sites-available/$3_$2.conf | xargs sed -i 's/#__PORT/'$HTTPAPACHEPORT'/g' /etc/apache2/sites-available/$3_$2.conf
 
-        a2ensite $2_$1.conf
-        systemctl reload apache2
+       sudo  a2ensite $3_$2.conf
+       sudo  systemctl reload apache2
 		
-		cp -rf $TEMPLATES/laravel/.gitignore $3/.gitignore
+	   sudo cp -rf $TEMPLATES/laravel/.gitignore $4/.gitignore
 
-        echo -e "\033[32m" Применение прав к папкам и каталогам. Немного подождите "\033[0;39m"
+       sudo  echo -e "\033[32m" Применение прав к папкам и каталогам. Немного подождите "\033[0;39m"
 
         #chmod
-        find $3 -type d -exec chmod 755 {} \;
-        find $3/public -type d -exec chmod 755 {} \;
-        find $3 -type f -exec chmod 644 {} \;
-        find $3/public -type f -exec chmod 644 {} \;
-        find $3/logs -type f -exec chmod 644 {} \;
-		find $3 -type d -exec chown $2:www-data {} \;
-		find $3 -type f -exec chown $2:www-data {} \;
+       sudo  find $4 -type d -exec chmod 755 {} \;
+       sudo  find $4/public -type d -exec chmod 755 {} \;
+       sudo  find $4 -type f -exec chmod 644 {} \;
+       sudo  find $4/public -type f -exec chmod 644 {} \;
+       sudo  find $4/logs -type f -exec chmod 644 {} \;
+	   sudo find $4 -type d -exec chown $3:www-data {} \;
+	   sudo find $4 -type f -exec chown $3:www-data {} \;
 
-        chown -R $2:www-data $3/logs
-        chown -R $2:www-data $3/public
-        chown -R $2:www-data $3/tmp
+       sudo  chown -R $3:www-data $4/logs
+       sudo  chown -R $3:www-data $4/public
+       sudo  chown -R $3:www-data $4/tmp
 		
 
-        chmod 777 $3/bootstrap/cache -R
-        chmod 777 $3/storage -R
+       sudo  chmod 777 $4/bootstrap/cache -R
+       sudo  chmod 777 $4/storage -R
 
-		cd $3
+	   sudo cd $4
 		echo -e "\033[32m" Инициализация Git "\033[0;39m"
-		git init
+	    git init
 		git add .
 		git commit -m "initial commit"
-		$SCRIPTS/menu
+		$SCRIPTS/menu $1
 
 
 else
@@ -88,7 +88,7 @@ else
     read item
     case "$item" in
         y|Y) echo "Ввели «y», продолжаем..."
-            $SCRIPTS/menu
+            $SCRIPTS/menu $1
             ;;
         *) echo "Выход..."
             exit 0

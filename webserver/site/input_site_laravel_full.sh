@@ -29,7 +29,7 @@ echo ''
     read item
     case "$item" in
         y|Y) echo
-            sudo $SCRIPTS/webserver/site/make_site_laravel.sh $domain $user $site_path $apache_config $nginx_config
+            $SCRIPTS/webserver/site/make_site_laravel.sh $1 $domain $user $site_path $apache_config $nginx_config
             exit 0
             ;;
         *) echo "Выход..."
