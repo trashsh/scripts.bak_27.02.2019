@@ -17,16 +17,12 @@ echo -n 'Выберите пункт меню:'
 read item
 case "$item" in
         1) sudo $SCRIPTS/users/input_useradd.sh $1
-           $MENU/menu_user.sh $1
             ;;
-		2) sudo $SCRIPTS/users/useradd_web.sh $1
-           $MENU/menu_user.sh $1
+		2) sudo $SCRIPTS/users/useradd_web.sh $1           
             ;;
-        3) sudo $SCRIPTS/users/userdel_system.sh $1
-            $MENU/menu_user.sh $1
+        3) sudo $SCRIPTS/users/userdel_system.sh $1            
             ;;
-        4) sudo $SCRIPTS/users/usersview.sh $1
-            $MENU/menu_user.sh $1
+        4) $SCRIPTS/users/usersview.sh $1
             ;;
 
         0)  echo ''
