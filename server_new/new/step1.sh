@@ -5,8 +5,7 @@ apt -y install mc git
 echo 'Git script'
 mkdir -p /my
 cd /my
-git clone https://github.com/trashsh/trash_repo.git
-mv ./trash_repo ./scripts
+git clone https://github.com/trashsh/scritps.git
 cd /my/scripts
 git init
 find /my/scripts -type d -exec chmod 777 {} \;
@@ -242,18 +241,6 @@ echo "fail2ban"
 apt -y install fail2ban
 tar -czvf $BACKUPFOLDER_INSTALLED/fail2ban.tar.gz /etc/fail2ban/
 
-echo "ufw settings"
-ufw enable
-ufw default allow outgoing
-ufw default deny incoming
-ufw allow 6666/tcp comment 'SSH'
-ufw allow 80/tcp comment 'HTTP-Nginx'
-ufw allow 443/tcp comment 'HTTPS-Nginx'
-ufw allow 10081/tcp comment 'ProFTPd'
-ufw allow 8080/tcp comment 'HTTP-Apache'
-ufw allow 8443/tcp comment 'HTTPS-Apacne'
-ufw allow 7000/tcp comment 'Webmin from Home'
-
 echo "install policykit"
 apt -y install policykit-1
 
@@ -291,3 +278,11 @@ git init
 git add .
 git commit -m "initial commit etc"
 
+apt install net-tools
+
+echo "proftpd settings"
+sed -i -e "s/# DefaultRoot/DefaultRoot/" /etc/proftpd/proftpd.conf
+sed -i -e "s/Port\t\t\t\t21/Port\t\t\t\t10081/" /etc/proftpd/proftpd.conf
+echo '/bin/false' >> /etc/shells
+#AuthUserFile /etc/proftpd/ftpd.passwd
+service proftpd restart
