@@ -1,3 +1,4 @@
+apt install net-tools
 
 echo "proftpd settings"
 sed -i -e "s/# DefaultRoot/DefaultRoot/" /etc/proftpd/proftpd.conf
