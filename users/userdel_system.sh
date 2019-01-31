@@ -1,5 +1,6 @@
 #!/bin/bash
 #удалить системного пользователя
+#$1-username
 source /etc/profile
 source ~/.bashrc
 
@@ -19,3 +20,5 @@ read -p "Введите имя пользователя: " username
 			echo ''
             ;;
     esac
+	
+$SCRIPTS/menu $1

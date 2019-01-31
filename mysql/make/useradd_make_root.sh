@@ -3,7 +3,7 @@
 source /etc/profile
 source ~/.bashrc
 
-if [ -n "$1" ] && [ -n "$2" ] 
+if [ -n "$1" ] && [ -n "$2" ]  && [ -n "$3" ] 
 then
 	mysql -e "GRANT ALL PRIVILEGES ON *.* To '$2'@'localhost' IDENTIFIED BY '$3' WITH GRANT OPTION;"
 	mysql -e "FLUSH PRIVILEGES;"
