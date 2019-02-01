@@ -1,16 +1,15 @@
 #!/bin/bash
-# $1-$USERNAME $2-db
+# $1-username process; $1-user
 source /etc/profile
 source ~/.bashrc
 
-if [ -n "$1" ] &&[ -n "$2" ] 
+if [ -n "$1" ] && [ -n "$2" ] 
 then
-	mysql -e "USE [$2];"
-	mysql -e "SHOW TABLES;"
-	echo -e "$COLOR_LIGHT_PURPLEТаблицы базы данных $COLOR_YELLOW$2$COLOR_NC"
+	mysql -e "DROP USER '$2'@'localhost';"
+	echo -e "$COLOR_LIGHT_PURPLEПользователь $COLOR_YELLOW$2$COLOR_LIGHT_PURPLE удален $COLOR_NC"
 else
        echo "--------------------------------------"
-    echo "Параметры запуска не найдены. Необходимы параметры: Имя пользователя, Название базы данных"
+    echo "Параметры запуска не найдены. Необходимы параметры: имя пользователя mysql"
     echo -n "Для запуска меню управление mysql напишите \"y\", для выхода - любой другой символ: "
     read item
     case "$item" in
@@ -21,5 +20,4 @@ else
             ;;
     esac
 fi
-
 

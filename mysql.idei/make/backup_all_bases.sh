@@ -2,7 +2,7 @@
 source /etc/profile
 source ~/.bashrc
 #Создание бэкапа всех баз на сервере
-# $1-$USERNAME $2 - BACKUPPATH, $3-type, $4-$USER $5-$PASSWORD
+#$1-$USERNAME process; $2 - BACKUPPATH, $3-type, $4-$USER $5-$PASSWORD
 
 
 if [ -n "$1" ] && [ -n "$2" ] 

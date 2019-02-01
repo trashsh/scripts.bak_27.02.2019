@@ -2,7 +2,7 @@
 source /etc/profile
 source ~/.bashrc
 #Создание бэкапа конкретной базы mysql
-# $1-$USERNAME $2 - BACKUPPATH, $2-type, $3-$USER $4-$PASSWORD
+# $1-username process; $2 - BACKUPPATH, $2-type, $3-$USER $4-$PASSWORD
 
 
 if [ -n "$1" ] && [ -n "$2" ] 

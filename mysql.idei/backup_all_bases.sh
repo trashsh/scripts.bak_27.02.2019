@@ -1,7 +1,7 @@
 #!/bin/bash
 source /etc/profile
 source ~/.bashrc
-#$1-$USERNAME
+# $1-username process;
 #Создание бэкапа всех баз данных
 
 d=`date +%Y%m%d`;

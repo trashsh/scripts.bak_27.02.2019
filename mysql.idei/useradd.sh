@@ -2,7 +2,7 @@
 source /etc/profile
 source ~/.bashrc
 
-#$1-$USERNAME
+# $1-username process;
 
 echo -e "\n${COLOR_GREEN}Добавление Пользователя в базу данных MySQL:${COLOR_NC}"
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-#$1-$USERNAME $2-user; $3-pass
+# $1-username process; $2-user; $3-pass
 source /etc/profile
 source ~/.bashrc
 

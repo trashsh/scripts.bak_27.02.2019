@@ -13,33 +13,21 @@ USERNAME=$(whoami)
 	echo '3: Управление базами данных'
 	echo '4: Управление бэкапами'
 	echo '5: Git'
-	echo '0: Выход'
+	echo '9: Сервер'
+	echo 'q: Выход'
 	echo ''
 	echo -n 'Выберите пункт меню:'
-	read item
-	case "$item" in
-			1) $MENU/menu_site.sh $USERNAME
-				;;
-			2) $MENU/menu_user.sh $USERNAME
-				;;
-			3) $MENU/menu_sql.sh $USERNAME
-				;;
-			4) $MENU/menu_backup.sh $USERNAME
-				;;
-			5) $MENU/menu_git.sh $USERNAME
-				;;
-			0) echo "Выход."
-				exit 0
-				;;
-			*) echo "Команда не введена. "
-				$0
-				;;
-	esac
-#  exit 1
-#else
-#  echo "Необходимо запустить от имени пользователя. Смена пользователя на $USERLAMER"
-#  su $USERLAMER
-#fi
-
-
-	
+		
+	while read
+    do
+        case "$REPLY" in
+        "1")  $MENU/menu_site.sh $USERNAME;  break;;
+        "2")  $MENU/menu_user.sh $USERNAME;  break;;
+		"3")  $MENU/menu_sql.sh $USERNAME;  break;;
+		"4")  $MENU/menu_backup.sh $USERNAME;  break;;
+		"5")  $MENU/menu_git.sh $USERNAME;  break;;
+		"9")  $MENU/menu_server.sh $USERNAME;  break;;
+        "q"|"Q")  break 2;; 
+         *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2;;
+        esac
+    done

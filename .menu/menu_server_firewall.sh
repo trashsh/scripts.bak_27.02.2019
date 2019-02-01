@@ -2,12 +2,9 @@
 source /etc/profile
 source ~/.bashrc
 echo ''
-echo -e "${COLOR_GREEN} ===Управление Git===${COLOR_NC}"
+echo -e "${COLOR_GREEN} ===Управление ufw===${COLOR_NC}"
 
-echo '1: Git commit'
-echo '2: Push remote'
-echo '3: Git remote view'
-
+echo '1: Firewall'
 
 echo '0: Назад'
 echo 'q: Выход'
@@ -17,9 +14,8 @@ echo -n 'Выберите пункт меню:'
 while read
     do
         case "$REPLY" in
-        "1")  $SCRIPTS/git/git_commit.sh $1;  break;;
-        "2")  $SCRIPTS/git/git_remote_push.sh $1;  break;;
-		"3")  $SCRIPTS/git/git_remote_view.sh $1;  break;;
+        "1")   $1;  break;;
+
 		"0")  $MYFOLDER/scripts/menu $1;  break;;
         "q"|"Q")  break 2;; 
          *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2;;

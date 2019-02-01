@@ -11,26 +11,20 @@ echo '4: Сертификаты'
 
 echo '9: Перезапустить Apache2 и Nginx'
 echo '0: Назад'
-echo '/: Выход'
+echo 'q: Выход'
 echo ''
 echo -n 'Выберите пункт меню:'
-read item
-case "$item" in
-        1) $MENU/menu_site_add.sh $1
-            ;;
-        2) $SCRIPTS/webserver/remove/site_remove_input.sh $1
-            ;;
-        3) $SCRIPTS/webserver/view/site_view_all.sh $1
-            ;;
-		4) $MENU/menu_site_cert.sh $1
-            ;;
-        9) $SCRIPTS/webserver/server/restart_webserver.sh $1
-            ;;
 
-        0)  echo ''
-            $MYFOLDER/scripts/menu $1
-            ;;
-        /) echo "Выход..."
-            exit 0
-            ;;
-esac
+while read
+    do
+        case "$REPLY" in
+        "1")  $MENU/menu_site_add.sh $1;  break;;
+        "2")  $SCRIPTS/webserver/remove/site_remove_input.sh $1;  break;;
+		"3")  $SCRIPTS/webserver/view/site_view_all.sh $1;  break;;
+		"4")  $MENU/menu_site_cert.sh $1;  break;;
+		"9")  $SCRIPTS/webserver/server/restart_webserver.sh $1;  break;;
+		"0")  $MYFOLDER/scripts/menu $1;  break;;
+        "q"|"Q")  break 2;; 
+         *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2;;
+        esac
+    done

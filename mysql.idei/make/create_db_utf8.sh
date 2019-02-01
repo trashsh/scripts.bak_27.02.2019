@@ -1,5 +1,5 @@
 #!/bin/bash
-#$1-$USERNAME $2-db
+#$1-$USERNAME process; $2-db
 source /etc/profile
 source ~/.bashrc
 

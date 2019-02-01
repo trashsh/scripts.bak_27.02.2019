@@ -1,15 +1,15 @@
 #!/bin/bash
-#$1-$USENAME $2-db
+# $1-username process;E $2-db
 source /etc/profile
 source ~/.bashrc
 
-if [ -n "$1" ] && [ -n "$2" ] 
+if [ -n "$1" ] &&[ -n "$2" ] 
 then
-	mysql -e "DROP DATABASE IF EXISTS $2;"
-	echo -e "$COLOR_LIGHT_PURPLEБаза данных $COLOR_YELLOW$2$COLOR_LIGHT_PURPLE удалена $COLOR_NC"
+	echo -e "$COLOR_LIGHT_PURPLEСписок прав доступа к базам mysql пользователя $COLOR_YELLOW$2$COLOR_LIGHT_PURPLE : $COLOR_NC"
+	mysql -e "SHOW GRANTS FOR '$2'@'localhost';"
 else
        echo "--------------------------------------"
-    echo "Параметры запуска не найдены. Необходимы параметры: имя пользователя mysql"
+    echo "Параметры запуска не найдены. Необходимы параметры: Имя пользователя"
     echo -n "Для запуска меню управление mysql напишите \"y\", для выхода - любой другой символ: "
     read item
     case "$item" in
@@ -20,4 +20,5 @@ else
             ;;
     esac
 fi
+
 

@@ -9,22 +9,18 @@ echo '2: Удалить пользователя'
 echo '3: Просмотр списка пользователей'
 
 echo '0: Назад'
-echo '/: Выход'
+echo 'q: Выход'
 echo ''
 echo -n 'Выберите пункт меню:'
-read item
-case "$item" in
-        1) $SCRIPTS/mysql/useradd.sh $1
-            ;;
-        2) $SCRIPTS/mysql/userdel.sh $1
-            ;;
-		3) $SCRIPTS/mysql/usersview.sh $1
-            ;;
 
-        0)  echo ''
-            $MENU/menu_sql.sh $1
-            ;;
-        /) echo "Выход..."
-            exit 0
-            ;;
-esac
+while read
+    do
+        case "$REPLY" in
+        "1")  $SCRIPTS/mysql/useradd.sh $1;  break;;
+        "2")  $SCRIPTS/mysql/userdel.sh $1;  break;;
+		"3")  $SCRIPTS/mysql/usersview.sh $1;  break;;
+		"0")  $MENU/menu_sql.sh $1;  break;;
+        "q"|"Q")  break 2;; 
+         *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2;;
+        esac
+    done

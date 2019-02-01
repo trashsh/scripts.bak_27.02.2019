@@ -12,31 +12,20 @@ echo '5: Указать диапазон дат'
 
 
 echo '0: Назад'
-echo '/: Выход'
+echo 'q: Выход'
 echo ''
 echo -n 'Выберите пункт меню:'
-read item
-case "$item" in
-        1) $SCRIPTS/system/backup/show/show_today.sh $1
-           $MENU/menu_backup.sh $1
-            ;;
-		2) $SCRIPTS/system/backup/show/show_yestoday.sh $1
-           $MENU/menu_backup.sh $1
-            ;;
-		3) $SCRIPTS/system/backup/show/show_week.sh $1
-           $MENU/menu_backup.sh $1
-            ;;
-		4) $SCRIPTS/system/backup/show/show_range.sh $1
-           $MENU/menu_backup.sh $1
-            ;;
-		5) $SCRIPTS/system/backup/show/show_range_input.sh $1
-           $MENU/menu_backup.sh $1
-            ;;
-        
-        0)  echo ''
-            $MYFOLDER/scripts/menu $1
-            ;;
-        /) echo "Выход..."
-            exit 0
-            ;;
-esac
+
+while read
+    do
+        case "$REPLY" in
+        "1")  $SCRIPTS/system/backup/show/show_today.sh $1;  break;;
+        "2")  $SCRIPTS/system/backup/show/show_yestoday.sh $1;  break;;
+		"3")  $SCRIPTS/system/backup/show/show_week.sh $1;  break;;
+		"4")  $SCRIPTS/system/backup/show/show_range.sh $1;  break;;
+		"5")  $SCRIPTS/system/backup/show/show_range_input.sh $1;  break;;
+		"0")  $SCRIPTS/.menu/menu_backup.sh $1;  break;;
+        "q"|"Q")  break 2;; 
+         *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2;;
+        esac
+    done

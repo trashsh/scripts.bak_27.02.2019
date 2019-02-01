@@ -1,7 +1,8 @@
 #!/bin/bash
 source /etc/profile
 source ~/.bashrc
-#$1-$USERNAME $2-path
+#$1-$USERNAME process; $2-path
+#Создание бэкапа папки
 
 DATE=$(date +%Y%m%d)
 TIME=$(date +%H%M)
