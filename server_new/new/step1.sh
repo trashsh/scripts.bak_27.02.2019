@@ -15,7 +15,15 @@ find /my/scripts -type f -exec chown root:root {} \;
 
 echo "set vars"
 sed -i '$ a \\nexport USERLAMER=\"lamer\"'  /etc/profile
+sed -i '$ a export MYSERVER=\"alixi.ru\"'  /etc/profile
+sed -i '$ a export SSHPORT=\"6666\"'  /etc/profile
+sed -i '$ a export FTPPORT=\"10081\"'  /etc/profile
+sed -i '$ a export NGINXHTTPPORT=\"80\"'  /etc/profile
+sed -i '$ a export NGINXHTTPSPORT=\"443\"'  /etc/profile
+sed -i '$ a export APACHEHTTPPORT=\"8080\"'  /etc/profile
+sed -i '$ a export APACHEHTTPSPORT=\"8443\"'  /etc/profile
 sed -i '$ a export WWWFOLDER=\"public_html\"'  /etc/profile
+sed -i '$ a export PHPMYADMINFOLDER=\"dbase\"'  /etc/profile
 sed -i '$ a export MYFOLDER=\"\/my\"'  /etc/profile
 sed -i '$ a export BACKUPFOLDER=\"\/var\/backups\"'  /etc/profile
 sed -i '$ a export BACKUPFOLDER_EMPTY=\"$BACKUPFOLDER\/vds\/empty\"'  /etc/profile
@@ -114,7 +122,7 @@ groupadd ssh-access
 usermod -G ssh-access -a root
 #cp -R /etc/ssh/ $BACKUPFOLDER_EMPTY/
 tar -czvf $BACKUPFOLDER_INSTALLED/ssh.tar.gz /etc/ssh/
-sed -i -e "s/#Port 22/Port 6666/" /etc/ssh/sshd_config
+sed -i -e "s/#Port 22/Port "$SSHPORT"/" /etc/ssh/sshd_config
 sed -i -e "s/#PasswordAuthentication yes/PasswordAuthentication no/" /etc/ssh/sshd_config
 #sed -i -e "s/ChallengeResponseAuthentication no/ChallengeResponseAuthentication yes/" /etc/ssh/sshd_config
 #sed -i '$ a \\nAuthenticationMethods publickey,password publickey,keyboard-interactive'  /etc/ssh/sshd_config
@@ -250,7 +258,7 @@ a2enmod proxy_fcgi setenvif
 a2enconf php7.2-fpm
 tar -czvf $BACKUPFOLDER_INSTALLED/phpmyadmin.tar.gz /etc/phpmyadmin/
 #cp -R /etc/phpmyadmin/ $BACKUPFOLDER_EMPTY/
-sed -i -e "s/Alias \/phpmyadmin/Alias \/dbase/" /etc/phpmyadmin/apache.conf
+sed -i -e "s/Alias \/phpmyadmin/Alias \/$PHPMYADMINFOLDER/" /etc/phpmyadmin/apache.conf
 service apache2 restart
 
 echo "install webmin"

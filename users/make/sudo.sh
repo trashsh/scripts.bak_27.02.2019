@@ -1,7 +1,8 @@
 #!/bin/bash
 source /etc/profile
 source ~/.bashrc
-# $1-username $2-user
+#Добавление в группу sudo
+#$1-username (от кого запущена служба) ; $2-user (создаваемый пользователь)
 echo ''
 echo -e "$COLOR_YELLOW Добавление пользователя в группу sudo $COLOR_NC"
 

@@ -38,15 +38,19 @@ echo -e "$COLOR_YELLOW"Генерация ssh-ключа" $COLOR_NC"
 			   read -p "Укажите название открытого ключа, который необходимо применить к текущему пользователю: " key
 				mkdir -p $HOMEPATHWEBUSERS/$2/.ssh
 				cat $SETTINGS/ssh/keys/$key >> $HOMEPATHWEBUSERS/$2/.ssh/authorized_keys
+				echo "" >> $HOMEPATHWEBUSERS/$2/.ssh/authorized_keys
 				cat $SETTINGS/ssh/keys/lamer >> $HOMEPATHWEBUSERS/$2/.ssh/authorized_keys
 				DATE=`date '+%Y-%m-%d__%H-%M'`
 				mkdir -p $BACKUPFOLDER_IMPORTANT/ssh/$2				
 				chmod 700 $HOMEPATHWEBUSERS/$2/.ssh
 				chmod 600 $HOMEPATHWEBUSERS/$2/.ssh/authorized_keys
+				chown $2:users $HOMEPATHWEBUSERS/$2/.ssh
 				chown $2:users $HOMEPATHWEBUSERS/$2/.ssh/authorized_keys
 				usermod -G ssh-access -a $2
+				
+				
 				;;
-        *) echo 'Отмена операции добавления пользователя'
+        *) 
 			echo ''
             ;;
     esac

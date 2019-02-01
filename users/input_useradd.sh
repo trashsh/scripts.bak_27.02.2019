@@ -16,6 +16,10 @@ echo -n -e "Для добавления системного пользоват�
 		$SCRIPTS/users/make/sudo.sh $1 $username
 		$SCRIPTS/users/make/keyssh.sh $1 $username
 		$SCRIPTS/users/make/mysql.sh $1 $username
+		
+		$SCRIPTS/users/make/showinfo_ssh.sh $1 $username
+		$SCRIPTS/users/make/showinfo_ftp.sh $1 $username
+		$SCRIPTS/users/make/showinfo_mysql.sh $1 $username
             ;;
         *) echo 'Отмена операции добавления пользователя'
 			echo ''
