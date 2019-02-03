@@ -14,11 +14,11 @@ while read
 			dt=$(date '+%d/%m/%Y %H:%M:%S');
 			sudo git add .
 			sudo git commit -m "$dt"
-			$MENU/menu_git.sh $1
+			$MENU/git.sh $1
 			;;
         "n"|"N")  
 			echo 'Отмена создания коммита'
-			$SCRIPTS/.menu/menu_git.sh $1
+			$SCRIPTS/.menu/git.sh $1
 			break;; 
 			
         *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2;;
