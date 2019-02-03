@@ -17,7 +17,7 @@ echo -n 'Выберите пункт меню:'
 while read
     do
         case "$REPLY" in
-        "1")  sudo $SCRIPTS/users/input_useradd.sh $1;  break;;
+        "1")  sudo $SCRIPTS/users/useradd_system.sh $1;  break;;
         "2")  sudo $SCRIPTS/users/useradd_web.sh $1;  break;;
 		"3")  sudo $SCRIPTS/users/userdel_system.sh $1;  break;;
 		"4")  $SCRIPTS/users/usersview.sh $1;  break;;
