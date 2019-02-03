@@ -18,10 +18,10 @@ echo -n 'Выберите пункт меню:'
 while read
     do
         case "$REPLY" in
-        "1")  $MENU/menu_site_add.sh $1;  break;;
+        "1")  $MENU/submenu/site_add.sh $1;  break;;
         "2")  $SCRIPTS/webserver/remove/site_remove_input.sh $1;  break;;
 		"3")  $SCRIPTS/webserver/view/site_view_all.sh $1;  break;;
-		"4")  $MENU/menu_site_cert.sh $1;  break;;
+		"4")  $MENU/submenu/site_cert.sh $1;  break;;
 		"9")  $SCRIPTS/webserver/server/restart_webserver.sh $1;  break;;
 		"0")  $MYFOLDER/scripts/menu $1;  break;;
         "q"|"Q")  break 2;; 

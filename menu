@@ -21,12 +21,12 @@ USERNAME=$(whoami)
 	while read
     do
         case "$REPLY" in
-        "1")  $MENU/menu_site.sh $USERNAME;  break;;
-        "2")  $MENU/menu_user.sh $USERNAME;  break;;
-		"3")  $MENU/menu_sql.sh $USERNAME;  break;;
-		"4")  $MENU/menu_backup.sh $USERNAME;  break;;
-		"5")  $MENU/menu_git.sh $USERNAME;  break;;
-		"9")  $MENU/menu_server.sh $USERNAME;  break;;
+        "1")  $MENU/site.sh $USERNAME;  break;;
+        "2")  $MENU/user.sh $USERNAME;  break;;
+		"3")  $MENU/sql.sh $USERNAME;  break;;
+		"4")  $MENU/backup.sh $USERNAME;  break;;
+		"5")  $MENU/git.sh $USERNAME;  break;;
+		"9")  $MENU/server.sh $USERNAME;  break;;
         "q"|"Q")  break 2;; 
          *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2;;
         esac
