@@ -21,7 +21,8 @@ while read
         "2")  $SCRIPTS/git/remote_push.sh $1;  break;;
 		"3")  $SCRIPTS/git/remote_view.sh $1;  break;;
 		"0")  $MYFOLDER/scripts/menu $1;  break;;
-        "q"|"Q")  break 2;; 
+        #"q"|"Q")  break 2;; 
+		"q"|"Q")  exit;; 
          *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2;;
         esac
     done
