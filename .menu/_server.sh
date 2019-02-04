@@ -2,10 +2,9 @@
 source /etc/profile
 source ~/.bashrc
 echo ''
-echo -e "${COLOR_GREEN} ===Управление базами данных===${COLOR_NC}"
+echo -e "${COLOR_GREEN} ===Управление Сервером===${COLOR_NC}"
 
-echo '1: Добавить базу данных'
-echo '2: Управление пользователями баз данных'
+echo '1: Firewall ufw'
 
 echo '0: Назад'
 echo 'q: Выход'
@@ -15,12 +14,9 @@ echo -n 'Выберите пункт меню:'
 while read
     do
         case "$REPLY" in
-        "1")  $SCRIPTS/sql/db_create.sh $1;  break;;
-        "2")  $MENU/menu_sql_users.sh $1;  break;;
+        "1")  $MENU/menu_server_firewall.sh $1;;
 		"0")  $MYFOLDER/scripts/menu $1;  break;;
         "q"|"Q")  break 2;; 
          *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2;;
         esac
     done
-
-	
