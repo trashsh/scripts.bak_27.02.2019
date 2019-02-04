@@ -19,13 +19,13 @@ echo -n 'Выберите пункт меню:'
 while read
     do
         case "$REPLY" in
-        "1")  $SCRIPTS/system/backup/show/show_today.sh $1;;
-        "2")  $SCRIPTS/system/backup/show/show_yestoday.sh $1;;
-		"3")  $SCRIPTS/system/backup/show/show_week.sh $1;;
-		"4")  $SCRIPTS/system/backup/show/show_range.sh $1;;
-		"5")  $SCRIPTS/system/backup/show/show_range_input.sh $1;;
+        "1")  $SCRIPTS/info/backups_info/today.sh $1;;
+        "2")  $SCRIPTS/info/backups_info/yestoday.sh $1;;
+		"3")  $SCRIPTS/info/backups_info/week.sh $1;;
+		"4")  $SCRIPTS/info/backups_info/range.sh $1;;
+		"5")  $SCRIPTS/info/backups_info/range_input.sh $1;;
 		"0")  $SCRIPTS/.menu/menu_backup.sh $1;  break;;
-        "q"|"Q")  break 2;; 
+        "q"|"Q")  exit 0;; 
          *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2;;
         esac
     done

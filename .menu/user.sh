@@ -22,7 +22,7 @@ while read
 		"3")  sudo $SCRIPTS/users/userdel_system.sh $1; break;;
 		"4")  $MENU/submenu/users_info.sh $1;;
 		"0")  $MYFOLDER/scripts/menu $1;  break;;
-        "q"|"Q")  break 2;; 
+        "q"|"Q")  exit 0;; 
          *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2;;
         esac
     done

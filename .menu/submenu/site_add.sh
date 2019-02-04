@@ -23,7 +23,7 @@ while read
 		"3")  $SCRIPTS/webserver/site/input_site_laravel_easy.sh $1;;
 		"4")  $SCRIPTS/webserver/site/input_site_laravel_full.sh $1;;		
 		"0")  $SCRIPTS/.menu/menu_site.sh $1;  break;;
-        "q"|"Q")  break 2;; 
+        "q"|"Q")  exit 0;; 
          *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2;;
         esac
     done

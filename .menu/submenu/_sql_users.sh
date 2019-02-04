@@ -20,7 +20,7 @@ while read
         "2")  $SCRIPTS/mysql/userdel.sh $1;;
 		"3")  $SCRIPTS/mysql/usersview.sh $1;;
 		"0")  $MENU/menu_sql.sh $1;  break;;
-        "q"|"Q")  break 2;; 
+        "q"|"Q")  exit 0;; 
          *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2;;
         esac
     done

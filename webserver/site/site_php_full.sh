@@ -2,7 +2,7 @@
 #ввод параметров добавления сайта php/html
 source /etc/profile
 source ~/.bashrc
-#$1-$USERNAME 
+#$1-$USERNAME process
 
 #Ввод параметров сайта для добавления виртуального хоста
 	user=$USER

@@ -21,7 +21,7 @@ while read
 		"3")  $SCRIPTS/info/users_info/ssh-access.sh $1;;
 		"4")  $SCRIPTS/info/users_info/useringroup.sh $1;;
 		"0")  $SCRIPTS/.menu/user.sh $1;  break;;
-        "q"|"Q")  break 2;; 
+        "q"|"Q")  exit 0;; 
          *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2;;
         esac
     done

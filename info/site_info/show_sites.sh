@@ -21,4 +21,4 @@ echo  -n "Nginx - sites-enabled: "
 ls $NGINXENABLED
 echo ''
 
-$MENU/menu_site.sh $1
+$MENU/site.sh $1

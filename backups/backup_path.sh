@@ -14,8 +14,8 @@ echo -n -e "Для создания бэкапа $COLOR_YELLOW" $path "$COLOR_NC
     do
         case "$REPLY" in
         "y"|"Y")  
-			$SCRIPTS/system/backup/make_backup_path.sh $1 $path
-			$SCRIPTS/.menu/menu_backup.sh $1
+			$SCRIPTS/backups/make/backup_path_make.sh $1 $path
+			$MENU/backup.sh $1
 			;;
         "n"|"N")  
 			echo "Отмена операции создания бэкапа\n"

@@ -18,13 +18,13 @@ echo -n 'Выберите пункт меню:'
 while read
     do
         case "$REPLY" in
-        "1")  $MENU/submenu/site_add.sh $1;;
-        "2")  $SCRIPTS/webserver/remove/site_remove_input.sh $1;;
-		"3")  $SCRIPTS/webserver/view/site_view_all.sh $1;;
-		"4")  $MENU/submenu/site_cert.sh $1;;
-		"9")  $SCRIPTS/webserver/server/restart_webserver.sh $1;;
+        "1")  $MENU/submenu/site_add.sh $1; break;;
+        "2")  $SCRIPTS/webserver/remove/remove_site.sh $1; break;;
+		"3")  $SCRIPTS/info/site_info/show_sites.sh $1; break;;
+		"4")  $MENU/submenu/site_cert.sh $1; break;;
+		"9")  $SCRIPTS/system/webserver/webserver_restart.sh $1;;
 		"0")  $MYFOLDER/scripts/menu $1;  break;;
-        "q"|"Q")  break 2;; 
+        "q"|"Q")  exit 0;; 
          *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2;;
         esac
     done

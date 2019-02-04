@@ -12,6 +12,7 @@ echo ''
 echo -e "$COLOR_YELLOW Создание бэкапа $COLOR_NC"
 		
 		mkdir -p $BACKUPFOLDER_DAYS/$DATE
-		tar -czvf $BACKUPFOLDER_DAYS/$DATE/$(basename $2)_$TIME.tar.gz $2
+		$SCRIPTS/archive/tar_with_structure.sh $1 $2 $BACKUPFOLDER_DAYS/$DATE $(basename $2)_$TIME.tar.gz
+
 		
 		

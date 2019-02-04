@@ -2,7 +2,7 @@
 #ввод параметров добавления сайта на laravel
 source /etc/profile
 source ~/.bashrc
-#$1-$USERNAME
+#$1-$USERNAME process
 
 clear
 echo $1

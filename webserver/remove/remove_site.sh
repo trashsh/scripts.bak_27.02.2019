@@ -1,6 +1,6 @@
 #!/bin/bash
 #ввод параметров удаляемого сайта
-#$1-$USERNAME
+#$1-$USERNAME process
 source /etc/profile
 source ~/.bashrc
 user=$USER

@@ -18,7 +18,7 @@ while read
         "1")  $SCRIPTS/sql/db_create.sh $1;;
         "2")  $MENU/menu_sql_users.sh $1;;
 		"0")  $MYFOLDER/scripts/menu $1;  break;;
-        "q"|"Q")  break 2;; 
+        "q"|"Q")  exit 0;; 
          *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2;;
         esac
     done

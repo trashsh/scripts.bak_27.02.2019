@@ -26,7 +26,7 @@ while read
 		"5")  $SCRIPTS/mysql/ $1;;
         "6")  $SCRIPTS/mysql/ $1;;
 		"0")  $MENU/menu_sql.sh $1;  break;;
-        "q"|"Q")  break 2;; 
+        "q"|"Q")  exit 0;; 
          *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2;;
         esac
     done
