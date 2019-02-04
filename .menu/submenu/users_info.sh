@@ -16,10 +16,10 @@ echo -n 'Выберите пункт меню:'
 while read
     do
         case "$REPLY" in
-        "1")  $SCRIPTS/users/make/usersview/users.sh $1;;
-		"2")  $SCRIPTS/users/make/usersview/sudo.sh $1;;
-		"3")  $SCRIPTS/users/make/usersview/ssh-access.sh $1;;
-		"4")  $SCRIPTS/users/make/usersview/useringroup.sh $1;;
+        "1")  $SCRIPTS/info/users_info/users.sh $1;;
+		"2")  $SCRIPTS/info/users_info/sudo_add.sh $1;;
+		"3")  $SCRIPTS/info/users_info/ssh-access.sh $1;;
+		"4")  $SCRIPTS/info/users_info/useringroup.sh $1;;
 		"0")  $SCRIPTS/.menu/user.sh $1;  break;;
         "q"|"Q")  break 2;; 
          *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2;;

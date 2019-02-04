@@ -2,10 +2,9 @@
 source /etc/profile
 source ~/.bashrc
 #Добавление системного пользователя
-#$1-username (от кого запущена служба) ; $2-user (создаваемый пользователь)
+#$1-username process ; $2-user (создаваемый пользователь)
 echo ''
-echo -e "$COLOR_YELLOW Добавление пользователя $COLOR_NC"
-		
+echo -e "$COLOR_YELLOW Добавление пользователя $COLOR_NC"		
 		mkdir -p $HOMEPATHWEBUSERS/$2
 		echo "source /etc/profile" >> $HOMEPATHWEBUSERS/$2/.bashrc
 		useradd -N -g users $2 -d $HOMEPATHWEBUSERS/$2 -s /bin/bash

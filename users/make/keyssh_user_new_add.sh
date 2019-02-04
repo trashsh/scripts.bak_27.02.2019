@@ -10,7 +10,7 @@ then
 echo ''
 echo -e "$COLOR_YELLOWГенерация ssh-ключа $COLOR_NC"
 
-		echo -n -e "Сгенерировать ключ доступа по SSH пользователю $COLOR_YELLOW" $2 "$COLOR_NC? введите $COLOR_BLUE\"y\"$COLOR_NC для подтверждения, $COLOR_BLUE\"n\"$COLOR_NC  - для импорта загруженного ключа, $COLOR_BLUE любой другой символ$COLOR_NC - для отмены: "
+		echo -n -e "Сгенерировать ключ доступа по SSH пользователю $COLOR_YELLOW" $2 "$COLOR_NC? введите $COLOR_BLUE\"y\"$COLOR_NC для подтверждения, $COLOR_BLUE\"n\"$COLOR_NC  - для импорта загруженного ключа: "
 		
 		
 		while read
@@ -37,7 +37,7 @@ echo -e "$COLOR_YELLOWГенерация ssh-ключа $COLOR_NC"
 				
 				if [ -d $BACKUPFOLDER_IMPORTANT/ssh/$2/$DATE ] ; then
 					if [ -f $BACKUPFOLDER_IMPORTANT/ssh/$2/$DATE.tar.gz ] ; then
-										rm -Rfv $BACKUPFOLDER_IMPORTANT/ssh/$2/$DATE
+										rm -Rf $BACKUPFOLDER_IMPORTANT/ssh/$2/$DATE
 									else
 										echo -e "$COLOR_REDОшибка автоматического удаления каталога \"$BACKUPFOLDER_IMPORTANT/ssh/$2/$DATE\". Требуется удалить его вручную.$COLOR_NC"
 									fi
@@ -78,8 +78,7 @@ echo -e "$COLOR_YELLOWГенерация ssh-ключа $COLOR_NC"
 				chown $2:users $HOMEPATHWEBUSERS/$2/.ssh/authorized_keys
 				usermod -G ssh-access -a $2
 				echo -e "\n$COLOR_YELLOWИмпорт ключа $COLOR_LIGHT_PURPLE\"$key\"$COLOR_YELLOW пользователю $COLOR_LIGHT_PURPLE\"$2\"$COLOR_YELLOW выполнен$COLOR_NC"
-				$SCRIPTS/menu
-				break				
+				break
 				;;
 			*) 
 			echo ''

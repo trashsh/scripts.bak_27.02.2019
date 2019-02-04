@@ -15,6 +15,7 @@ while read
 			sudo git add .
 			sudo git commit -m "$dt"
 			$MENU/git.sh $1
+			break
 			;;
         "n"|"N")  
 			echo 'Отмена создания коммита'

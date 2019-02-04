@@ -7,4 +7,4 @@ source ~/.bashrc
 clear
 echo -e "\n${COLOR_YELLOW}Список пользователей группы \"users\":${COLOR_NC}"
 cat /etc/passwd | grep ":100::"
-$MENU/submenu/users_view.sh $1
+$MENU/submenu/users_info.sh $1

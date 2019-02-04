@@ -10,7 +10,7 @@ then
 echo ''
 echo -e "$COLOR_YELLOW Добавление пользователя в группу sudo $COLOR_NC"
 
-		echo -n -e "Добавить пользователя $COLOR_YELLOW\""$2"\"$COLOR_NC в список sudo? введите $COLOR_BLUE\"y\"$COLOR_NC для подтверждения, для выхода - $COLOR_BLUE\"n\"$COLOR_NC: "
+		echo -n -e "Добавить пользователя $COLOR_YELLOW\""$2"\"$COLOR_NC в список $COLOR_YELLOW\"sudo\"$COLOR_NC? введите $COLOR_BLUE\"y\"$COLOR_NC для подтверждения, для выхода - $COLOR_BLUE\"n\"$COLOR_NC: "
 		
 		while read
 		do

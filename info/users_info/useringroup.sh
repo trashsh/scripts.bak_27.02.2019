@@ -12,4 +12,4 @@ read -p ":" username
 echo -e "\n${COLOR_YELLOW}Пользователь \"$username\" состоит в следующих группах:${COLOR_NC}"
 more /etc/group | grep $username	
 	
-$MENU/submenu/users_view.sh $1
+$MENU/submenu/users_info.sh $1
