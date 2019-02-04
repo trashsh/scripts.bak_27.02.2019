@@ -18,5 +18,5 @@ user=$USER
 #    getent group www-data
 #	echo ''
     
-    sudo $SCRIPTS/webserver/remove/site_remove_make.sh $1 $domain $path $user
+    sudo $SCRIPTS/webserver/remove/make/remove_site_make.sh $1 $domain $path $user
 

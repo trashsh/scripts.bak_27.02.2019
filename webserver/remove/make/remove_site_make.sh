@@ -23,42 +23,42 @@ user_domain=$4_$2
                 #удаление файлов без пользователя
                     a2dissite $user_domain.conf
 
-                    # remove the symlink in the sites-enabled directory
+                    
                     if [ -f "$NGINXENABLED"/"$user_domain.conf" ] ; then
                            sudo rm "$NGINXENABLED"/"$user_domain.conf"
                     fi
 
-                    # remove the config in the sites-available directory
+                    
                     if [ -f "$NGINXAVAILABLE"/"$user_domain.conf" ] ; then
                             sudo rm "$NGINXAVAILABLE"/"$user_domain.conf"
                     fi
 
-                    # remove the symlink in the sites-enabled directory
+                    
                     if [ -f "$APACHEENABLED"/"$user_domain.conf" ] ; then
                             sudo rm "$APACHEENABLED"/"$user_domain.conf"
                     fi
 
-                    # remove the config in the sites-available directory
+                    
                     if [ -f "$APACHEAVAILABLE"/"$user_domain.conf" ] ; then
                             sudo rm "$APACHEAVAILABLE"/"$user_domain.conf"
                     fi
 
-                    # remove the access log apache
+                    
                     if [ -f $3/logs/error_apache.log ] ;  then
                             sudo rm $3/logs/error_apache.log
                     fi
 
-                    # remove the error log
+                    
                     if [ -f $3/logs/access_apache.log ] ;  then
                             sudo rm $3/logs/access_apache.log
                     fi
 
-                    # remove the access log nginx
+                    
                     if [ -f $3/logs/access_nginx.log ] ;  then
                             sudo rm $3/logs/access_nginx.log
                     fi
 
-                    # remove the error log
+                    
                     if [ -f $3/logs/error_nginx.log ] ;  then
                             sudo rm $3/logs/error_nginx.log
                     fi
@@ -69,18 +69,18 @@ user_domain=$4_$2
                     sudo rm -Rfv $3
 
                    echo "Удаление домена $2 завершено"
-                   $MENU/menu_site.sh $1
+                   $MENU/site.sh $1
 
                    exit 0
             else
             #Подтверждение на удаление пользователя и каталога не получено
                 echo "Удаление отменено"
-                $MENU/menu_site.sh $1
+                $MENU/site.sh $1
                 exit 0
             fi
 
 
-    $MENU/menu_site.sh $1
+    $MENU/site.sh $1
     else
     #Пользователь существует
         read -p "напишите "yes" для удаления домена $2, каталога $3 и пользователя $4_$2 или любой символ для отмены : " yesdeldomain
@@ -92,42 +92,42 @@ user_domain=$4_$2
 
                     sudo a2dissite $user_domain.conf
 
-                    # remove the symlink in the sites-enabled directory
+                    
                     if [ -f "$NGINXENABLED"/"$user_domain.conf" ] ; then
                             sudo rm "$NGINXENABLED"/"$user_domain.conf"
                     fi
 
-                    # remove the config in the sites-available directory
+                    
                     if [ -f "$NGINXAVAILABLE"/"$user_domain.conf" ] ; then
                             sudo rm "$NGINXAVAILABLE"/"$user_domain.conf"
                     fi
 
-                    # remove the symlink in the sites-enabled directory
+                    
                     if [ -f "$APACHEENABLED"/"$user_domain.conf" ] ; then
                             sudo rm "$APACHEENABLED"/"$user_domain.conf"
                     fi
 
-                    # remove the config in the sites-available directory
+                    
                     if [ -f "$APACHEAVAILABLE"/"$user_domain.conf" ] ; then
                             sudo rm "$APACHEAVAILABLE"/"$user_domain.conf"
                     fi
 
-                    # remove the access log apache
+                    
                     if [ -f $3/logs/error_apache.log ] ;  then
                             sudo rm $3/logs/error_apache.log
                     fi
 
-                    # remove the error log
+                    
                     if [ -f $3/logs/access_apache.log ] ;  then
                             sudo rm $3/logs/access_apache.log
                     fi
 
-                    # remove the access log nginx
+                    
                     if [ -f $3/logs/access_nginx.log ] ;  then
                             rm $3/logs/access_nginx.log
                     fi
 
-                    # remove the error log
+                    
                     if [ -f $3/logs/error_nginx.log ] ;  then
                             sudo rm $3/logs/error_nginx.log
                     fi
@@ -137,12 +137,12 @@ user_domain=$4_$2
 
                     sudo rm -Rfv $3
                     echo "Удаление домена $2 и пользователя $4 завершено"
-                    $MENU/menu_site.sh $1
+                    $MENU/site.sh $1
                     exit 0
             else
             #Подтверждение на удаление пользователя и каталога не получено
                 echo "Удаление отменено"
-                $MENU/menu_site.sh $1
+                $MENU/site.sh $1
                 exit 0
             fi
     fi

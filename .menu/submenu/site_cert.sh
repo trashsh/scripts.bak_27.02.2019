@@ -17,7 +17,7 @@ while read
         case "$REPLY" in
         "1")  sudo certbot certificates $1;;
         "2")  sudo letsencrypt $1;;
-		"0")  $SCRIPTS/.menu/menu_site.sh $1;  break;;
+		"0")  $SCRIPTS/.menu/site.sh $1;  break;;
         "q"|"Q")  exit 0;; 
          *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2;;
         esac

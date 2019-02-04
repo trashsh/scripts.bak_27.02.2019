@@ -60,9 +60,10 @@ then
         sudo chown -R $3:www-data $4/tmp
 		
 		cd $4/$WWWFOLDER
-		echo -e "\033[32m" Инициализация Git "\033[0;39m"
+		echo -e "\033[32m" Инициализация Git "\033[0;39m"		
 		git init
-		git add .
+		touch $4/$WWWFOLDER/.gitignore
+		git add .		
 		git commit -m "initial commit"
 		
 		echo -e "==========================================="

@@ -19,9 +19,9 @@ while read
     do
         case "$REPLY" in
         "1")  $SCRIPTS/webserver/site/input_site_php_easy.sh $1;;
-        "2")  $SCRIPTS/webserver/site/input_site_php_full.sh $1;;
+        "2")  $SCRIPTS/webserver/site/site_php_full.sh $1;;
 		"3")  $SCRIPTS/webserver/site/input_site_laravel_easy.sh $1;;
-		"4")  $SCRIPTS/webserver/site/input_site_laravel_full.sh $1;;		
+		"4")  $SCRIPTS/webserver/site/site_laravell_full.sh $1;;		
 		"0")  $SCRIPTS/.menu/menu_site.sh $1;  break;;
         "q"|"Q")  exit 0;; 
          *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2;;

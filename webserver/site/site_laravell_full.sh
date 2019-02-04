@@ -5,7 +5,6 @@ source ~/.bashrc
 #$1-$USERNAME process
 
 clear
-echo $1
 echo -e "\n${COLOR_GREEN}Добавление сайта на фреймворке Laravel ${COLOR_NC}"
 echo -e "${COLOR_YELLOW}Список имеющихся доменов на сервере: ${COLOR_NC}"
 user=$USER
@@ -29,7 +28,7 @@ echo ''
     read item
     case "$item" in
         y|Y) echo
-            $SCRIPTS/webserver/site/make_site_laravel.sh $1 $domain $user $site_path $apache_config $nginx_config
+            sudo $SCRIPTS/webserver/site/make/site_laravel_make.sh $1 $domain $user $site_path $apache_config $nginx_config
             exit 0
             ;;
         *) echo "Выход..."

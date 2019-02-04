@@ -27,7 +27,7 @@ USERNAME=$(whoami)
 		"4")  $MENU/backup.sh $USERNAME;  break;;
 		"5")  $MENU/git.sh $USERNAME;  break;;
 		"9")  $MENU/server.sh $USERNAME;  break;;
-        "q"|"Q")  break 2;; 
+        "q"|"Q")  exit 0;; 
          *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2;;
         esac
     done
