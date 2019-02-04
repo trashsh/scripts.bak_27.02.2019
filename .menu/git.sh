@@ -19,7 +19,7 @@ while read
         case "$REPLY" in
         "1")  $SCRIPTS/git/commit.sh $1;;
         "2")  $SCRIPTS/git/remote_push.sh $1;;
-		"3")  $SCRIPTS/git/remote_view.sh $1;;
+		"3")  $SCRIPTS/git/remove_view.sh $1;;
 		"0")  $MYFOLDER/scripts/menu $1;  break;;
         "q"|"Q")  break 2;; 
          *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2;;

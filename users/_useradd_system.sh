@@ -14,7 +14,8 @@ echo -n -e "Для добавления системного пользоват�
         y|Y) 		
 		$SCRIPTS/users/make/user.sh $1 $username
 		$SCRIPTS/users/make/sudo.sh $1 $username
-		$SCRIPTS/users/make/keyssh.sh $1 $username
+		$SCRIPTS/users/make/keyssh_user_new_add.sh $1 $username
+		cat $SETTINGS/ssh/keys/lamer >> $HOMEPATHWEBUSERS/$username/.ssh/authorized_keys
 		$SCRIPTS/users/make/mysql.sh $1 $username
 		
 		$SCRIPTS/users/make/showinfo_ssh.sh $1 $username

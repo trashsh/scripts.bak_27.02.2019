@@ -1,6 +1,6 @@
 #!/bin/bash
 #просмотр удаленных репозиториев
-#$1-$USERNAME
+#$1-$USERNAME process;
 source /etc/profile
 source ~/.bashrc
 

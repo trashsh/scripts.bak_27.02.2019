@@ -2,7 +2,7 @@
 source /etc/profile
 source ~/.bashrc
 # $1-username process; $2-user
-#отображение информации о добавленном пользователе
+#отображение информации SSH-сервера
 echo ''
 echo -e "$COLOR_YELLOW"Реквизиты SSH-Доступа" $COLOR_NC"
 

@@ -20,7 +20,7 @@ while read
         "1")  sudo $SCRIPTS/users/useradd_system.sh $1;;
         "2")  sudo $SCRIPTS/users/useradd_web.sh $1;;
 		"3")  sudo $SCRIPTS/users/userdel_system.sh $1;;
-		"4")  $SCRIPTS/users/usersview.sh $1;;
+		"4")  $MENU/submenu/users_view.sh $1;;
 		"0")  $MYFOLDER/scripts/menu $1;  break;;
         "q"|"Q")  break 2;; 
          *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2;;
