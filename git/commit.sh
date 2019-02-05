@@ -26,3 +26,4 @@ while read
         esac
     done
 
+exit 0
