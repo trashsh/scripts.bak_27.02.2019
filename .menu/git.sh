@@ -17,7 +17,7 @@ echo -n 'Выберите пункт меню:'
 while read
     do
         case "$REPLY" in
-        "1")  $SCRIPTS/git/commit.sh $1;;
+        "1")  $SCRIPTS/git/commit.sh $1;break;;
         "2")  $SCRIPTS/git/remote_push.sh $1;;
 		"3")  $SCRIPTS/git/remote_view.sh $1;;
 		"0")  $MYFOLDER/scripts/menu $1;  break;;
