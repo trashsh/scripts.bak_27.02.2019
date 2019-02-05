@@ -13,13 +13,12 @@ then
         sudo mkdir -p $4		
         sudo useradd $3_$2 -N -d $4 -m -s /bin/false
         sudo adduser $3_$2 www-data
-		echo -e "${COLOR_YELLOW}Установка пароля для ftp-пользователя \"$3_$2\"${COLOR_NC}"
+		echo -e "\n${COLOR_YELLOW}Установка пароля для ftp-пользователя \"$3_$2\"${COLOR_NC}"
 		
 		#ftp passwd
-		echo -n -e "Пароль для пользователя $COLOR_YELLOW" $3_$2 "$COLOR_NC сгенерировать или установить вручную? \nВведите $COLOR_BLUE\"y\"$COLOR_NC для автогенерации, для ручного ввода - $COLOR_BLUE\"n\"$COLOR_NC: "
+		echo -n -e "Пароль для пользователя FTP $COLOR_YELLOW" $3_$2 "$COLOR_NC сгенерировать или установить вручную? \nВведите $COLOR_BLUE\"y\"$COLOR_NC для автогенерации, для ручного ввода - $COLOR_BLUE\"n\"$COLOR_NC: "
 		while read
 		do
-			echo -n ": "
 			case "$REPLY" in
 			y|Y) FTPPASSWORD="$(openssl rand -base64 14)";
 				 break;;
@@ -34,7 +33,6 @@ then
 		echo -n -e "Пароль для пользователя MYSQL $COLOR_YELLOW" $3_$2 "$COLOR_NC сгенерировать или установить вручную? \nВведите $COLOR_BLUE\"y\"$COLOR_NC для автогенерации, для ручного ввода - $COLOR_BLUE\"n\"$COLOR_NC: "
 		while read
 		do
-			echo -n ": "
 			case "$REPLY" in
 			y|Y) MYSQLPASSWORD="$(openssl rand -base64 14)";
 				 break;;

@@ -15,8 +15,7 @@ source ~/.bashrc
     echo "Список имеющихся доменов:"	
 
     ls $HOMEPATHWEBUSERS/$1
-    echo -e "${COLOR_BLUE} Введите домен для добавления ${COLOR_NC}"
-	echo -n ": "	
+    echo -n -e "${COLOR_BLUE} Введите домен для добавления ${COLOR_NC}: "
     read domain
 	site_path=$HOMEPATHWEBUSERS/$1/$domain
 	echo ''

@@ -22,18 +22,21 @@ then
 			echo -e "Dumping database: $COLOR_YELLOW$db$COLOR_NC"
 			
 		case $3 in
-			1)
+			"1")
 				mysqldump --databases $db > $2$db.$dt.sql
-				tar -czvf $2$db.$dt.sql.tar.gz $2$db.$dt.sql --remove-files
+#				$SCRIPTS/archive/tar_with_structure_remove_original.sh $2$db.$dt.sql $2 $db.$dt.sql
+#				tar -czvf $2$db.$dt.sql.tar.gz $2$db.$dt.sql --remove-files
 				;;
-			2)
+			"2")
 				mysqldump -u$4 -p$5 --databases $db > $2$db.$dt.sql
-				tar -czvf $2$db.$dt.sql.tar.gz $2$db.$dt.sql --remove-files
+#				$SCRIPTS/archive/tar_with_structure_remove_original.sh $2$db.$dt.sql $2 $db.$dt.sql
+#				tar -czvf $2$db.$dt.sql.tar.gz $2$db.$dt.sql --remove-files
 				;;
 			*)
 				echo "Ошибка передачи параметров"
 				;;
-		esac		
+		esac	
+				$SCRIPTS/archive/tar_with_structure_remove_original.sh $2$db.$dt.sql.tar.gz $2 $db.$dt.sql		
 			
 		fi		
 done

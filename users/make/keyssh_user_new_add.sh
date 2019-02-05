@@ -33,7 +33,7 @@ echo -e "$COLOR_YELLOWГенерация ssh-ключа $COLOR_NC"
 				cat $HOMEPATHWEBUSERS/$2/.ssh/ssh_$2.pub >> $BACKUPFOLDER_IMPORTANT/ssh/$2/$DATE/ssh_$2.pub
 				cat $HOMEPATHWEBUSERS/$2/.ssh/ssh_$2 >> $BACKUPFOLDER_IMPORTANT/ssh/$2/$DATE/ssh_$2
 				cat $HOMEPATHWEBUSERS/$2/.ssh/ssh_$2.ppk >> $BACKUPFOLDER_IMPORTANT/ssh/$2/$DATE/ssh_$2.ppk
-				$SCRIPTS/archive/tar_without_structure.sh $1 $HOMEPATHWEBUSERS/$2/.ssh/ $BACKUPFOLDER_IMPORTANT/ssh/$2/ $DATE.tar.gz
+				$SCRIPTS/archive/tar_folder_without_structure.sh $1 $HOMEPATHWEBUSERS/$2/.ssh/ $BACKUPFOLDER_IMPORTANT/ssh/$2/ $DATE.tar.gz
 				
 				if [ -d $BACKUPFOLDER_IMPORTANT/ssh/$2/$DATE ] ; then
 					if [ -f $BACKUPFOLDER_IMPORTANT/ssh/$2/$DATE.tar.gz ] ; then
@@ -49,7 +49,6 @@ echo -e "$COLOR_YELLOWГенерация ssh-ключа $COLOR_NC"
 				
 				
 				
-#				tar -czf $BACKUPFOLDER_IMPORTANT/ssh/$2/$DATE.tar.gz $BACKUPFOLDER_IMPORTANT/ssh/$2/$DATE
 				chmod 700 $HOMEPATHWEBUSERS/$2/.ssh
 				chmod 600 $HOMEPATHWEBUSERS/$2/.ssh/authorized_keys
 				chmod 600 $HOMEPATHWEBUSERS/$2/.ssh/ssh_$2.pub

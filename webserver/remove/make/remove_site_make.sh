@@ -14,11 +14,11 @@ user_domain=$4_$2
     grep "$4:" /etc/passwd >/dev/null
     if [ $? -ne 0 ]; then
          echo 'Пользователь не найден и не будет удален'
-		echo -n -e "напишите \"${COLOR_BLUE}yes${COLOR_NC}\" для удаления домена ${COLOR_GREEN}$2${COLOR_NC}, каталога ${COLOR_GREEN}$3${COLOR_NC} БЕЗ пользователя ${COLOR_GREEN}$4${COLOR_NC} или любой символ для отмены : "
+		echo -n -e "напишите$COLOR_BLUE delete $COLOR_NC для удаления домена $COLOR_YELLOW$2$COLOR_NC, каталога $COLOR_YELLOW$3$COLOR_NC БЕЗ пользователя $COLOR_YELLOW$4_$2$COLOR_NC или любой символ для отмены : "
         #удаление каталога без существования пользователя
         read -p yesdeldomain
         #Получено подтверждение на удаление пользователя и каталога
-            if [[ $yesdeldomain = "yes" ]]
+            if [[ $yesdeldomain = "delete" ]]
                 then
                 #удаление файлов без пользователя
                     a2dissite $user_domain.conf
@@ -83,12 +83,12 @@ user_domain=$4_$2
     $MENU/site.sh $1
     else
     #Пользователь существует
-        echo -n -e "напишите "yes" для удаления домена $2, каталога $3 и пользователя $4_$2 или любой символ для отмены : " 
+		echo -n -e "напишите$COLOR_BLUE delete$COLOR_NC для удаления домена $COLOR_YELLOW$2$COLOR_NC, каталога $COLOR_YELLOW$3$COLOR_NC и пользователя $COLOR_YELLOW$4_$2$COLOR_NC или любой символ для отмены : "
 		read yesdeldomain
 		
 		
         #Получено подтверждение на удаление пользователя и каталога
-            if [[ $yesdeldomain = "yes" ]]
+            if [[ $yesdeldomain = "delete" ]]
                 then
                     sudo userdel $4_$2
                     echo "Пользователь $user удален"
