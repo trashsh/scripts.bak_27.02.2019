@@ -13,8 +13,41 @@ then
         sudo mkdir -p $4		
         sudo useradd $3_$2 -N -d $4 -m -s /bin/false
         sudo adduser $3_$2 www-data
-		echo -e "${COLOR_YELLOW}Установка пароля для ftp-пользователя \"$3\"${COLOR_NC}"
-        sudo passwd $3_$2
+		echo -e "${COLOR_YELLOW}Установка пароля для ftp-пользователя \"$3_$2\"${COLOR_NC}"
+		
+		#ftp passwd
+		echo -n -e "Пароль для пользователя $COLOR_YELLOW" $3_$2 "$COLOR_NC сгенерировать или установить вручную? \nВведите $COLOR_BLUE\"y\"$COLOR_NC для автогенерации, для ручного ввода - $COLOR_BLUE\"n\"$COLOR_NC: "
+		while read
+		do
+			echo -n ": "
+			case "$REPLY" in
+			y|Y) FTPPASSWORD="$(openssl rand -base64 14)";
+				 break;;
+			n|N) echo -n -e "$COLOR_BLUE Введите пароль для пользователя FTP$COLOR_NC $COLOR_YELLOW" $3_$2 "$COLOR_NC $COLOR_BLUE:";
+				 read FTPPASSWORD;
+				 break;;
+			esac							 
+		done		
+		echo "$3_$2:$FTPPASSWORD" | chpasswd
+		
+		#mysql user/passwd
+		echo -n -e "Пароль для пользователя MYSQL $COLOR_YELLOW" $3_$2 "$COLOR_NC сгенерировать или установить вручную? \nВведите $COLOR_BLUE\"y\"$COLOR_NC для автогенерации, для ручного ввода - $COLOR_BLUE\"n\"$COLOR_NC: "
+		while read
+		do
+			echo -n ": "
+			case "$REPLY" in
+			y|Y) MYSQLPASSWORD="$(openssl rand -base64 14)";
+				 break;;
+			n|N) echo -n -e "$COLOR_BLUE Введите пароль для пользователя FTP$COLOR_NC $COLOR_YELLOW" $3_$2 "$COLOR_NC $COLOR_BLUE:";
+				 read MYSQLPASSWORD;
+				 break;;
+			esac							 
+		done
+		sudo $SCRIPTS/mysql/make/useradd_make_user.sh $1 $3_$2 $MYSQLPASSWORD
+		sudo $SCRIPTS/mysql/make/create_db_utf8.sh $1 $3_$2
+		sudo $SCRIPTS/mysql/make/db_make_admin.sh $1 $3_$2 $3_$2
+			
+ #       sudo passwd $3_$2
         sudo cp -R /etc/skel/* $4
 
        #copy index.php
@@ -58,6 +91,8 @@ then
         sudo chown -R $3:www-data $4/logs
         sudo chown -R $3:www-data $4/$WWWFOLDER
         sudo chown -R $3:www-data $4/tmp
+
+		
 		
 		cd $4/$WWWFOLDER
 		echo -e "\033[32m" Инициализация Git "\033[0;39m"		
@@ -72,9 +107,11 @@ then
         echo -e "Сайт доступен по адресу: ${COLOR_YELLOW} http://"$2":8080 ${COLOR_NC} (apache)"
 		echo -e "Сервер FTP: ${COLOR_YELLOW} "$2":10081 ${COLOR_NC}"
 		echo -e "FTP User: ${COLOR_YELLOW} $3_$2 ${COLOR_NC}"
+		echo -e "FTP Password: ${COLOR_YELLOW} $FTPPASSWORD ${COLOR_NC}"
 		echo -e "PhpMyAdmin: ${COLOR_YELLOW} https://conf.mmgx.ru/dbase ${COLOR_NC}"
 		echo -e "Adminer: ${COLOR_YELLOW} https://conf.mmgx.ru/a ${COLOR_NC}"
 		echo -e "MYSQL User: ${COLOR_YELLOW} $3_$2 ${COLOR_NC}"
+		echo -e "MYSQL Password: ${COLOR_YELLOW} $MYSQLPASSWORD ${COLOR_NC}"		
 		echo -e "MYSQL DB: ${COLOR_YELLOW} $3_$2 ${COLOR_NC}"
 		
 		$SCRIPTS/menu $1
