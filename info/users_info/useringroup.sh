@@ -4,7 +4,6 @@
 source /etc/profile
 source ~/.bashrc
 
-clear
 echo -e "\n${COLOR_YELLOW}Список системных пользователей:${COLOR_NC}"
 cat /etc/passwd | grep ":100::"
 echo -e "\n${COLOR_BLUE}Введите интересующего вас пользователя \"ssh-access\":${COLOR_NC}"

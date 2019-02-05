@@ -164,7 +164,10 @@ chmod 600 $HOMEPATHWEBUSERS/$USERLAMER/.ssh/authorized_keys
 chown $USERLAMER:users $HOMEPATHWEBUSERS/$USERLAMER/.ssh
 chown $USERLAMER:users $HOMEPATHWEBUSERS/$USERLAMER/.ssh/authorized_keys
   service ssh restart
-  
+
+echo "ftp settings"
+groupadd ftp-access
+usermod -G ftp-access -a $USERLAMER
   
 echo "install apache2"
 apt -y install apache2
