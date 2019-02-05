@@ -117,6 +117,9 @@ sed -i -e "s/# GROUP=100/GROUP=100/" /etc/default/useradd
 #sed -i -e 's/"# HOME=\/home"/"HOME=$HOMEPATHSYSUSERS"/' /etc/default/useradd
 #sed -i 's|'# HOME=\/home'|HOME=$HOMEPATHSYSUSERS|g' /etc/default/useradd
 
+echo "install soft"
+apt -y install mc git git-core composer  wget zip unzip unrar arj putty-tools nano  ufw proftpd  
+
 echo "ssh settings"
 groupadd ssh-access
 usermod -G ssh-access -a root
@@ -148,7 +151,7 @@ service mysql restart
 
 echo "create user"
 source /etc/profile
-$SCRIPTS/users/input_useradd.sh
+$SCRIPTS/users/useradd_system.sh
 mkdir -p $HOMEPATHWEBUSERS/$USERLAMER/.ssh
 touch $HOMEPATHWEBUSERS/$USERLAMER/.ssh/authorized_keys
 #usermod -G ssh-access -a $USERLAMER
@@ -186,8 +189,6 @@ a2enmod rewrite
 service apache2 restart
 
 
-echo "install soft"
-apt -y install mc git git-core composer  wget zip unzip unrar arj putty-tools nano  ufw proftpd  
 tar -czvf $BACKUPFOLDER_INSTALLED/proftpd.tar.gz /etc/proftpd/
 tar -czvf $BACKUPFOLDER_INSTALLED/ufw.tar.gz /etc/ufw/
 apt -y install curl build-essential software-properties-common net-tools

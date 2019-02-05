@@ -7,7 +7,7 @@ echo ''
 echo -e "$COLOR_YELLOW Добавление пользователя $COLOR_NC"		
 		mkdir -p $HOMEPATHWEBUSERS/$2
 		echo "source /etc/profile" >> $HOMEPATHWEBUSERS/$2/.bashrc
-		useradd -N -g users $2 -d $HOMEPATHWEBUSERS/$2 -s /bin/bash
+		useradd -N -g users -d $HOMEPATHWEBUSERS/$2 -s /bin/bash $2
 		chmod 755 $HOMEPATHWEBUSERS/$2
 		chown $2:users $HOMEPATHWEBUSERS/$2
 		touch $HOMEPATHWEBUSERS/$2/.bashrc

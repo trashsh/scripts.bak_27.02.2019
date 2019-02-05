@@ -8,7 +8,7 @@ if [ -n "$1" ] && [ -n "$2" ]
 then
 
 echo ''
-echo -e "$COLOR_YELLOWГенерация ssh-ключа $COLOR_NC"
+echo -e "$COLOR_YELLOW Генерация ssh-ключа $COLOR_NC"
 
 		echo -n -e "Сгенерировать ключ доступа по SSH пользователю $COLOR_YELLOW" $2 "$COLOR_NC? введите $COLOR_BLUE\"y\"$COLOR_NC для подтверждения, $COLOR_BLUE\"n\"$COLOR_NC  - для импорта загруженного ключа: "
 		
@@ -87,8 +87,8 @@ echo -e "$COLOR_YELLOWГенерация ssh-ключа $COLOR_NC"
 
 
 	else
-    echo -e "\n$COLOR_YELLOWПараметры запуска не найдены$COLOR_NC. Необходимы параметры: имя пользователя"
-    echo -n -e "$COLOR_YELLOWДля запуска основного меню напишите $COLOR_BLUE\"y\"$COLOR_YELLOW, для выхода - $COLOR_BLUE\"n\"$COLOR_NC:"
+    echo -e "\n$COLOR_YELLOW Параметры запуска не найдены$COLOR_NC. Необходимы параметры: имя пользователя"
+    echo -n -e "$COLOR_YELLOW Для запуска основного меню напишите $COLOR_BLUE\"y\"$COLOR_YELLOW, для выхода - $COLOR_BLUE\"n\"$COLOR_NC:"
 	while read
 		do
 			echo -n ": "
