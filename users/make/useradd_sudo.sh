@@ -18,7 +18,7 @@ echo -e "$COLOR_YELLOW Добавление пользователя в груп
 			y|Y)  adduser $2 sudo;
 					echo -e "Пользователь $COLOR_YELLOW" $2 "$COLOR_NC добавлен в список sudo";
 					break;;
-			n|N)  echo -e "\n$COLOR_YELLOWПользователь $COLOR_LIGHT_PURPLE\"$2\" $COLOR_NC$COLOR_YELLOWсоздан, но не добавлен в список $COLOR_GREEN\"sudo\"$COLOR_NC";  break;;
+			n|N)  echo -e "\n$COLOR_YELLOW Пользователь $COLOR_LIGHT_PURPLE\"$2\" $COLOR_NC$COLOR_YELLOW создан, но не добавлен в список $COLOR_GREEN\"sudo\"$COLOR_NC";  break;;
 			esac
 		done
 

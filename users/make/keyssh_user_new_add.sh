@@ -21,9 +21,9 @@ echo -e "$COLOR_YELLOW Генерация ssh-ключа $COLOR_NC"
 				DATE=`date '+%Y-%m-%d__%H-%M'`				
 				mkdir -p $HOMEPATHWEBUSERS/$2/.ssh
 				cd $HOMEPATHWEBUSERS/$2/.ssh
-				echo -e "\n$COLOR_YELLOWГенерация ключа. Сейчас необходимо будет установить пароль на ключевой файл.Минимум - 5 символов$COLOR_NC"
+				echo -e "\n$COLOR_YELLOW Генерация ключа. Сейчас необходимо будет установить пароль на ключевой файл.Минимум - 5 символов$COLOR_NC"
 				ssh-keygen -t rsa -f ssh_$2 -C "ssh_$2"
-				echo -e "\n$COLOR_YELLOWКонвертация ключа в формат программы Putty. Необходимо ввести пароль на ключевой файл, установленный на предыдушем шаге $COLOR_NC"
+				echo -e "\n$COLOR_YELLOW Конвертация ключа в формат программы Putty. Необходимо ввести пароль на ключевой файл, установленный на предыдушем шаге $COLOR_NC"
 				sudo puttygen $HOMEPATHWEBUSERS/$2/.ssh/ssh_$2 -C "ssh_$2" -o $HOMEPATHWEBUSERS/$2/.ssh/ssh_$2.ppk
 				DATE=`date '+%Y-%m-%d__%H-%M'`
 				mkdir -p $BACKUPFOLDER_IMPORTANT/ssh/$2
@@ -39,12 +39,12 @@ echo -e "$COLOR_YELLOW Генерация ssh-ключа $COLOR_NC"
 					if [ -f $BACKUPFOLDER_IMPORTANT/ssh/$2/$DATE.tar.gz ] ; then
 										rm -Rf $BACKUPFOLDER_IMPORTANT/ssh/$2/$DATE
 									else
-										echo -e "$COLOR_REDОшибка автоматического удаления каталога \"$BACKUPFOLDER_IMPORTANT/ssh/$2/$DATE\". Требуется удалить его вручную.$COLOR_NC"
+										echo -e "$COLOR_RED Ошибка автоматического удаления каталога \"$BACKUPFOLDER_IMPORTANT/ssh/$2/$DATE\". Требуется удалить его вручную.$COLOR_NC"
 									fi
 
 								
 					else
-						echo -e "$COLOR_REDОшибка автоматического удаления каталога \"$BACKUPFOLDER_IMPORTANT/ssh/$2/$DATE\". Требуется удалить его вручную.$COLOR_NC"
+						echo -e "$COLOR_RED Ошибка автоматического удаления каталога \"$BACKUPFOLDER_IMPORTANT/ssh/$2/$DATE\". Требуется удалить его вручную.$COLOR_NC"
 					fi
 				
 				
@@ -61,9 +61,9 @@ echo -e "$COLOR_YELLOW Генерация ssh-ключа $COLOR_NC"
 				usermod -G ssh-access -a $2
 				break
 				;;
-			n|N)  echo -e "\n$COLOR_YELLOWСписок возможных ключей для импорта: $COLOR_NC"
+			n|N)  echo -e "\n$COLOR_YELLOW Список возможных ключей для импорта: $COLOR_NC"
 			   ls -l $SETTINGS/ssh/keys/
-			   echo -n -e "$COLOR_BLUEУкажите название открытого ключа, который необходимо применить к текущему пользователю: $COLOR_NC"
+			   echo -n -e "$COLOR_BLUE Укажите название открытого ключа, который необходимо применить к текущему пользователю: $COLOR_NC"
 			   read -p ":" key
 				mkdir -p $HOMEPATHWEBUSERS/$2/.ssh
 				cat $SETTINGS/ssh/keys/$key >> $HOMEPATHWEBUSERS/$2/.ssh/authorized_keys
@@ -76,7 +76,7 @@ echo -e "$COLOR_YELLOW Генерация ssh-ключа $COLOR_NC"
 				chown $2:users $HOMEPATHWEBUSERS/$2/.ssh
 				chown $2:users $HOMEPATHWEBUSERS/$2/.ssh/authorized_keys
 				usermod -G ssh-access -a $2
-				echo -e "\n$COLOR_YELLOWИмпорт ключа $COLOR_LIGHT_PURPLE\"$key\"$COLOR_YELLOW пользователю $COLOR_LIGHT_PURPLE\"$2\"$COLOR_YELLOW выполнен$COLOR_NC"
+				echo -e "\n$COLOR_YELLOW Импорт ключа $COLOR_LIGHT_PURPLE\"$key\"$COLOR_YELLOW пользователю $COLOR_LIGHT_PURPLE\"$2\"$COLOR_YELLOW выполнен$COLOR_NC"
 				break
 				;;
 			*) 

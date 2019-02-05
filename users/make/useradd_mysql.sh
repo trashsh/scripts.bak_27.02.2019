@@ -28,7 +28,7 @@ echo -e "$COLOR_YELLOW"Создание пользователя базы дан
 			y|Y) PASSWORD="$(openssl rand -base64 14)";
 				 echo "Password: $PASSWORD";
 				 break;;
-			n|N) echo -n -e "$COLOR_BLUE Введите пароль для пользователя$COLOR_NC $COLOR_YELLOW" $2 "$COLOR_NC $COLOR_BLUEбазы данных mysql$COLOR_NC:";
+			n|N) echo -n -e "$COLOR_BLUE Введите пароль для пользователя$COLOR_NC $COLOR_YELLOW" $2 "$COLOR_NC $COLOR_BLUE базы данных mysql$COLOR_NC:";
 				 read PASSWORD;
 				 break;;
 			esac

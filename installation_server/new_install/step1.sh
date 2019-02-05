@@ -118,7 +118,7 @@ sed -i -e "s/# GROUP=100/GROUP=100/" /etc/default/useradd
 #sed -i 's|'# HOME=\/home'|HOME=$HOMEPATHSYSUSERS|g' /etc/default/useradd
 
 echo "install soft"
-apt -y install mc git git-core composer  wget zip unzip unrar arj putty-tools nano  ufw proftpd  
+apt -y install mc git git-core composer  wget zip unzip unrar arj putty-tools nano ufw proftpd  
 
 echo "ssh settings"
 groupadd ssh-access
@@ -151,7 +151,7 @@ service mysql restart
 
 echo "create user"
 source /etc/profile
-$SCRIPTS/users/useradd_system.sh
+$SCRIPTS/users/useradd_system.sh $USERLAMER
 mkdir -p $HOMEPATHWEBUSERS/$USERLAMER/.ssh
 touch $HOMEPATHWEBUSERS/$USERLAMER/.ssh/authorized_keys
 #usermod -G ssh-access -a $USERLAMER
