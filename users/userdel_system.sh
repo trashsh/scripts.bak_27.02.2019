@@ -16,6 +16,7 @@ read -p "Введите имя пользователя: " username
 			echo -n ": "
 			case "$REPLY" in
 			y|Y) userdel -r $username
+				 $SCRIPTS/mysql/userdel.sh $1 $username
 					$MENU/user.sh
 					break;;
 			n|N)  $MENU/user.sh $1
@@ -23,4 +24,5 @@ read -p "Введите имя пользователя: " username
 			esac
 		done
 
+ $SCRIPTS/info/mysql/full_info.sh
 	

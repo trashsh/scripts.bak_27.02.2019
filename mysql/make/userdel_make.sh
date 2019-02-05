@@ -1,11 +1,12 @@
 #!/bin/bash
-# $1-username process; $1-user
+# $1-username process; $2-user
 source /etc/profile
 source ~/.bashrc
 
 if [ -n "$1" ] && [ -n "$2" ] 
 then
 	mysql -e "DROP USER '$2'@'localhost';"
+	mysql -e "DROP USER '$2'@'%';"
 	echo -e "$COLOR_LIGHT_PURPLEПользователь $COLOR_YELLOW$2$COLOR_LIGHT_PURPLE удален $COLOR_NC"
 else
        echo "--------------------------------------"
