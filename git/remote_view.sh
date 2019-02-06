@@ -9,3 +9,4 @@ echo -e "\n${COLOR_YELLOW}Список удаленных репозиторие
 git remote -v
 echo ""
 $MENU/git.sh $1
+exit 0
