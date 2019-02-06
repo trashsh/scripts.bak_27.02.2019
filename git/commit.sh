@@ -4,7 +4,7 @@
 source /etc/profile
 source ~/.bashrc
 
-echo -n -e "Для создания коммита репозитария $COLOR_YELLOW\""$SCRIPTS"\"$COLOR_NC введите $COLOR_BLUE\"y\"$COLOR_NC, для выхода - $COLOR_BLUE\"n\"$COLOR_NC: " 
+echo -n -e "Для создания коммита репозитария ${COLOR_YELLOW}\""$SCRIPTS"\"${COLOR_NC} введите ${COLOR_BLUE}\"y\"${COLOR_NC}, для выхода - ${COLOR_BLUE}\"n\"${COLOR_NC}: " 
 while read
     do
         case "$REPLY" in
@@ -19,7 +19,7 @@ while read
 			;;
         "n"|"N")  
 			echo 'Отмена создания коммита'
-			$SCRIPTS/.menu/git.sh $1
+				$SCRIPTS/.menu/git.sh $1
 			break;; 
 			
         *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2;;
