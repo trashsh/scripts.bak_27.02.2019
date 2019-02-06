@@ -84,16 +84,7 @@ else
     echo "--------------------------------------"
     echo "Параметры запуска не найдены. Необходимы параметры: домен, имя пользователя,путь к папке с сайтом,название шаблона apache,название шаблона nginx."
     echo "Например $0 domain.ru user /home/webusers/domain.ru php.conf php.conf"
-    echo -n "Для запуска основного меню напишите \"y\", для выхода - любой другой символ: "
-    read item
-    case "$item" in
-        y|Y) echo "Ввели «y», продолжаем..."
-            $SCRIPTS/menu $1
-            ;;
-        *) echo "Выход..."
-            exit 0
-            ;;
-    esac
+    FileParamsNotFound "$1" "Для запуска главного введите" "$SCRIPTS/menu"  
 fi
 
 

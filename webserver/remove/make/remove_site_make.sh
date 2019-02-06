@@ -158,14 +158,5 @@ else
     echo "Например domain.ru /home/webusers/lamer/domain.ru user"
     echo "Список доменов на сервере пользователя $1:"
     ls $HOMEPATHWEBUSERS/$1
-    echo -n "Для запуска основного меню напишите \"y\", для выхода - любой другой символ: "
-    read item
-    case "$item" in
-        y|Y) echo "Ввели «y», продолжаем..."
-            $MYFOLDER/scripts/menu $1
-            ;;
-        *) echo "Выход..."
-            exit 0
-            ;;
-    esac
+    FileParamsNotFound "$1" "Для запуска главного введите" "$SCRIPTS/menu"  
 fi

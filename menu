@@ -3,6 +3,7 @@ source /etc/profile
 source ~/.bashrc
 
 USERNAME=$(whoami)
+echo $1
 
 #if [[ $EUID -ne 0 ]]; then
     echo ''

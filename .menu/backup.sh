@@ -18,13 +18,14 @@ echo -n 'Выберите пункт меню:'
 while read
     do
         case "$REPLY" in
-        "1")  sudo $SCRIPTS/backups/backup_path.sh $1;;
-        "2")  echo "В разработке";;
-		"3")  $MENU/menu_sql_backup.sh $1;;
-		"4")  echo "В разработке";;
-		"5")  $MENU/submenu/backup_show.sh $1;;
+        "1")  sudo $SCRIPTS/backups/backup_path.sh $1; break;;
+        "2")  echo "В разработке"; break;;
+		"3")  $MENU/menu_sql_backup.sh $1; break;;
+		"4")  echo "В разработке"; break;;
+		"5")  $MENU/submenu/backup_show.sh $1; break;;
 		"0")  $MYFOLDER/scripts/menu $1;  break;;
         "q"|"Q")  exit 0;; 
          *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2;;
         esac
     done
+exit 0

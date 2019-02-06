@@ -1,4 +1,5 @@
 #!/bin/bash
+#$1-username process
 source /etc/profile
 source ~/.bashrc
 echo ''
@@ -21,3 +22,4 @@ while read
          *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2;;
         esac
     done
+exit 0

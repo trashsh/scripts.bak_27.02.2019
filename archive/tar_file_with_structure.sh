@@ -1,31 +1,21 @@
 #!/bin/bash
-#$1-$USERNAME process; $2- путь к файлу, подлежащего архивации; $3-каталог размещения архива; $4 - имя архива
+#$1-$USERNAME process; $2- путь к файлу, подлежащего архивации; $3-путь к создаваемому архиву
 #Архивация файлов с полными абсолютными путями
 source /etc/profile
 source ~/.bashrc
 
 
-if [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ] && [ -n "4" ] 
+if [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ]
 then
 if [ -f $2 ] ; then
-					tar cfz $3/$4 $2
+					tar cfz $3 $2
 				else
-					echo -e "$COLOR_REDКаталог \"$2\" для архивации не найден$COLOR_NC"
+					echo -e "${COLOR_RED}Файл \"$2\" для архивации не найден${COLOR_NC}"
                 fi
 
 else
-    echo -e "\n$COLOR_YELLOWПараметры запуска не найдены$COLOR_NC. Необходимы параметры: путь к каталогу для архивации, путь к архиву"
-    echo -n -e "$COLOR_YELLOWДля запуска основного меню напишите $COLOR_BLUE\"y\"$COLOR_YELLOW, для выхода - $COLOR_BLUE\"n\"$COLOR_NC:"
-	while read
-		do
-			echo -n ": "
-			case "$REPLY" in
-			y|Y) $SCRIPTS/menu $1;
-					break;;
-			n|N)  exit 0;
-			esac
-		done
-
+    echo -e "\n${COLOR_YELLOW}Параметры запуска не найдены${COLOR_NC}. Необходимы параметры: 1-USERNAME process; 2- путь к файлу, подлежащего архивации; 3-путь к создаваемому архиву"
+    FileParamsNotFound "$1" "Для запуска главного меню введите" "$SCRIPTS/menu"	
 fi
 
-
+exit 0

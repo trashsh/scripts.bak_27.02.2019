@@ -12,17 +12,7 @@ mysql -e "SELECT User,Host,Grant_priv,Create_priv,Drop_priv,Create_user_priv FRO
 
 else
     echo -e "\n$COLOR_YELLOW Параметры запуска не найдены$COLOR_NC. Необходимы параметры: имя пользователя mysql, столбец для сортировки"
-    echo -n -e "$COLOR_YELLOW Для запуска основного меню напишите $COLOR_BLUE\"y\"$COLOR_YELLOW, для выхода - $COLOR_BLUE\"n\"$COLOR_NC:"
-	while read
-		do
-			echo -n ": "
-			case "$REPLY" in
-			y|Y) $SCRIPTS/menu $1;
-					break;;
-			n|N)  exit 0;
-			esac
-		done
-
+    FileParamsNotFound "$1" "Для запуска главного меню введите" "$SCRIPTS/menu"
 fi
 
 
