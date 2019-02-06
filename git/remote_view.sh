@@ -4,9 +4,9 @@
 source /etc/profile
 source ~/.bashrc
 
-cd $SCRIPTS
-echo -e "\n${COLOR_YELLOW}Список удаленных репозиториев:${COLOR_NC}"
-git remote -v
-echo ""
-$MENU/git.sh $1
-exit 0
+        echo $1
+		cd $SCRIPTS
+		echo -e "\n${COLOR_YELLOW}Список удаленных репозиториев:${COLOR_NC}"
+		git remote -v
+		$MENU/git.sh $1
+		exit 0

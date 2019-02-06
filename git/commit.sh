@@ -11,10 +11,9 @@ while read
         "y"|"Y")  
 			echo -e "\n ${COLOR_YELLOW} Git commit generation:${COLOR_NC}"
 			cd $SCRIPTS
-			dt=$(date '+%d/%m/%Y %H:%M:%S');
+			dt=$(date '+%d/%m/%Y %H:%M:%S')
 			sudo git add .
-			sudo git commit -m "$dt"
-			$MENU/git.sh $1
+			sudo git commit -m "$dt"			
 			break
 			;;
         "n"|"N")  
@@ -26,4 +25,5 @@ while read
         esac
     done
 
+$MENU/git.sh $1
 exit 0

@@ -12,5 +12,5 @@ sudo git remote add bitbucket https://gothundead@bitbucket.org/gothundead/script
 sudo git push github master
 sudo git push bitbucket master
 echo ""
-$SCRIPTS/.menu/git.sh $1
+$MENU/git.sh $1
 exit 0
