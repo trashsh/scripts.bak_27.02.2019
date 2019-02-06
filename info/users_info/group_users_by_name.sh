@@ -5,4 +5,4 @@ source /etc/profile
 source ~/.bashrc
 
 echo -e "\n${COLOR_YELLOW}Список пользователей группы \"users\", содержащих в имени \"$2\"${COLOR_NC}"
-more /etc/passwd | grep -E ":100::.*$2"
+more /etc/passwd | grep -E ":100::.*$2" | highlight green "$2"

@@ -3,8 +3,10 @@
 source /etc/profile
 source ~/.bashrc
 
-echo -e "$COLOR_YELLOW"Имеющиеся системные пользователи: " $COLOR_NC"
-cat /etc/passwd | grep ":100::"
+#echo -e "$COLOR_YELLOW"Имеющиеся системные пользователи: " $COLOR_NC"
+#cat /etc/passwd | grep ":100::" | highlight yellow "$1"
+$SCRIPTS/info/users_info/full_info_by_name.sh $1 $1
+
 echo ''
 echo -e "$COLOR_YELLOW"Создание системного пользователя " $COLOR_NC"
 read -p "Введите имя пользователя: " username

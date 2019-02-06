@@ -5,5 +5,4 @@ source /etc/profile
 source ~/.bashrc
 
 echo -e "\n${COLOR_YELLOW}Список пользователей группы \"ftp-access\", содержащих в имени \"$2\"${COLOR_NC}"
-more /etc/group | grep -E "ftp-access.*$2"
-echo ""
+more /etc/group | grep -E "ftp-access.*$2" | highlight green "$2"
