@@ -5,6 +5,7 @@ sudo sed -i "s/|\s*\((count(\$analyzed_sql_results\['select_expr'\]\)/| (\1)/g" 
 sed -i '$ a source $SCRIPTS/functions/file_params_not_found.sh'  /root/.bashrc
 sed -i '$ a source $SCRIPTS/external_scripts/dev-shell-essentials-master/dev-shell-essentials.sh'  /root/.bashrc
 sed -i '$ a source $SCRIPTS/external_scripts/dev-shell-essentials-master/dev-shell-essentials.sh'  /etc/profile
+sed -i '$ a export LINE=\"----------------------------------------------------------------------------------------------"'  /etc/profile
 source ~/.bashrc
 source /etc/profile
 
