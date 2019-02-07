@@ -3,9 +3,10 @@
 #$1-username
 source /etc/profile
 source ~/.bashrc
+source $SCRIPTS/info/users_info/users_info.sh
 
-echo ''
-cat /etc/passwd | grep ":100::"
+viewGroupUsersAccessAll
+
 echo -e "\n$COLOR_YELLOWУдаление системного пользователя  $COLOR_NC"
 read -p "Введите имя пользователя: " username
 	
@@ -16,7 +17,7 @@ read -p "Введите имя пользователя: " username
 			echo -n ": "
 			case "$REPLY" in
 			y|Y) userdel -r $username
-				 $SCRIPTS/mysql/userdel.sh $1 $username
+				 $SCRIPTS/mysql/make/userdel_make.sh $1 $username
 					$MENU/user.sh
 					break;;
 			n|N)  $MENU/user.sh $1
@@ -24,5 +25,3 @@ read -p "Введите имя пользователя: " username
 			esac
 		done
 
- $SCRIPTS/info/mysql/full_info.sh
-	

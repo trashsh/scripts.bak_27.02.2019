@@ -14,6 +14,7 @@ echo $1
 	echo '3: Управление базами данных'
 	echo '4: Управление бэкапами'
 	echo '5: Git'
+	echo '8: Testing'
 	echo '9: Сервер'
 	echo 'q: Выход'
 	echo ''
@@ -27,6 +28,7 @@ echo $1
 		"3")  $MENU/sql.sh $USERNAME;  break;;
 		"4")  $MENU/backup.sh $USERNAME;  break;;
 		"5")  $MENU/git.sh $USERNAME;  break;;
+		"8")  $MENU/testing.sh $USERNAME;  break;;
 		"9")  $MENU/server.sh $USERNAME;  break;;
         "q"|"Q")  exit 0;; 
          *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2;;
