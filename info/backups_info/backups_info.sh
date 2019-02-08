@@ -71,7 +71,6 @@ read DATE1
 echo -e -n "$COLOR_BLUE"Укажите последнюю дату диапазона в формате yyyymmdd:" $COLOR_NC"
 read DATE2
 echo -e "$COLOR_YELLOW"Список бэкапов $(date --date $DATE1 "+%Y.%m.%d") - $(date --date $DATE2 "+%Y.%m.%d")" $COLOR_NC"
-
 start_ts=$(date -d "$DATE1" '+%s')
 end_ts=$(date -d "$DATE2" '+%s')
 range=$(( ( end_ts - start_ts )/(60*60*24) ))
