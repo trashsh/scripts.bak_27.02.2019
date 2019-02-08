@@ -52,7 +52,13 @@ echo -e "$COLOR_YELLOW"Создание пользователя базы дан
 			if [ -f "$HOMEPATHWEBUSERS"/"$2"/".my.cnf" ] ; then
 				   cat $HOMEPATHWEBUSERS/$2/.my.cnf | grep $HOMEPATHWEBUSERS
 							{
+					echo '[mysqld]'
+					echo 'init_connect=‘SET collation_connection=utf8_general_ci’'
+					echo 'character-set-server=utf8'
+					echo 'collation-server=utf8_general_ci'
+					echo ''					
 					echo '[client]'
+					echo 'default-character-set=utf8'
 					echo 'user='$2
 					echo 'password='$PASSWORD
 					} > $HOMEPATHWEBUSERS/$2/.my.cnf
@@ -72,10 +78,4 @@ else
     echo -e "\n$COLOR_YELLOW Параметры запуска не найдены$COLOR_NC. Необходимы параметры: имя пользователя"
     FileParamsNotFound "$1" "Для запуска главного введите" "$SCRIPTS/menu"  
 fi
-
-
-
-
-
-
 
