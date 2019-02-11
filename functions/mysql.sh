@@ -241,25 +241,34 @@ dbCheckExportedBase(){
 dbCreateUser(){
 if [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ] 
 then
-	if [[ ! -z "`mysql -qfsBe "SELECT User FROM mysql.user WHERE User='$1'" 2>&1`" ]]
+	if [[  -z "`mysql -qfsBe "SELECT User FROM mysql.user WHERE User='$1'" 2>&1`" ]]
 	then
 				
         case "$3" in
+		#права пользователя
         1)  mysql -e "CREATE USER '$1'@'localhost' IDENTIFIED BY '$2';"
 			mysql -e "FLUSH PRIVILEGES;"
-			echo -e "${COLOR_LIGHT_PURPLE}Пользователь баз данных mysql ${COLOR_YELLOW}$2${COLOR_LIGHT_PURPLE} создан${COLOR_NC}"			
-			break
+			echo -e "${COLOR_LIGHT_PURPLE}\nПользователь баз данных mysql ${COLOR_YELLOW}$2${COLOR_LIGHT_PURPLE} создан${COLOR_NC}"
+			dbViewUserInfo $1
 			;;
-		2)  mysql -e "GRANT ALL PRIVILEGES ON *.* To '$1'@'localhost' IDENTIFIED BY '$2' WITH GRANT OPTION;"
+		#права администратора без GRANT OPTION
+		2)  mysql -e "GRANT ALL PRIVILEGES ON *.* To '$1'@'localhost' IDENTIFIED BY '$2';"
 			mysql -e "FLUSH PRIVILEGES;"
-			echo -e "${COLOR_LIGHT_PURPLE}Пользователь баз данных mysql ${COLOR_YELLOW}$2${COLOR_LIGHT_PURPLE} с правами администратора создан${COLOR_NC}"
-			break
+			echo -e "${COLOR_LIGHT_PURPLE}\nПользователь баз данных mysql ${COLOR_YELLOW}$2${COLOR_LIGHT_PURPLE} с правами администратора создан${COLOR_NC}"
+			dbViewUserInfo $1
+			;;
+		#права администратора с GRANT OPTION	
+		3)  mysql -e "GRANT ALL PRIVILEGES ON *.* To '$1'@'localhost' IDENTIFIED BY '$2'  WITH GRANT OPTION;"
+			mysql -e "FLUSH PRIVILEGES;"
+			echo -e "${COLOR_LIGHT_PURPLE}\nПользователь баз данных mysql ${COLOR_YELLOW}$2${COLOR_LIGHT_PURPLE} с правами администратора {WITH GRANT OPTION} создан${COLOR_NC}"
+			dbViewUserInfo $1
 			;;
 		*) echo -e "${COLOR_RED}Ошибка передачи параметра 'type' в функцию ${COLOR_YELLOW}dbCreateUser${COLOR_NC}";;
         esac
 		
 	else
-		echo -e "${COLOR_RED}Пользователь ${COLOR_YELLOW}\"$1\"${COLOR_RED}уже существует."
+		echo -e "${COLOR_RED}\nПользователь ${COLOR_YELLOW}\"$1\"${COLOR_RED} уже существует."
+		dbViewUserInfo $1
 		
 	fi
 else
@@ -330,7 +339,7 @@ dbViewAllUsersByContainName(){
 		echo -e "${COLOR_LIGHT_YELLOW}\nПеречень пользователей MYSQL, содержащих в названии \"$1\" $COLOR_NC"
 		mysql -e "SELECT User,Host,Grant_priv,Create_priv,Drop_priv,Create_user_priv FROM mysql.user WHERE User like '%%$1%%' ORDER BY User ASC"
 	else
-		echo -e "${COLOR_LIGHT_RED}Не передан параметр в функцию dbViewAllUsersByContainName в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}" 
+		echo -e "${COLOR_RED}Не передан параметр в функцию dbViewAllUsersByContainName в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}" 
 		exit 1
 	fi
 }
@@ -339,10 +348,16 @@ dbViewAllUsersByContainName(){
 dbViewUserInfo(){
 	if [ -n "$1" ] 
 	then
-		echo -e "${COLOR_LIGHT_YELLOW}\nИнформация о пользователе ${COLOR_GREEN}\"$1\" $COLOR_NC"
-		mysql -e "SELECT User,Host,Grant_priv,Create_priv,Drop_priv,Create_user_priv, Delete_priv FROM mysql.user WHERE User like '$1' ORDER BY User ASC"
+		if [[ ! -z "`mysql -qfsBe "SELECT User FROM mysql.user WHERE User='$1'" 2>&1`" ]]
+		then
+			echo -e "${COLOR_YELLOW}\nИнформация о пользователе MYSQL ${COLOR_GREEN}\"$1\" $COLOR_NC"
+			mysql -e "SELECT User,Host,Grant_priv,Create_priv,Drop_priv,Create_user_priv, Delete_priv,account_locked, password_last_changed FROM mysql.user WHERE User like '$1' ORDER BY User ASC"
+			
+		else
+			echo -e "${COLOR_RED}Пользователь ${COLOR_YELLOW} \"$1\" ${COLOR_RED} не существует ${COLOR_NC}" 
+		fi		
 	else
-		echo -e "${COLOR_LIGHT_RED}Не передан параметр в функцию dbViewAllUsersByContainName в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}" 
+		echo -e "${COLOR_RED}Не передан параметр в функцию dbViewUserInfo в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}" 
 		exit 1
 	fi
 }

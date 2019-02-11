@@ -4,4 +4,4 @@ source ~/.bashrc
 source $SCRIPTS/functions/mysql.sh
 source $SCRIPTS/functions/archive.sh
 
-dbViewUserInfo $1
+dbCreateUser $1 $2 $3
