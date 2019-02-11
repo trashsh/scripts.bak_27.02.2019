@@ -8,11 +8,10 @@ declare -x -f dbBackupBasesOneUser # #Создание бэкапа всех п�
 
 
 declare -x -f dbViewAllBases 			#отобразить список всех баз данных mysql
-declare -x -f dbViewBasesByUser 		#отобразить список всех баз данных, владельцем которой является пользователь mysql $1_*		 	($1-user)
+declare -x -f dbViewBasesByUsername 		#отобразить список всех баз данных, владельцем которой является пользователь mysql $1_*		 	($1-user)
 declare -x -f dbViewBasesByTextContain 		#отобразить список всех баз данных mysql с названием, содержащим переменную $1		 			($1-user)
 declare -x -f dbViewAllUsers			#отобразить список всех пользователей баз данных mysql
 declare -x -f dbViewAllUsersByContainName		#отобразить список всех пользователей баз данных mysql, содержащих в названии переменную $1		($1-user)
-declare -x -f dbViewAllInfo				#отобразить всю информацию по mysql-базам
 declare -x -f dbViewUserInfo
 
 
@@ -285,40 +284,32 @@ fi
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 #отобразить список всех баз данных mysql
 dbViewAllBases(){
-	echo -e "${COLOR_LIGHT_YELLOW}Перечень баз данных MYSQL ${COLOR_NC}"
+	echo -e "${COLOR_YELLOW}\nПеречень баз данных MYSQL ${COLOR_NC}"
 	mysql -e "show databases;"	
 }
 
+
 #отобразить список всех баз данных, владельцем которой является пользователь mysql $1_*
-dbViewBasesByUser(){
+dbViewBasesByUsername(){
 	if [ -n "$1" ] 
 	then
-		echo -e "${COLOR_LIGHT_YELLOW} \nПеречень баз данных MYSQL пользователя \"$1\" ${COLOR_NC}"
+		echo -e "${COLOR_YELLOW} \nПеречень баз данных MYSQL пользователя ${COLOR_GREEN}\"$1\" ${COLOR_NC}"
 		mysql -e "SHOW DATABASES LIKE '$1\_%';"
 	else
-		echo -e "${COLOR_LIGHT_RED}Не передан параметр в функцию dbViewBasesByUser в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}" 
+		echo -e "${COLOR_LIGHT_RED}Не передан параметр в функцию dbViewBasesByUsername в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}" 
 		exit 1
 	fi
 }
 
+#######СДЕЛАНО. Не трогать!!!!#######
 #отобразить список всех баз данных mysql с названием, содержащим переменную $1
+#$без параметров
 dbViewBasesByTextContain(){	
 	if [ -n "$1" ] 
 	then
-		echo -e "${COLOR_LIGHT_YELLOW} \nПеречень баз данных MYSQL содержащих в названии слово \"$1\" ${COLOR_NC}"
+		echo -e "${COLOR_YELLOW} \nПеречень баз данных MYSQL содержащих в названии слово ${COLOR_GREEN}\"$1\" ${COLOR_NC}"
 		mysql -e "SHOW DATABASES LIKE '%$1%';"
 	else
 		echo -e "${COLOR_LIGHT_RED}Не передан параметр в функцию dbViewBasesByTextContain в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}" 
@@ -326,25 +317,31 @@ dbViewBasesByTextContain(){
 	fi
 }
 
+#######СДЕЛАНО. Не трогать!!!!#######
 #отобразить список всех пользователей баз данных mysql
+#$без параметров
 dbViewAllUsers(){
 	echo -e "${COLOR_LIGHT_YELLOW}Перечень пользователей MYSQL ${COLOR_NC}"
-	mysql -e "SELECT User,Host FROM mysql.user;"
+	mysql -e "SELECT User,Host,Grant_priv,Create_priv,Drop_priv,Create_user_priv,Delete_priv,account_locked, password_last_changed FROM mysql.user;"
 }
 
+#######СДЕЛАНО. Не трогать!!!!#######
 #отобразить список всех пользователей баз данных mysql, содержащих в названии переменную $1
+#$1-user
 dbViewAllUsersByContainName(){
 	if [ -n "$1" ] 
 	then
-		echo -e "${COLOR_LIGHT_YELLOW}\nПеречень пользователей MYSQL, содержащих в названии \"$1\" $COLOR_NC"
-		mysql -e "SELECT User,Host,Grant_priv,Create_priv,Drop_priv,Create_user_priv FROM mysql.user WHERE User like '%%$1%%' ORDER BY User ASC"
+		echo -e "${COLOR_YELLOW}\nПеречень пользователей MYSQL, содержащих в названии ${COLOR_GREEN}\"$1\" $COLOR_NC"
+		mysql -e "SELECT User,Host,Grant_priv,Create_priv,Drop_priv,Create_user_priv,Delete_priv,account_locked, password_last_changed FROM mysql.user WHERE User like '%%$1%%' ORDER BY User ASC"
 	else
 		echo -e "${COLOR_RED}Не передан параметр в функцию dbViewAllUsersByContainName в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}" 
 		exit 1
 	fi
 }
 
+#######СДЕЛАНО. Не трогать!!!!#######
 #отобразить информацию о пользователе
+#$1-user
 dbViewUserInfo(){
 	if [ -n "$1" ] 
 	then
@@ -360,13 +357,4 @@ dbViewUserInfo(){
 		echo -e "${COLOR_RED}Не передан параметр в функцию dbViewUserInfo в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}" 
 		exit 1
 	fi
-}
-
-#отобразить всю информацию по mysql-базам
-dbViewAllInfo(){
-	dbViewAllBases
-	dbViewBasesByUser $1
-	dbViewBasesByTextContain $1
-	dbViewAllUsers
-	dbViewAllUsersByContainName $1
 }
