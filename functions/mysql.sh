@@ -286,7 +286,7 @@ fi
 
 #отобразить список всех баз данных mysql
 dbViewAllBases(){
-	echo -e "${COLOR_YELLOW}\nПеречень баз данных MYSQL ${COLOR_NC}"
+	echo -e "${COLOR_YELLOW}Перечень баз данных MYSQL ${COLOR_NC}"
 	mysql -e "show databases;"	
 }
 
@@ -295,8 +295,14 @@ dbViewAllBases(){
 dbViewBasesByUsername(){
 	if [ -n "$1" ] 
 	then
-		echo -e "${COLOR_YELLOW} \nПеречень баз данных MYSQL пользователя ${COLOR_GREEN}\"$1\" ${COLOR_NC}"
-		mysql -e "SHOW DATABASES LIKE '$1\_%';"
+		#проверка на пустой результат
+		if [[ $(mysql -e "SHOW DATABASES LIKE '$1\_%';") ]]; then
+			echo -e "${COLOR_YELLOW}Перечень баз данных MYSQL пользователя ${COLOR_GREEN}\"$1\" ${COLOR_NC}"
+			mysql -e "SHOW DATABASES LIKE '$1\_%';"
+		else
+			echo -e "${COLOR_LIGHT_RED}Базы данных, в имени которых содержится значение ${COLOR_YELLOW}\"$1\"${COLOR_LIGHT_RED} отсутствуют${COLOR_NC}"
+		fi
+				
 	else
 		echo -e "${COLOR_LIGHT_RED}Не передан параметр в функцию dbViewBasesByUsername в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}" 
 		exit 1
@@ -308,9 +314,14 @@ dbViewBasesByUsername(){
 #$без параметров
 dbViewBasesByTextContain(){	
 	if [ -n "$1" ] 
-	then
-		echo -e "${COLOR_YELLOW} \nПеречень баз данных MYSQL содержащих в названии слово ${COLOR_GREEN}\"$1\" ${COLOR_NC}"
-		mysql -e "SHOW DATABASES LIKE '%$1%';"
+	then	
+		#проверка на пустой результат
+		if [[ $(mysql -e "SHOW DATABASES LIKE '%$1%';") ]]; then
+			echo -e "${COLOR_YELLOW}Перечень баз данных MYSQL содержащих в названии слово ${COLOR_GREEN}\"$1\" ${COLOR_NC}"
+			mysql -e "SHOW DATABASES LIKE '%$1%';"
+		else
+			echo -e "${COLOR_LIGHT_RED}Пользователи, в имени которых содержится значение ${COLOR_YELLOW}\"$1\"${COLOR_LIGHT_RED} отсутствуют${COLOR_NC}"
+		fi	
 	else
 		echo -e "${COLOR_LIGHT_RED}Не передан параметр в функцию dbViewBasesByTextContain в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}" 
 		exit 1
@@ -321,7 +332,7 @@ dbViewBasesByTextContain(){
 #отобразить список всех пользователей баз данных mysql
 #$без параметров
 dbViewAllUsers(){
-	echo -e "${COLOR_LIGHT_YELLOW}Перечень пользователей MYSQL ${COLOR_NC}"
+	echo -e "${COLOR_YELLOW}Перечень пользователей MYSQL ${COLOR_NC}"
 	mysql -e "SELECT User,Host,Grant_priv,Create_priv,Drop_priv,Create_user_priv,Delete_priv,account_locked, password_last_changed FROM mysql.user;"
 }
 
@@ -331,8 +342,14 @@ dbViewAllUsers(){
 dbViewAllUsersByContainName(){
 	if [ -n "$1" ] 
 	then
-		echo -e "${COLOR_YELLOW}\nПеречень пользователей MYSQL, содержащих в названии ${COLOR_GREEN}\"$1\" $COLOR_NC"
+		#проверка на пустой результат
+		if [[ $(mysql -e "SELECT User,Host,Grant_priv,Create_priv,Drop_priv,Create_user_priv,Delete_priv,account_locked, password_last_changed FROM mysql.user WHERE User like '%%$1%%' ORDER BY User ASC") ]]; then
+			echo -e "${COLOR_YELLOW}Перечень пользователей MYSQL, содержащих в названии ${COLOR_GREEN}\"$1\" $COLOR_NC"
 		mysql -e "SELECT User,Host,Grant_priv,Create_priv,Drop_priv,Create_user_priv,Delete_priv,account_locked, password_last_changed FROM mysql.user WHERE User like '%%$1%%' ORDER BY User ASC"
+		else
+			echo -e "${COLOR_LIGHT_RED}Пользователи, в имени которых содержится значение ${COLOR_YELLOW}\"$1\"${COLOR_LIGHT_RED} отсутствуют${COLOR_NC}"
+		fi
+			
 	else
 		echo -e "${COLOR_RED}Не передан параметр в функцию dbViewAllUsersByContainName в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}" 
 		exit 1
@@ -347,11 +364,11 @@ dbViewUserInfo(){
 	then
 		if [[ ! -z "`mysql -qfsBe "SELECT User FROM mysql.user WHERE User='$1'" 2>&1`" ]]
 		then
-			echo -e "${COLOR_YELLOW}\nИнформация о пользователе MYSQL ${COLOR_GREEN}\"$1\" $COLOR_NC"
+			echo -e "${COLOR_YELLOW}Информация о пользователе MYSQL ${COLOR_GREEN}\"$1\" $COLOR_NC"
 			mysql -e "SELECT User,Host,Grant_priv,Create_priv,Drop_priv,Create_user_priv, Delete_priv,account_locked, password_last_changed FROM mysql.user WHERE User like '$1' ORDER BY User ASC"
 			
 		else
-			echo -e "${COLOR_RED}Пользователь ${COLOR_YELLOW} \"$1\" ${COLOR_RED} не существует ${COLOR_NC}" 
+			echo -e "${COLOR_LIGHT_RED}Пользователь ${COLOR_YELLOW} \"$1\" ${COLOR_LIGHT_RED} не существует ${COLOR_NC}" 
 		fi		
 	else
 		echo -e "${COLOR_RED}Не передан параметр в функцию dbViewUserInfo в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}" 
