@@ -4,6 +4,7 @@ source $SCRIPTS/functions/archive.sh
 declare -x -f dbBackupBases	#Создание бэкапа всех пользовательских баз данных. #В параметре $1 может быть установлен каталог выгрузки. По умолчанию грузится в `date +%Y.%m.%d`
 declare -x -f dbBackupBase	#Создание бэкапа указанной базы данных. #$1 - название базы данных. В параметре $2 может быть установлен каталог выгрузки. По умолчанию грузится в $BACKUPFOLDER_DAYS\`date +%Y.%m.%d`
 declare -x -f dbCheckExportedBase #проверка успешности выгрузки базы данных mysql. $1-имя базы; $2-имя проверяемого файла
+declare -x -f dbBackupBasesOneUser
 
 #######СДЕЛАНО. Не трогать!!!!#######
 #Создание бэкапа всех пользовательских баз данных.
@@ -19,7 +20,7 @@ dbBackupBases(){
 #проверка существования каталога из полученного параметра
 		if ! [ -d "$1" ] ; then
 			echo -e "${COLOR_RED} Каталог \"$1\" не найден ${COLOR_NC}. Создать его?"	
-			echo -n -e "Введите $COLOR_BLUE\"y\"${COLOR_NC} для создания каталога \"$1\", для отмены операции - $COLOR_BLUE\"n\"${COLOR_NC}: "
+			echo -n -e "Введите ${COLOR_BLUE}\"y\"${COLOR_NC} для создания каталога ${COLOR_YELLOW}\"$1\"${COLOR_NC}, для отмены операции - ${COLOR_BLUE}\"n\"${COLOR_NC}: "
 		
 			while read
 			do
@@ -66,6 +67,82 @@ done
 }
 
 #--------------------------------------------------------------------------------------------------------------------------------
+
+#Создание бэкапа всех пользовательских баз данных указанного пользователя.
+#$1-username параметре $2 может быть установлен каталог выгрузки. По умолчанию грузится в $BACKUPFOLDER_DAYS\`date +%Y.%m.%d`
+dbBackupBasesOneUser(){
+#	mysql -e "show databases;"
+	d=`date +%Y.%m.%d`;
+	dt=`date +%Y.%m.%d_%H.%M`;
+	
+	if [[ ! -z "`mysql -qfsBe "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='$1'" 2>&1`" ]];
+	then
+	  echo "Указанный пользователь существует"
+	else
+	  echo -e "${COLOR_RED}Указанный пользователь ${COLOR_YELLOW}\"$1\"${COLOR_RED} не существует${COLOR_NC}"
+	fi
+	
+		
+		
+	
+#проверка существование каталога назначения и его создание при необходимости		
+#проверка существования переданного параметра
+	if [ -n "$2" ] 
+	then	
+#проверка существования каталога из полученного параметра
+		if ! [ -d "$2" ] ; then
+			echo -e "${COLOR_RED} Каталог \"$2\" не найден ${COLOR_NC}. Создать его?"	
+			echo -n -e "Введите ${COLOR_BLUE}\"y\"${COLOR_NC} для создания каталога ${COLOR_YELLOW}\"$2\"${COLOR_NC}, для отмены операции - ${COLOR_BLUE}\"n\"${COLOR_NC}: "
+		
+			while read
+			do
+			echo -n ": "
+				case "$REPLY" in
+				y|Y) 
+					mkdir -p "$2";
+				DESTINATION=$2
+				echo $DESTINATION				
+					break;;
+				n|N)
+					 break;;
+				esac	
+			done
+			else 
+			#каталог существует
+			DESTINATION=$2
+		fi	
+	else
+		#каталог устанавливается по умолчанию
+		DESTINATION=$BACKUPFOLDER_DAYS/$d
+	fi
+
+	databases=`mysql -e "SHOW DATABASES LIKE '"$1"_%';" | tr -d "| " | grep -v Database`
+#создание каталога назначения, если его нет
+	if ! [ -d "$DESTINATION" ] ; then
+		mkdir -p "$DESTINATION"
+	fi
+	
+	
+#выгрузка баз данных				
+	for db in $databases; do
+		FILENAME=$DESTINATION/mysql."$db"-$dt 
+		echo $FILENAME
+		if [[ "$db" != "information_schema" ]] && [[ "$db" != "performance_schema" ]] && [[ "$db" != "mysql" ]] && [[ "$db" != _* ]] && [[ "$db" != "phpmyadmin" ]] && [[ "$db" != "sys" ]] ; then
+			echo -e "---\nВыгрузка базы данных MYSQL: ${COLOR_YELLOW}$db${COLOR_NC}"
+			mysqldump --databases $db > $FILENAME.sql
+#архивация выгруженной базы и удаление оригинального файла sql
+			tar_file_without_structure_remove	$FILENAME.sql $FILENAME.tar.gz	
+#проверка на существование выгруженных и заархививанных баз данных
+			if  [ -f "$FILENAME.tar.gz" ] ; then
+				echo -e "${COLOR_GREEN}Выгрузка базы данных MYSQL:${COLOR_NC} ${COLOR_YELLOW}$db${COLOR_NC} ${COLOR_GREEN}успешно завершилась в файл${COLOR_NC}${COLOR_YELLOW} \"$FILENAME.tar.gz\"${COLOR_NC}\n---"
+			else
+				echo -e "${COLOR_RED}Выгрузка базы данных: ${COLOR_NC}${COLOR_YELLOW}$db${COLOR_NC} ${COLOR_RED}завершилась с ошибкой${COLOR_NC}\n---"
+			fi			
+	fi		
+done
+}
+
+#--------------------------------------------------------------------------------------------------------------------------------
 #######СДЕЛАНО. Не трогать!!!!#######
 #Создание бэкапа указанной базы данных.
 #$1 - название базы данных. В параметре $2 может быть установлен каталог выгрузки. По умолчанию грузится в $BACKUPFOLDER_DAYS\`date +%Y.%m.%d`
@@ -92,8 +169,9 @@ dbBackupBase(){
 			mkdir -p $BACKUPFOLDER_DAYS/$d
 		fi		
 		
+		
 		#пусть к файлу с бэкапом без расширения
-		FILENAME=$DESTINATION/$1_$dt
+		FILENAME=$DESTINATION/mysql."$db"-$dt 
 
 		#проверка существования папки для сохранения бэкапа
 		if [ -d "$DESTINATION" ] ; then
@@ -103,7 +181,7 @@ dbBackupBase(){
 		#Если нет каталога назначения	
 		else
 			echo -e "${COLOR_RED} Каталог ${COLOR_YELLOW}\"$DESTINATION\"${COLOR_NC}${COLOR_RED} не найден ${COLOR_NC}. Создать его?"	
-			echo -n -e "Введите $COLOR_BLUE\"y\"$COLOR_NC для создания каталога \"$DESTINATION\", для отмены операции - $COLOR_BLUE\"n\"$COLOR_NC: "
+			echo -n -e "Введите ${COLOR_BLUE}\"y\"$COLOR_NC для создания каталога ${COLOR_YELLOW}\"$DESTINATION\"${COLOR_nC}, для отмены операции - ${COLOR_BLUE}\"n\"$COLOR_NC: "
 		
 			while read
 			do
