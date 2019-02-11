@@ -4,7 +4,17 @@ source $SCRIPTS/functions/archive.sh
 declare -x -f dbBackupBases	#Создание бэкапа всех пользовательских баз данных. #В параметре $1 может быть установлен каталог выгрузки. По умолчанию грузится в `date +%Y.%m.%d`
 declare -x -f dbBackupBase	#Создание бэкапа указанной базы данных. #$1 - название базы данных. В параметре $2 может быть установлен каталог выгрузки. По умолчанию грузится в $BACKUPFOLDER_DAYS\`date +%Y.%m.%d`
 declare -x -f dbCheckExportedBase #проверка успешности выгрузки базы данных mysql. $1-имя базы; $2-имя проверяемого файла
-declare -x -f dbBackupBasesOneUser
+declare -x -f dbBackupBasesOneUser # #Создание бэкапа всех пользовательских баз данных указанного пользователя. #$1-username параметре $2 может быть установлен каталог выгрузки. По умолчанию грузится в $BACKUPFOLDER_DAYS\`date +%Y.%m.%d`
+
+
+declare -x -f dbViewAllBases 			#отобразить список всех баз данных mysql
+declare -x -f dbViewBasesByUser 		#отобразить список всех баз данных, владельцем которой является пользователь mysql $1_*		 	($1-user)
+declare -x -f dbViewBasesByTextContain 		#отобразить список всех баз данных mysql с названием, содержащим переменную $1		 			($1-user)
+declare -x -f dbViewAllUsers			#отобразить список всех пользователей баз данных mysql
+declare -x -f dbViewAllUsersByContainName		#отобразить список всех пользователей баз данных mysql, содержащих в названии переменную $1		($1-user)
+declare -x -f dbViewAllInfo				#отобразить всю информацию по mysql-базам
+declare -x -f dbViewUserInfo
+
 
 #######СДЕЛАНО. Не трогать!!!!#######
 #Создание бэкапа всех пользовательских баз данных.
@@ -67,7 +77,7 @@ done
 }
 
 #--------------------------------------------------------------------------------------------------------------------------------
-
+#######СДЕЛАНО. Не трогать!!!!#######
 #Создание бэкапа всех пользовательских баз данных указанного пользователя.
 #$1-username параметре $2 может быть установлен каталог выгрузки. По умолчанию грузится в $BACKUPFOLDER_DAYS\`date +%Y.%m.%d`
 dbBackupBasesOneUser(){
@@ -75,16 +85,9 @@ dbBackupBasesOneUser(){
 	d=`date +%Y.%m.%d`;
 	dt=`date +%Y.%m.%d_%H.%M`;
 	
-	if [[ ! -z "`mysql -qfsBe "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='$1'" 2>&1`" ]];
+	if [[ ! -z "`mysql -qfsBe "SELECT User FROM mysql.user WHERE User='$1'" 2>&1`" ]]
 	then
-	  echo "Указанный пользователь существует"
-	else
-	  echo -e "${COLOR_RED}Указанный пользователь ${COLOR_YELLOW}\"$1\"${COLOR_RED} не существует${COLOR_NC}"
-	fi
-	
-		
-		
-	
+	  #Указанный пользователь существует
 #проверка существование каталога назначения и его создание при необходимости		
 #проверка существования переданного параметра
 	if [ -n "$2" ] 
@@ -140,6 +143,14 @@ dbBackupBasesOneUser(){
 			fi			
 	fi		
 done
+	else	
+	  echo -e "${COLOR_RED}Указанный пользователь ${COLOR_YELLOW}\"$1\"${COLOR_RED} не существует${COLOR_NC}"
+	fi
+	
+		
+		
+	
+
 }
 
 #--------------------------------------------------------------------------------------------------------------------------------
@@ -212,7 +223,8 @@ dbBackupBase(){
 	#конец проверки существования базы		
 }
 
-#######СДЕЛАНО. Не трогать!!!!#######
+#---------------------------------------------------------------------------------------------------------------------
+#######СДЕЛАНО. Не трогать!!!!####### Можно сделать проверку не по наличию файла, а используя тестирование архива
 #проверка успешности выгрузки базы данных mysql $1 в файл $2
 #$1-имя базы; $2-имя файла
 dbCheckExportedBase(){
@@ -221,4 +233,125 @@ dbCheckExportedBase(){
 			else
 				echo -e "${COLOR_RED}Выгрузка базы данных: ${COLOR_NC}${COLOR_YELLOW}\"$1\"${COLOR_NC}${COLOR_RED} в файл ${COLOR_YELLOW}\"$2\"${COLOR_NC}${COLOR_RED} завершилась с ошибкой. Указанный файл отсутствует${COLOR_NC}\n---"
 	fi
+}
+
+#проверка успешности выгрузки базы данных mysql $1 в файл $2
+#$1-имя пользователя, $2-пароль, $3 - тип пользователя
+#type1-user,	type2-admin WITH GRANT OPTION
+dbCreateUser(){
+if [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ] 
+then
+	if [[ ! -z "`mysql -qfsBe "SELECT User FROM mysql.user WHERE User='$1'" 2>&1`" ]]
+	then
+				
+        case "$3" in
+        1)  mysql -e "CREATE USER '$1'@'localhost' IDENTIFIED BY '$2';"
+			mysql -e "FLUSH PRIVILEGES;"
+			echo -e "${COLOR_LIGHT_PURPLE}Пользователь баз данных mysql ${COLOR_YELLOW}$2${COLOR_LIGHT_PURPLE} создан${COLOR_NC}"			
+			break
+			;;
+		2)  mysql -e "GRANT ALL PRIVILEGES ON *.* To '$1'@'localhost' IDENTIFIED BY '$2' WITH GRANT OPTION;"
+			mysql -e "FLUSH PRIVILEGES;"
+			echo -e "${COLOR_LIGHT_PURPLE}Пользователь баз данных mysql ${COLOR_YELLOW}$2${COLOR_LIGHT_PURPLE} с правами администратора создан${COLOR_NC}"
+			break
+			;;
+		*) echo -e "${COLOR_RED}Ошибка передачи параметра 'type' в функцию ${COLOR_YELLOW}dbCreateUser${COLOR_NC}";;
+        esac
+		
+	else
+		echo -e "${COLOR_RED}Пользователь ${COLOR_YELLOW}\"$1\"${COLOR_RED}уже существует."
+		
+	fi
+else
+ echo -e "${COLOR_RED}В функцию ${COLOR_NC}${COLOR_YELLOW}\"dbCreateUser\"${COLOR_NC}${COLOR_RED} не переданы параметры ${COLOR_NC}"
+fi
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#отобразить список всех баз данных mysql
+dbViewAllBases(){
+	echo -e "${COLOR_LIGHT_YELLOW}Перечень баз данных MYSQL ${COLOR_NC}"
+	mysql -e "show databases;"	
+}
+
+#отобразить список всех баз данных, владельцем которой является пользователь mysql $1_*
+dbViewBasesByUser(){
+	if [ -n "$1" ] 
+	then
+		echo -e "${COLOR_LIGHT_YELLOW} \nПеречень баз данных MYSQL пользователя \"$1\" ${COLOR_NC}"
+		mysql -e "SHOW DATABASES LIKE '$1\_%';"
+	else
+		echo -e "${COLOR_LIGHT_RED}Не передан параметр в функцию dbViewBasesByUser в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}" 
+		exit 1
+	fi
+}
+
+#отобразить список всех баз данных mysql с названием, содержащим переменную $1
+dbViewBasesByTextContain(){	
+	if [ -n "$1" ] 
+	then
+		echo -e "${COLOR_LIGHT_YELLOW} \nПеречень баз данных MYSQL содержащих в названии слово \"$1\" ${COLOR_NC}"
+		mysql -e "SHOW DATABASES LIKE '%$1%';"
+	else
+		echo -e "${COLOR_LIGHT_RED}Не передан параметр в функцию dbViewBasesByTextContain в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}" 
+		exit 1
+	fi
+}
+
+#отобразить список всех пользователей баз данных mysql
+dbViewAllUsers(){
+	echo -e "${COLOR_LIGHT_YELLOW}Перечень пользователей MYSQL ${COLOR_NC}"
+	mysql -e "SELECT User,Host FROM mysql.user;"
+}
+
+#отобразить список всех пользователей баз данных mysql, содержащих в названии переменную $1
+dbViewAllUsersByContainName(){
+	if [ -n "$1" ] 
+	then
+		echo -e "${COLOR_LIGHT_YELLOW}\nПеречень пользователей MYSQL, содержащих в названии \"$1\" $COLOR_NC"
+		mysql -e "SELECT User,Host,Grant_priv,Create_priv,Drop_priv,Create_user_priv FROM mysql.user WHERE User like '%%$1%%' ORDER BY User ASC"
+	else
+		echo -e "${COLOR_LIGHT_RED}Не передан параметр в функцию dbViewAllUsersByContainName в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}" 
+		exit 1
+	fi
+}
+
+#отобразить информацию о пользователе
+dbViewUserInfo(){
+	if [ -n "$1" ] 
+	then
+		echo -e "${COLOR_LIGHT_YELLOW}\nИнформация о пользователе ${COLOR_GREEN}\"$1\" $COLOR_NC"
+		mysql -e "SELECT User,Host,Grant_priv,Create_priv,Drop_priv,Create_user_priv, Delete_priv FROM mysql.user WHERE User like '$1' ORDER BY User ASC"
+	else
+		echo -e "${COLOR_LIGHT_RED}Не передан параметр в функцию dbViewAllUsersByContainName в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}" 
+		exit 1
+	fi
+}
+
+#отобразить всю информацию по mysql-базам
+dbViewAllInfo(){
+	dbViewAllBases
+	dbViewBasesByUser $1
+	dbViewBasesByTextContain $1
+	dbViewAllUsers
+	dbViewAllUsersByContainName $1
 }
