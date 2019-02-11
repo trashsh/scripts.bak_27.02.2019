@@ -3,6 +3,8 @@
 #source ~/.bashrc
 #Вывод сообщения с предложением запуска указанного в параметре 3 меню
 
+declare -x -f FileParamsNotFound
+
 FileParamsNotFound(){
 echo -n -e "${COLOR_YELLOW}$2 ${COLOR_BLUE}\"y\"${COLOR_YELLOW}, для выхода введите ${COLOR_BLUE}\"n\"${COLOR_NC}:"
 	while read
@@ -17,5 +19,3 @@ echo -n -e "${COLOR_YELLOW}$2 ${COLOR_BLUE}\"y\"${COLOR_YELLOW}, для выхо
 		done
 		
 }
-
-declare -x -f FileParamsNotFound
