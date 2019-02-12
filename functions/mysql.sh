@@ -16,6 +16,10 @@ declare -x -f dbViewUserInfo
 
 declare -x -f dbCreateBase	#создание базы данных; #$1-dbname, $2-CHARACTER SET (например utf8), $3-COLLATE (например utf8_general_ci)
 declare -x -f dbViewUserGrant #Предоставление всех прав пользователю на базу: #$1-имя пользователя, $2-база
+declare -x -f dbSetFullAccessToBase #Предоставление всех прав пользователю на базу; #$1-база данных, $2-имя пользователя, $3-сервер
+declare -x -f dbCreateUser #Создание пользователя mysql #$1-имя пользователя, $2-пароль, $3 - тип пользователя    #type 1-user, type 2-admin; type 3-admin WITH GRANT OPTION
+declare -x -f dbDropBase #Удаление базы данных #$1-база данных, $2-"drop" - подтверждение
+declare -x -f dbShowTables #Вывод всех таблиц указанной базы данных  #$1-база данных
 
 #######СДЕЛАНО. Не трогать!!!!#######
 #Создание бэкапа всех пользовательских баз данных.
@@ -398,7 +402,7 @@ dbViewUserGrant(){
 ##$1-user
 	if [ -n "$1" ]
 	then
-	#проверка на существование базы данных
+	#проверка на существование пользователя mysql
 		if [[ ! -z "`mysql -qfsBe "SELECT User FROM mysql.user WHERE User='$1'" 2>&1`" ]];
 		then
 		  mysql -e "SHOW GRANTS FOR '$1'@'localhost';"
@@ -413,9 +417,82 @@ fi
 }
 
 
-
+#######СДЕЛАНО. Не трогать!!!!#######
 #Предоставление всех прав пользователю на базу
-#$1-имя пользователя, $2-база
-dbViewUserGrant(){
+#$1-база данных, $2-имя пользователя, $3-сервер
+dbSetFullAccessToBase(){
+	if [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ]
+	then
+	#проверка на существование пользователя mysql
+		if [[ ! -z "`mysql -qfsBe "SELECT User FROM mysql.user WHERE User='$2'" 2>&1`" ]];
+		then
+			#проверка на существование базы данных
+			if [[ ! -z "`mysql -qfsBe "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='$1'" 2>&1`" ]];
+			then
+				dbViewUserGrant $2
+				mysql -e "GRANT ALL PRIVILEGES ON $1.* TO $2@$3 REQUIRE NONE WITH GRANT OPTION MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0; FLUSH PRIVILEGES;"
+				dbViewUserGrant $2
+			else
+			  echo -e "${COLOR_RED}База данных ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует ${COLOR_NC}" 
+			fi
+			
+		else
+		  echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует ${COLOR_NC}" 
+		fi
+	
+	else
+		echo -e "${COLOR_RED}Не переданы параметры в функцию dbCreateBase в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}" 
+		exit 1
+fi
+}
 
+#######СДЕЛАНО. Не трогать!!!!#######
+#Удаление базы данных
+#$1-база данных, $2-"drop" - подтверждение
+dbDropBase(){
+	if [ -n "$1" ] && [ -n "$2" ]
+	then
+	#проверка на существование пользователя mysql
+		if [ "$2" = "drop" ]
+		then
+			#проверка на существование базы данных
+			if [[ ! -z "`mysql -qfsBe "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='$1'" 2>&1`" ]];
+			then
+				dbViewBasesByTextContain $1
+				mysql -e "DROP DATABASE IF EXISTS $1;"				
+				dbViewBasesByTextContain $1
+			else
+			  
+			  echo -e "${COLOR_RED}База данных ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует ${COLOR_NC}" 
+			fi
+			
+		else
+			
+		  echo -e "${COLOR_RED}Подтверждение на удаление базы данных ${COLOR_GREEN}\"$1\"${COLOR_RED} не получено ${COLOR_NC}" 
+		fi
+	
+	else
+		echo -e "${COLOR_RED}Не переданы параметры в функцию dbCreateBase в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}" 
+		exit 1
+fi
+}
+
+#######СДЕЛАНО. Не трогать!!!!#######
+#Вывод всех таблиц указанной базы данных
+#$1-база данных
+dbShowTables(){
+	if [ -n "$1" ] 
+	then
+			#проверка на существование базы данных
+			if [[ ! -z "`mysql -qfsBe "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='$1'" 2>&1`" ]];
+			then
+				mysql -e "SHOW TABLES FROM $1;"
+			else			  
+			  echo -e "${COLOR_RED}База данных ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует ${COLOR_NC}" 
+			fi
+	
+	else
+		echo -e "${COLOR_RED}Не переданы параметры в функцию dbCreateBase в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}" 
+		exit 1
+fi
 }
