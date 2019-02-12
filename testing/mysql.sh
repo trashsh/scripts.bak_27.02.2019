@@ -36,6 +36,9 @@ echo -e "${COLOR_LIGHT_RED}=========${COLOR_GREEN}dbViewAllBases${COLOR_NC} ${CO
 dbViewAllBases
 echo -e "${COLOR_LIGHT_RED}${COLOR_NC}"
 
+echo -e "${COLOR_LIGHT_RED}=========${COLOR_GREEN}dbViewUserGrant${COLOR_NC} ${COLOR_YELLOW}(#1-USER)${COLOR_NC}${COLOR_LIGHT_RED}===========${COLOR_NC}"
+dbViewUserGrant $test
+echo -e "${COLOR_LIGHT_RED}${COLOR_NC}"
 
 
 read -p "Нажмите Enter Для продолжения. Для выхода - Ctrl+C"
