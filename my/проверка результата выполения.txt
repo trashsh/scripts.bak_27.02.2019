@@ -5,3 +5,10 @@ if [[ $(ls -A) ]]; then
 else
     echo "no files found"
 fi
+
+
+
+
+if [[  -z "`mysql -qfsBe "SELECT User FROM mysql.user WHERE User='$1'" 2>&1`" ]]
+	then
+		

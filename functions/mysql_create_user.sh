@@ -77,8 +77,8 @@ done
 
 #--------------------------------------------------------------------------------------------------------------------------------
 #######СДЕЛАНО. Не трогать!!!!#######
-#Создание бэкапа всех пользовательских баз данных указанного пользователя {username\_%}
-#$1-username; в параметре $2 может быть установлен каталог выгрузки. По умолчанию грузится в $BACKUPFOLDER_DAYS\`date +%Y.%m.%d`
+#Создание бэкапа всех пользовательских баз данных указанного пользователя.
+#$1-username параметре $2 может быть установлен каталог выгрузки. По умолчанию грузится в $BACKUPFOLDER_DAYS\`date +%Y.%m.%d`
 dbBackupBasesOneUser(){
 #	mysql -e "show databases;"
 	d=`date +%Y.%m.%d`;
@@ -146,6 +146,10 @@ done
 	  echo -e "${COLOR_RED}Указанный пользователь ${COLOR_YELLOW}\"$1\"${COLOR_RED} не существует${COLOR_NC}"
 	fi
 	
+		
+		
+	
+
 }
 
 #--------------------------------------------------------------------------------------------------------------------------------
@@ -231,12 +235,12 @@ dbCheckExportedBase(){
 }
 
 
-#######СДЕЛАНО. Не трогать!!!!#######
-#Создание пользователя mysql
+#проверка успешности выгрузки базы данных mysql $1 в файл $2
 #$1-имя пользователя, $2-пароль, $3 - тип пользователя    #type 1-user, type 2-admin; type 3-admin WITH GRANT OPTION
 dbCreateUser(){
 if [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ] 
 then
+
 	if [[  -z "`mysql -qfsBe "SELECT User FROM mysql.user WHERE User='$1'" 2>&1`" ]]
 	then
 				
@@ -303,7 +307,7 @@ dbViewBasesByUsername(){
 
 #######СДЕЛАНО. Не трогать!!!!#######
 #отобразить список всех баз данных mysql с названием, содержащим переменную $1
-#$1 - часть названия базы данных
+#$без параметров
 dbViewBasesByTextContain(){	
 	if [ -n "$1" ] 
 	then	
@@ -327,7 +331,6 @@ dbViewAllUsers(){
 	echo -e "${COLOR_YELLOW}Перечень пользователей MYSQL ${COLOR_NC}"
 	mysql -e "SELECT User,Host,Grant_priv,Create_priv,Drop_priv,Create_user_priv,Delete_priv,account_locked, password_last_changed FROM mysql.user;"
 }
-
 
 #######СДЕЛАНО. Не трогать!!!!#######
 #отобразить список всех пользователей баз данных mysql, содержащих в названии переменную $1
@@ -360,7 +363,7 @@ dbViewUserInfo(){
 			echo -e "${COLOR_YELLOW}Информация о пользователе MYSQL ${COLOR_GREEN}\"$1\" $COLOR_NC"
 			mysql -e "SELECT User,Host,Grant_priv,Create_priv,Drop_priv,Create_user_priv, Delete_priv,account_locked, password_last_changed FROM mysql.user WHERE User like '$1' ORDER BY User ASC"
 		else
-			echo -e "${COLOR_LIGHT_RED}Пользователь ${COLOR_YELLOW}\"$1\"${COLOR_LIGHT_RED} не существует ${COLOR_NC}"
+			echo -e "${COLOR_LIGHT_RED}Пользователь ${COLOR_YELLOW}\"$1\"${COLOR_LIGHT_RED} не существует${COLOR_NC}"
 		fi	
 	
 	else
