@@ -9,9 +9,7 @@ source $SCRIPTS/functions/site.sh
 source $SCRIPTS/functions/users.sh
 
 
-function example {
-  VAR=foo
-}
+#UserAddToGroupSudo $1
+#UserShowGroup $1
 
-example RESULT1
-echo $RESULT1
+FileExistWithInfo $1 $2

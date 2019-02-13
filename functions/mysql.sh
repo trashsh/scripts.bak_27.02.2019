@@ -21,7 +21,9 @@ declare -x -f dbCreateUser #Создание пользователя mysql #$1-
 declare -x -f dbDropBase #Удаление базы данных #$1-база данных, $2-"drop" - подтверждение
 declare -x -f dbShowTables #Вывод всех таблиц указанной базы данных  #$1-база данных
 declare -x -f dbDropUser #Удаление пользователя #$1-user, $2-"drop" - подтверждение
-declare -x -f dbChangeUserPass #$1-user,$2-host; $3-password; $4-тип аутентификации (по умолчанию mysql_native_password)
+declare -x -f dbChangeUserPassword #$1-user,$2-host; $3-password; $4-тип аутентификации (по умолчанию mysql_native_password). #смена в файле и в базе mysql
+
+declare -x -f dbSetMyCnfFile #Смена пароля и создание файла ~/.my.cnf  #$1-user,$2-password;	Смена только в файле .my.cnf. В базе не меняется
 
 #######СДЕЛАНО. Не трогать!!!!#######
 #Создание бэкапа всех пользовательских баз данных.
@@ -531,29 +533,80 @@ dbDropUser(){
 fi
 }
 
+#######СДЕЛАНО. Не трогать!!!!#######
+#Смена пароля и создание файла ~/.my.cnf (только файл)
+#$1-user,$2-password;
+dbSetMyCnfFile(){
+#проверка параметров запуска
+if [ -n "$1" ] && [ -n "$2" ]
+then
+	#Если существует указанный пользователь
+	grep "^$1:" /etc/passwd >/dev/null
+	if [ $? -ne 0 ]
+	then
+		echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует. Ошибка выполнения скрипта dbSetMyCnfFile${COLOR_NC}". 	
+	else
+		#пользователь существует
+			dt=`date +%Y.%m.%d_%H.%M.%S`;
+			#если файл для бэкапа существует 
+			if [ -f "$HOMEPATHWEBUSERS"/"$1"/"my.cnf" ] ; then
+					backupImportantFile $1 "my.cnf"  $HOMEPATHWEBUSERS/$1/.my.cnf	
+					sed -i "s/.*password=.*/password=$2/" $HOMEPATHWEBUSERS/$1/.my.cnf		   
+			#если файл для бэкапа не существует 	
+			else
+				touch $HOMEPATHWEBUSERS/$1/.my.cnf
+				cat $HOMEPATHWEBUSERS/$1/.my.cnf | grep $HOMEPATHWEBUSERS
+									{
+							echo '[mysqld]'
+							echo 'init_connect=‘SET collation_connection=utf8_general_ci’'
+							echo 'character-set-server=utf8'
+							echo 'collation-server=utf8_general_ci'
+							echo ''					
+							echo '[client]'
+							echo 'default-character-set=utf8'
+							echo 'user='$1
+							echo 'password='$2
+							} > $HOMEPATHWEBUSERS/$1/.my.cnf
+							chmod 600 $HOMEPATHWEBUSERS/$1/.my.cnf
+							chown $1:users $HOMEPATHWEBUSERS/$1/.my.cnf		
+							
+							backupImportantFile $1 "my.cnf"  $HOMEPATHWEBUSERS/$1/.my.cnf	
 
-#Смена пароля
+			fi
+	fi
 
-#####СДЕЛАТЬ
-#$1-user,$2-host; $3-password; $4-тип аутентификации (по умолчанию mysql_native_password)
-dbChangeUserPass(){
-	if [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ] && [ -n "$4" ]
-	then	
-			#проверка на существование пользователя
+
+else
+	echo -e "${COLOR_RED}Не переданы параметры в функцию dbSetMy_cnf в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}" 
+fi
+}
+
+#######СДЕЛАНО. Не трогать!!!!#######
+#Смена пароля пользователя mysql
+#$1-user; $2-host $3-password $4-autentification type (mysql_native_password)
+#смена в файле и в базе mysql
+dbChangeUserPassword(){
+if [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ] && [ -n "$4" ]
+then 
+	#проверка на существование пользователя
 			if [[ ! -z "`mysql -qfsBe "SELECT User FROM mysql.user WHERE User='$1'" 2>&1`" ]];
 			then				
 				mysql -e "ALTER USER '$1'@'$2' IDENTIFIED WITH '$4' BY '$3';"
-				echo -e "${COLOR_LIGHT_PURPLE}Пароль пользователя $2 изменен ${COLOR_NC}"
+				echo -e "${COLOR_LIGHT_PURPLE}Пароль пользователя $1 изменен ${COLOR_NC}"
+				#корректирование файла ~/.my.cnf
+				dbSetMyCnfFile $1 $3
 				
 			else			  
 			  echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует ${COLOR_NC}" 
 			  
 			fi
-			
-
-	
-	else
-		echo -e "${COLOR_RED}Не переданы параметры в функцию dbChangeUserPass в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}" 
-		exit 1
+else
+	echo -e "${COLOR_RED}Не переданы параметры в функцию ${COLOR_GREEN}\"dbChangeUserPassword\"${COLOR_RED}. Выполнение скрипта аварийно завершено ${COLOR_NC}" 
+	exit 1
 fi
 }
+
+
+
+
+

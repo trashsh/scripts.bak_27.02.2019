@@ -15,3 +15,9 @@ groupadd admin-access
 usermod -G admin-access -a root
 usermod -G admin-access -a $USERLAMER
 
+apt-get install quota
+#fstab usrquota
+sed -i -e "s/=remount-ro /=remount-ro,usrquota /" /etc/fstab
+mount -o remount /
+quotacheck -cum /
+quotaon /

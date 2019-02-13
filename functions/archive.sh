@@ -11,6 +11,9 @@ declare -x -f tar_folder_without_structure_remove #архивация содер
 declare -x -f untar_without_structure #разархивация содержимого папки без сохранения структуры каталогов #$1-ссылка на каталог разархивации; $2-ссылка на архив
 declare -x -f untar_with_structure	#разархивация содержимого папки с сохранением структуры каталогов: ##$1-ссылка на каталог разархивации; $2-ссылка на архив
 
+declare -x -f backupImportantFile #Создание бэкапов в каталог BACKUPFOLDER_IMPORTANT $1-user, $2-destination_folder в папке BACKUPFOLDER_IMPORTANT, $3-файл для создания бэкапа
+
+
 #######СДЕЛАНО. Не трогать!!!!#######
 #архивация файла со структурой каталогов
 #$1-ссылка на архивируемый файл; $2-ссылка на конечный архив
@@ -441,4 +444,19 @@ then
 else
 	echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции \"untar_with_structure\" ${COLOR_NC}"
 fi
+}
+
+#$1-user, $2-destination_folder в папке BACKUPFOLDER_IMPORTANT, $3-файл для создания бэкапа
+backupImportantFile(){
+	dt=`date +%Y.%m.%d_%H.%M.%S`;
+	if ! [ -f $3 ] ; then
+		echo -e "${COLOR_RED} Файл ${COLOR_YELLOW}\"$3\"${COLOR_RED} не существует${COLOR_NC}"
+	else
+			#если папка для бэкапов не существует
+			if ! [ -d "$BACKUPFOLDER_IMPORTANT"/"$2"/"$1" ] ; then
+				mkdir -p $BACKUPFOLDER_IMPORTANT/$2/$1
+			fi
+												
+	tar_file_structure $3 $BACKUPFOLDER_IMPORTANT/$2/$1/$2_$1_$dt.tar.gz
+	fi
 }
