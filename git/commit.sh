@@ -23,7 +23,7 @@ while read
 							dt=$(date '+%d/%m/%Y %H:%M:%S')
 							sudo git add .
 							sudo git commit -m "$dt - $comment"			
-							break
+							break 
 							;;
 						*)  
 							dt=$(date '+%d/%m/%Y %H:%M:%S')
