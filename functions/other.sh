@@ -4,6 +4,7 @@
 declare -x -f FileParamsNotFound	#Вывод сообщения с предложением запуска указанного в параметре 3 меню. #$1-user; $2-сообщение; $3-ссылка на скрипт меню для запуска
 declare -x -f FolderExistWithInfo	#проверка существования папки с выводом информации. #$1-path, $2-type (create/exist)
 declare -x -f FileExistWithInfo	#проверка существования файла с выводом информации. #$1-path, $2-type (create/exist)
+declare -x -f viewPHPVersion
 
 #Вывод сообщения с предложением запуска указанного в параметре 3 меню
 #$1-user; $2-сообщение; $3-ссылка на скрипт меню для запуска
@@ -67,4 +68,12 @@ FileExistWithInfo(){
 				*) 
 					echo -e "${COLOR_GREEN}Ошибка параметров в функции ${COLOR_YELLOW}\"FolderExistWithInfo\"${COLOR_NC}";;
 				esac
+}
+
+#отобразить версию php
+viewPHPVersion(){
+	echo ""
+	echo "Версия PHP:"
+	php -v
+	echo ""
 }

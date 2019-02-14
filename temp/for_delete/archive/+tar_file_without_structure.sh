@@ -3,7 +3,6 @@
 #Архивация файла с относительными путями (без структуры)
 source /etc/profile
 source ~/.bashrc
-source $SCRIPTS/functions/file_params_not_found.sh
 
 
 if [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ]

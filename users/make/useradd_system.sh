@@ -10,7 +10,6 @@ echo -e "$COLOR_YELLOW Добавление пользователя $COLOR_NC"
 		mkdir -p $HOMEPATHWEBUSERS/$2/.backups/autobackup
 		mkdir -p $HOMEPATHWEBUSERS/$2/.backups/userbackup
 		echo "source /etc/profile" >> $HOMEPATHWEBUSERS/$2/.bashrc
-		sed -i '$ a source $SCRIPTS/functions/file_params_not_found.sh'  $HOMEPATHWEBUSERS/$2/.bashrc
 		sed -i '$ a source $SCRIPTS/external_scripts/dev-shell-essentials-master/dev-shell-essentials.sh'  $HOMEPATHWEBUSERS/$2/.bashrc
 		sed -i '$ a source $SCRIPTS/functions/mysql.sh' $HOMEPATHWEBUSERS/$2/.bashrc
 		sed -i '$ a source $SCRIPTS/functions/archive.sh'  $HOMEPATHWEBUSERS/$2/.bashrc
