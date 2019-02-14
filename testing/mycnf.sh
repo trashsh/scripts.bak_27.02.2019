@@ -1,17 +1,32 @@
 #!/bin/bash
-source /etc/profile
-source ~/.bashrc
-source $SCRIPTS/functions/archive.sh
-source $SCRIPTS/functions/mysql.sh
-source $SCRIPTS/functions/other.sh
-source $SCRIPTS/functions/site.sh
 
-source $SCRIPTS/functions/users.sh
+declare -x -f functionName #Описание функции: ($1-Описание первого параметра ; $2-второго ; $3-третьго ; $4-четвертого ; $5-пятого ;)
 
+#
+#Описание функции
+#$1-Описание первого параметра ; $2-второго ; $3-третьго ; $4-четвертого ; $5-пятого ;
+functionName() {
+    #Проверка существования каталога "/my/scritps"
+    if [ -d /my/scritps ] ; then
+        #Каталог "/my/scritps" существует
+        #Проверка существования файла "/etc/profile"
+        if [ -f /etc/profile ] ; then
+            #Файл "/etc/profile" существует
 
-function example {
-  VAR=foo
+            #Файл "/etc/profile" существует (конец)
+        else
+            #Файл "/etc/profile" не существует
+            echo -e "${COLOR_RED}Файл ${COLOR_GREEN}\"/etc/profile\"${COLOR_RED}не существует${COLOR_NC}"
+            #Файл "/etc/profile" не существует (конец)
+        fi
+        #Конец проверки существования файла "/etc/profile"
+
+        #Каталог "/my/scritps" существует (конец)
+    else
+        #Каталог "/my/scritps" не существует
+
+        #Каталог "/my/scritps" не существует (конец)
+    fi
+    #Конец проверки существования каталога "/my/scritps"
+
 }
-
-example RESULT1
-echo $RESULT1
