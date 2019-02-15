@@ -9,11 +9,11 @@ declare -x -f viewMysqlAccess			#отобразить реквизиты дос�
 declare -x -f viewSiteConfigsByName		#Вывод перечня сайтов указанного пользователя (конфиги веб-сервера)  ($1-user)
 declare -x -f viewSiteFoldersByName		#Вывод перечня сайтов указанного пользователя  ($1-user)
 
-declare -x -f viewBackupsToday
-declare -x -f viewBackupsYestoday
-declare -x -f viewBackupsWeek
-declare -x -f viewBackupsRange
-declare -x -f viewBackupsRangeInput
+declare -x -f viewBackupsToday          #Вывод бэкапов за сегодня
+declare -x -f viewBackupsYestoday       #Вывод бэкапов за вчерашний день
+declare -x -f viewBackupsWeek           #Вывод бэкапов за последнюю неделю
+declare -x -f viewBackupsRange          #Вывод бэкапов конкретный день ($1-DATE)
+declare -x -f viewBackupsRangeInput     #Вывод бэкапов за указанный диапазон дат ($1-date1, $2-data2)
 
 
 #отобразить реквизиты доступа к серверу FTP
@@ -58,8 +58,6 @@ viewMysqlAccess(){
             cat $HOMEPATHWEBUSERS/$1/.my.cnf
 		else echo -e "${COLOR_RED}Файл $HOMEPATHWEBUSERS/$1/.my.cnf не существует${COLOR_NC}"
         fi
-
-
 		echo $LINE
 	else
 		echo -e "${COLOR_LIGHT_RED}Не передан параметр в функцию viewMysqlAccess в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}"
@@ -76,7 +74,6 @@ viewSiteConfigsByName(){
             echo -e "\nСписок сайтов в каталоге пользователя ${COLOR_YELLOW}\"$1\"${COLOR_NC}" $HOMEPATHWEBUSERS/$1:
 			ls $HOMEPATHWEBUSERS/$1 | echo ""
         fi
-
 
 		echo -n "Apache - sites-available (user:$1): "
 		ls $APACHEAVAILABLE | grep -E "$1.*$1" | echo ""
@@ -104,14 +101,13 @@ viewSiteFoldersByName(){
 		else
 			echo -e "${COLOR_RED}Каталог $HOMEPATHWEBUSERS/$1/ не существует. Ошибка в функции viewSiteFoldersByName ${COLOR_NC}"
         fi
-
-
 	else
 		echo -e "${COLOR_LIGHT_RED}Не передан параметр в функцию viewSiteFoldersByName в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}"
 		exit 1
 	fi
 }
 
+#Вывод бэкапов за сегодня
 viewBackupsToday(){
 	echo ""
 	DATE=$(date +%Y%m%d)
@@ -125,6 +121,7 @@ viewBackupsToday(){
 
 }
 
+#Вывод бэкапов за вчерашний день
 viewBackupsYestoday(){
 	echo ""
 	DATE=$(date --date yesterday "+%Y%m%d")
@@ -137,7 +134,7 @@ viewBackupsYestoday(){
 	fi
 }
 
-
+#Вывод бэкапов за последнюю неделю
 viewBackupsWeek(){
 	echo ""
 	TODAY=$(date +%Y%m%d)
@@ -154,40 +151,60 @@ viewBackupsWeek(){
 	done
 }
 
+#Вывод бэкапов конкретный день ($1-DATE)
 viewBackupsRange(){
-echo ''
-echo -e -n "$COLOR_BLUE"Укажите дату в формате yyyymmdd:" $COLOR_NC"
-read DATE
- if [ -d "$BACKUPFOLDER_DAYS"/"$DATE"/"mysql" ] ; then
-    echo -e "$COLOR_YELLOW"Список бэкапов $(date --date $DATE "+%Y.%m.%d")" $COLOR_NC"
-	echo -e "$COLOR_BROWN"$DATE - Базы данных mysql:" $COLOR_NC"
-	ls -l $BACKUPFOLDER_DAYS/$DATE/mysql
- else
-	echo -e "$COLOR_REDБэкапы mysql за $(date --date $DATE "+%Y.%m.%d") отсутствуют$COLOR_NC"
- fi
+#Проверка на существование параметров запуска скрипта
+if [ -n "$1" ]
+then
+#Параметры запуска существуют
+    echo ''
+    if [ -d "$BACKUPFOLDER_DAYS"/"$1"/ ] ; then
+        echo -e "$COLOR_YELLOW"Список бэкапов $(date --date $1 "+%Y.%m.%d")" $COLOR_NC"
+        echo -e "$COLOR_BROWN"$1 - Базы данных mysql:" $COLOR_NC"
+        ls -l $BACKUPFOLDER_DAYS/$1/mysql
+    else
+        echo -e "$COLOR_REDБэкапы mysql за $(date --date $1 "+%Y.%m.%d") отсутствуют$COLOR_NC"
+    fi
+#Параметры запуска существуют (конец)
+else
+#Параметры запуска отсутствуют
+    echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"viewBackupsRange\"${COLOR_RED} ${COLOR_NC}"
+#Параметры запуска отсутствуют (конец)
+fi
+#Конец проверки существования параметров запуска скрипта
+
+
 }
 
+#Вывод бэкапов за указанный диапазон дат ($1-date1, $2-data2)
 viewBackupsRangeInput(){
-echo ''
-echo -e -n "$COLOR_BLUE"Укажите первую дату диапазона в формате yyyymmdd:" $COLOR_NC"
-read DATE1
-echo -e -n "$COLOR_BLUE"Укажите последнюю дату диапазона в формате yyyymmdd:" $COLOR_NC"
-read DATE2
-echo -e "$COLOR_YELLOW"Список бэкапов $(date --date $DATE1 "+%Y.%m.%d") - $(date --date $DATE2 "+%Y.%m.%d")" $COLOR_NC"
-start_ts=$(date -d "$DATE1" '+%s')
-end_ts=$(date -d "$DATE2" '+%s')
-range=$(( ( end_ts - start_ts )/(60*60*24) ))
-echo -e "$COLOR_BROWN" Базы данных mysql:" $COLOR_NC"
-n=0
-for ((i=0; i<${range#-}+1; i++))
-do
-	DATE=$(date --date=''$i' days ago' "+%Y%m%d");
-	if [ -d "$BACKUPFOLDER_DAYS"/"$DATE" ] ; then
-		echo -e "$COLOR_BROWN"$DATE:" $COLOR_NC"
-		ls -l $BACKUPFOLDER_DAYS/$DATE/mysql
-		n=$(($n+1))
-	fi
+    #Проверка на существование параметров запуска скрипта
+    if [ -n "$1" ] && [ -n "$2" ]
+    then
+    #Параметры запуска существуют
+        echo -e "$COLOR_YELLOW"Список бэкапов $(date --date $1 "+%Y.%m.%d") - $(date --date $2 "+%Y.%m.%d")" $COLOR_NC"
+        start_ts=$(date -d "$1" '+%s')
+        end_ts=$(date -d "$2" '+%s')
+        range=$(( ( end_ts - start_ts )/(60*60*24) ))
+        echo -e "$COLOR_BROWN" Базы данных mysql:" $COLOR_NC"
+        n=0
+        for ((i=0; i<${range#-}+1; i++))
+        do
+            DATE=$(date --date=''$i' days ago' "+%Y%m%d");
+            if [ -d "$BACKUPFOLDER_DAYS"/"$DATE" ] ; then
+                echo -e "$COLOR_BROWN"$DATE:" $COLOR_NC"
+                ls -l $BACKUPFOLDER_DAYS/$DATE/
+                n=$(($n+1))
+            fi
 
-done
-echo $n
+        done
+        echo $n
+    #Параметры запуска существуют (конец)
+    else
+    #Параметры запуска отсутствуют
+        echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"viewBackupsRangeInput\"${COLOR_RED} ${COLOR_NC}"
+    #Параметры запуска отсутствуют (конец)
+    fi
+    #Конец проверки существования параметров запуска скрипта
+
 }

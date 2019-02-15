@@ -5,10 +5,11 @@ source $SCRIPTS/functions/mysql.sh
 source $SCRIPTS/functions/other.sh
 source $SCRIPTS/functions/site.sh
 
-declare -x -f UserAddToGroupSudo
-declare -x -f UserShowGroup
-declare -x -f AddAdminSshKeytoSite
-declare -x -f GenerateSshKey
+declare -x -f UserAddToGroupSudo #Добавление пользователя в группу sudo: ($1-user)
+declare -x -f UserShowGroup #Вывод списка групп, в которых состоит пользователь: ($1-user ;)
+declare -x -f UserDeleteFromGroup #Удаление пользователя $1 из группы $2: ($1-user ; $2-group ;)
+declare -x -f AddAdminSshKeytoSite #Добавить ключ ssh к указанному пользователю: ($1-user ; $2-путь к ключу ssh ;)
+declare -x -f GenerateSshKey #Генерация ssh-ключа пользователю $1: ($1-user ;)
 
 declare -x -f viewGroupFtpAccessAll						#Вывод всех пользователей группы ftp-access
 declare -x -f viewGroupFtpAccessByName					#Вывод всех пользователей группы ftp-access с указанием части имени пользователя ($1-user)
@@ -22,152 +23,198 @@ declare -x -f viewGroupSudoAccessAll					#Вывод всех пользоват
 declare -x -f viewGroupSudoAccessByName					#Вывод пользователей группы sudo с указанием части имени пользователя ($1-user)
 declare -x -f viewUserInGroupByName						#Вывод групп, в которых состоит указанный пользователь ($1-user)
 
-#Добавление пользователя $1 в группу sudo
-UserAddToGroupSudo(){
 
-if [ -n "$1" ]
-then
-	echo -e "${COLOR_YELLOW} Добавление пользователя в группу sudo ${COLOR_NC}"
-	grep "^$1:" /etc/passwd >/dev/null
-	if [ $? -ne 0 ]
-	then
-		echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует${COLOR_NC}"
-	
-	else
-		echo -n -e "Добавить пользователя ${COLOR_YELLOW}\""$1"\"${COLOR_NC} в список ${COLOR_YELLOW}\"sudo\"${COLOR_NC}? введите ${COLOR_BLUE}\"y\"${COLOR_NC} для подтверждения, для выхода - ${COLOR_BLUE}\"n\"${COLOR_NC}: "
-		
-		
-		while read
-		do
-			case "$REPLY" in
-			y|Y)  adduser $1 sudo;
-					echo -e "Пользователь ${COLOR_YELLOW}" $1 "${COLOR_NC} добавлен в список sudo";
-					echo ""
-					UserShowGroup $1
-					break;;
-			n|N)  echo -e "\n${COLOR_YELLOW} Пользователь ${COLOR_LIGHT_PURPLE}\"$1\" ${COLOR_NC}${COLOR_YELLOW} создан, но не добавлен в список $COLOR_GREEN\"sudo\"${COLOR_NC}";  break;;
-			esac
-		done	
-	fi
-else
-    echo -e "\n${COLOR_YELLOW} Параметры запуска не найдены${COLOR_NC}. Функция UserAddToGroupSudo"
-    FileParamsNotFound "$1" "Для запуска главного введите" "$SCRIPTS/menu"  
-fi
-}
 
-#######СДЕЛАНО. Не трогать!!!!#######
-#Вывод списка групп, в которых состоит пользователь $1
-UserShowGroup(){
+#Добавление пользователя в группу sudo
+#$1-user
+UserAddToGroupSudo() {
+	#Проверка на существование параметров запуска скрипта
 	if [ -n "$1" ]
-then
-
-grep "^$1:" /etc/passwd >/dev/null
-if [ $? -ne 0 ]; then
- echo -e "${COLOR_RED}Пользователь ${COLOR_YELLOW}\"$1\"${COLOR_RED} не найден. Ошибка выполнения функции UserShowGroup${COLOR_NC}"
-else
-		echo -e "${COLOR_YELLOW}Список групп, в которых состоит пользователь ${COLOR_GREEN}\""$1"\"${COLOR_NC}: "
-		grep "$1" /etc/group | highlight green "$1"
-		
-fi
-
-else
-    echo -e "\n${COLOR_YELLOW} Параметры запуска не найдены${COLOR_NC}. Функция UserShowGroup"
-    FileParamsNotFound "$1" "Для запуска главного введите" "$SCRIPTS/menu"  
-fi
+	then
+	#Параметры запуска существуют
+        echo -e "${COLOR_YELLOW} Добавление пользователя в группу sudo ${COLOR_NC}"
+	    grep "^$1:" /etc/passwd >/dev/null
+	    #Проверка на успешность выполнения предыдущей команды
+	    if [ $? -ne 0 ]
+	    	then
+	    		#предыдущая команда завершилась с ошибкой
+	    		echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует${COLOR_NC}"
+	    		#предыдущая команда завершилась с ошибкой (конец)
+	    	else
+	    		#предыдущая команда завершилась успешно
+	    		echo -n -e "Добавить пользователя ${COLOR_YELLOW}\""$1"\"${COLOR_NC} в список ${COLOR_YELLOW}\"sudo\"${COLOR_NC}? введите ${COLOR_BLUE}\"y\"${COLOR_NC} для подтверждения, для выхода - ${COLOR_BLUE}\"n\"${COLOR_NC}: "
+				
+                while read
+                do
+                    case "$REPLY" in
+                    y|Y)  adduser $1 sudo;
+                            echo -e "Пользователь ${COLOR_YELLOW}" $1 "${COLOR_NC} добавлен в список sudo";
+                            echo ""
+                            UserShowGroup $1
+                            break;;
+                    n|N)  echo -e "\n${COLOR_YELLOW} Пользователь ${COLOR_LIGHT_PURPLE}\"$1\" ${COLOR_NC}${COLOR_YELLOW} создан, но не добавлен в список $COLOR_GREEN\"sudo\"${COLOR_NC}";  break;;
+                    esac
+                done
+	    		#предыдущая команда завершилась успешно (конец)
+	    fi
+	    #Конец проверки на успешность выполнения предыдущей команды
+	#Параметры запуска существуют (конец)
+	else
+	#Параметры запуска отсутствуют
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"UserAddToGroupSudo\"${COLOR_RED} ${COLOR_NC}"
+	#Параметры запуска отсутствуют (конец)
+	fi
+	#Конец проверки существования параметров запуска скрипта
 }
 
 
+#Вывод списка групп, в которых состоит пользователь
+#$1-user ;
+UserShowGroup() {
+	#Проверка на существование параметров запуска скрипта
+	if [ -n "$1" ]  
+	then
+	#Параметры запуска существуют
+		grep "^$1:" /etc/passwd >/dev/null
+		#Проверка на успешность выполнения предыдущей команды
+		if [ $? -ne 0 ]
+			then
+				#предыдущая команда завершилась с ошибкой
+				echo -e "${COLOR_RED}Пользователь ${COLOR_YELLOW}\"$1\"${COLOR_RED} не найден. Ошибка выполнения функции UserShowGroup${COLOR_NC}"
+				#предыдущая команда завершилась с ошибкой (конец)
+			else
+				#предыдущая команда завершилась успешно
+				echo -e "${COLOR_YELLOW}Список групп, в которых состоит пользователь ${COLOR_GREEN}\""$1"\"${COLOR_NC}: "
+		        grep "$1" /etc/group | highlight green "$1"
+				#предыдущая команда завершилась успешно (конец)
+		fi
+		#Конец проверки на успешность выполнения предыдущей команды
+	#Параметры запуска существуют (конец)
+	else
+	#Параметры запуска отсутствуют
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"UserShowGroup\"${COLOR_RED} ${COLOR_NC}"
+	#Параметры запуска отсутствуют (конец)
+	fi
+	#Конец проверки существования параметров запуска скрипта    
+}
 
 #Удаление пользователя $1 из группы $2
-UserDeleteFromGroup(){
-if [ -n "$1" ] && [ -n "$2" ]
-then
-	echo -e "${COLOR_YELLOW} Удаление пользователя ${COLOR_GREEN}\"$1\"${COLOR_YELLOW} из группы  ${COLOR_GREEN}\"$2\"${COLOR_NC}"
-	UserShowGroup $1
-	grep "^$1:" /etc/passwd >/dev/null
-	if [ $? -ne 0 ]
+#$1-user ; $2-group ;
+UserDeleteFromGroup() {
+	#Проверка на существование параметров запуска скрипта
+	if [ -n "$1" ] && [ -n "$2" ]
 	then
-		echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует${COLOR_NC}"
-	
+	#Параметры запуска существуют
+        echo -e "${COLOR_YELLOW} Удаление пользователя ${COLOR_GREEN}\"$1\"${COLOR_YELLOW} из группы  ${COLOR_GREEN}\"$2\"${COLOR_NC}"
+        UserShowGroup $1
+        grep "^$1:" /etc/passwd >/dev/null
+        #Проверка на успешность выполнения предыдущей команды
+        if [ $? -ne 0 ]
+        	then
+        		#предыдущая команда завершилась с ошибкой
+        		echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует${COLOR_NC}"
+        		#предыдущая команда завершилась с ошибкой (конец)
+        	else
+        		#предыдущая команда завершилась успешно
+        		if grep -q $2 /etc/group
+                then
+                     echo -n -e "Удалить пользователя ${COLOR_YELLOW}\""$1"\"${COLOR_NC} из группы ${COLOR_YELLOW}\"$2\"${COLOR_NC}? введите ${COLOR_BLUE}\"y\"${COLOR_NC} для подтверждения, для выхода - ${COLOR_BLUE}\"n\"${COLOR_NC}: "
+
+                        while read
+                        do
+                            case "$REPLY" in
+                            y|Y)  gpasswd -d $1 $2;
+                                    UserShowGroup $1
+                                    break;;
+                            n|N)  echo -e "\n${COLOR_YELLOW} Удаление пользователя ${COLOR_GREEN}\"$1\" ${COLOR_NC}${COLOR_YELLOW} из группы ${COLOR_GREEN}\"$2\"${COLOR_YELLOW} прекращено${COLOR_NC}"
+                            break;;
+
+                            esac
+                        done
+
+                else
+                    echo -e "${COLOR_RED}Группа ${COLOR_GREEN}$2${COLOR_RED} не существует. Ошибка выполнения функции UserDeleteFromGroup${COLOR_NC}"
+                fi
+        		#предыдущая команда завершилась успешно (конец)
+            fi
+        #Конец проверки на успешность выполнения предыдущей команды
+	#Параметры запуска существуют (конец)
 	else
-		if grep -q $2 /etc/group
-		then
-			 echo -n -e "Удалить пользователя ${COLOR_YELLOW}\""$1"\"${COLOR_NC} из группы ${COLOR_YELLOW}\"$2\"${COLOR_NC}? введите ${COLOR_BLUE}\"y\"${COLOR_NC} для подтверждения, для выхода - ${COLOR_BLUE}\"n\"${COLOR_NC}: "
-		
-				while read
-				do
-					case "$REPLY" in
-					y|Y)  gpasswd -d $1 $2;
-							UserShowGroup $1
-							break;;
-					n|N)  echo -e "\n${COLOR_YELLOW} Удаление пользователя ${COLOR_GREEN}\"$1\" ${COLOR_NC}${COLOR_YELLOW} из группы ${COLOR_GREEN}\"$2\"${COLOR_YELLOW} прекращено${COLOR_NC}"
-					break;;
-					
-					esac
-				done	
-	
-	else
-		echo -e "${COLOR_RED}Группа ${COLOR_GREEN}$2${COLOR_RED} не существует. Ошибка выполнения функции UserDeleteFromGroup${COLOR_NC}"
+	#Параметры запуска отсутствуют
+	    echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"\"${COLOR_RED} ${COLOR_NC}"
+	#Параметры запуска отсутствуют (конец)
 	fi
-			
-	fi	
-		
-		
-else
-    echo -e "\n${COLOR_YELLOW} Параметры запуска не найдены${COLOR_NC}. Функция UserDeleteFromGroup"
-    FileParamsNotFound "$1" "Для запуска главного введите" "$SCRIPTS/menu"  
-fi
+	#Конец проверки существования параметров запуска скрипта
 }
 
-
-#Добавление ключа ssh к указанному пользователю
-#$1-user $2-путь к добавляемому ключу
-AddAdminSshKeytoSite(){
-if [ -n "$1" ] && [ -n "$2" ] 
-then
-	grep "^$1:" /etc/passwd >/dev/null
-	if [ $? -ne 0 ]
+#Добавить ключ ssh к указанному пользователю
+#$1-user ; $2-путь к ключу ssh ;
+AddAdminSshKeytoSite() {
+	#Проверка на существование параметров запуска скрипта
+	if [ -n "$1" ] && [ -n "$2" ] 
 	then
-		echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует${COLOR_NC}"
-	
-	else
-	
-			if [ -f $2 ]
+	#Параметры запуска существуют
+		grep "^$1:" /etc/passwd >/dev/null
+		#Проверка на успешность выполнения предыдущей команды
+		if [ $? -ne 0 ]
 			then
-					if [ -f "$HOMEPATHWEBUSERS/$1/.ssh/authorized_keys" ]
-					then
-						cat $2 >> $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys
-					else
-						echo -e "${COLOR_RED}Файл ${COLOR_GREEN}\"$HOMEPATHWEBUSERS/$1/.ssh/authorized_keys\"${COLOR_RED} не найден ${COLOR_NC}"
-					fi
+				#предыдущая команда завершилась с ошибкой
+				echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует${COLOR_NC}"
+				#предыдущая команда завершилась с ошибкой (конец)
 			else
-				echo -e "${COLOR_RED}Файл ${COLOR_GREEN}\"$2\"${COLOR_RED} не найден ${COLOR_NC}"
-				#Сделать предложение генерации ключа
-			fi
+				#предыдущая команда завершилась успешно
+				#Проверка существования файла "$2"
+				if [ -f $2 ] ; then
+				    #Файл "$2" существует
+				    #Проверка существования файла ""$HOMEPATHWEBUSERS/$1/.ssh/authorized_keys""
+				    if [ -f "$HOMEPATHWEBUSERS/$1/.ssh/authorized_keys" ] ; then
+				        #Файл ""$HOMEPATHWEBUSERS/$1/.ssh/authorized_keys"" существует
+				        cat $2 >> $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys
+				        #Файл ""$HOMEPATHWEBUSERS/$1/.ssh/authorized_keys"" существует (конец)
+				    else
+				        #Файл ""$HOMEPATHWEBUSERS/$1/.ssh/authorized_keys"" не существует
+				        echo -e "${COLOR_RED}Файл ${COLOR_GREEN}\"$HOMEPATHWEBUSERS/$1/.ssh/authorized_keys\"${COLOR_RED} не найден ${COLOR_NC}"
+				        #Файл ""$HOMEPATHWEBUSERS/$1/.ssh/authorized_keys"" не существует (конец)
+				    fi
+				    #Конец проверки существования файла ""$HOMEPATHWEBUSERS/$1/.ssh/authorized_keys""
+
+				    #Файл "$2" существует (конец)
+				else
+				    #Файл "$2" не существует
+				    echo -e "${COLOR_RED}Файл ${COLOR_GREEN}\"$2\"${COLOR_RED} не найден ${COLOR_NC}"
+				    #Файл "$2" не существует (конец)
+				fi
+				#Конец проверки существования файла "$2"
+
+				#предыдущая команда завершилась успешно (конец)
+		fi
+		#Конец проверки на успешность выполнения предыдущей команды
+	#Параметры запуска существуют (конец)
+	else
+	#Параметры запуска отсутствуют
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"AddAdminSshKeytoSite\"${COLOR_RED} ${COLOR_NC}"
+	#Параметры запуска отсутствуют (конец)
 	fi
-else
-    echo -e "\n${COLOR_YELLOW} Параметры запуска не найдены. Функция AddAdminSshKeytoSite"
-    FileParamsNotFound "$1" "Для запуска главного введите" "$SCRIPTS/menu"  
-fi
+	#Конец проверки существования параметров запуска скрипта    
 }
 
-
-#Генерация ключа ssh для указанного пользователя $1
-#$1-user
-GenerateSshKey(){
-if [ -n "$1" ]
-then
-	echo ''
-echo -e "${COLOR_YELLOW} Генерация ssh-ключа ${COLOR_NC}"
+#Генерация ssh-ключа пользователю $1
+#$1-user ;
+GenerateSshKey() {
+	#Проверка на существование параметров запуска скрипта
+	if [ -n "$1" ]
+	then
+	#Параметры запуска существуют
+		echo -e "${COLOR_YELLOW} Генерация ssh-ключа ${COLOR_NC}"
 
 		echo -n -e "Сгенерировать ключ доступа по SSH пользователю ${COLOR_YELLOW}" $1 "${COLOR_NC}? введите ${COLOR_BLUE}\"y\"${COLOR_NC} для подтверждения, ${COLOR_BLUE}\"n\"${COLOR_NC}  - для импорта загруженного ключа: "
-				
+
 		while read
 		do
 			echo -n ": "
 			case "$REPLY" in
 			y|Y)  echo
-				DATE=`date '+%Y-%m-%d__%H-%M'`				
+				DATE=`date '+%Y-%m-%d__%H-%M'`
 				mkdir -p $HOMEPATHWEBUSERS/$1/.ssh
 				cd $HOMEPATHWEBUSERS/$1/.ssh
 				echo -e "\n${COLOR_YELLOW} Генерация ключа. Сейчас необходимо будет установить пароль на ключевой файл.Минимум - 5 символов${COLOR_NC}"
@@ -183,22 +230,8 @@ echo -e "${COLOR_YELLOW} Генерация ssh-ключа ${COLOR_NC}"
 				cat $HOMEPATHWEBUSERS/$1/.ssh/ssh_$1 >> $BACKUPFOLDER_IMPORTANT/ssh/$1/$DATE/ssh_$1
 				cat $HOMEPATHWEBUSERS/$1/.ssh/ssh_$1.ppk >> $BACKUPFOLDER_IMPORTANT/ssh/$1/$DATE/ssh_$1.ppk
 				$SCRIPTS/archive/tar_folder_without_structure.sh $1 $HOMEPATHWEBUSERS/$1/.ssh/ $BACKUPFOLDER_IMPORTANT/ssh/$1/ $DATE.tar.gz
-				
-				if [ -d $BACKUPFOLDER_IMPORTANT/ssh/$1/$DATE ] ; then
-					if [ -f $BACKUPFOLDER_IMPORTANT/ssh/$1/$DATE.tar.gz ] ; then
-										rm -Rf $BACKUPFOLDER_IMPORTANT/ssh/$1/$DATE
-									else
-										echo -e "${COLOR_RED} Ошибка автоматического удаления каталога \"$BACKUPFOLDER_IMPORTANT/ssh/$1/$DATE\". Требуется удалить его вручную.${COLOR_NC}"
-									fi
 
-								
-					else
-						echo -e "${COLOR_RED} Ошибка автоматического удаления каталога \"$BACKUPFOLDER_IMPORTANT/ssh/$1/$DATE\". Требуется удалить его вручную.${COLOR_NC}"
-					fi
-				
-				
-				
-				chmod 700 $HOMEPATHWEBUSERS/$1/.ssh
+                chmod 700 $HOMEPATHWEBUSERS/$1/.ssh
 				chmod 600 $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys
 				chmod 600 $HOMEPATHWEBUSERS/$1/.ssh/ssh_$1.pub
 				chmod 600 $HOMEPATHWEBUSERS/$1/.ssh/ssh_$1
@@ -219,7 +252,7 @@ echo -e "${COLOR_YELLOW} Генерация ssh-ключа ${COLOR_NC}"
 				echo "" >> $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys
 				cat $SETTINGS/ssh/keys/lamer >> $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys
 				DATE=`date '+%Y-%m-%d__%H-%M'`
-				mkdir -p $BACKUPFOLDER_IMPORTANT/ssh/$1				
+				mkdir -p $BACKUPFOLDER_IMPORTANT/ssh/$1
 				chmod 700 $HOMEPATHWEBUSERS/$1/.ssh
 				chmod 600 $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys
 				chown $1:users $HOMEPATHWEBUSERS/$1/.ssh
@@ -228,18 +261,23 @@ echo -e "${COLOR_YELLOW} Генерация ssh-ключа ${COLOR_NC}"
 				echo -e "\n${COLOR_YELLOW} Импорт ключа $COLOR_LIGHT_PURPLE\"$key\"${COLOR_YELLOW} пользователю $COLOR_LIGHT_PURPLE\"$1\"${COLOR_YELLOW} выполнен${COLOR_NC}"
 				break
 				;;
-			*) 
+			*)
 			echo ''
-            ;;	
+            ;;
 			esac
 		done
 
 
+
+	#Параметры запуска существуют (конец)
 	else
-    echo -e "\n${COLOR_YELLOW} Параметры запуска не найдены${COLOR_NC}. Необходимы параметры: имя пользователя"
-    FileParamsNotFound "$1" "Для запуска главного введите" "$SCRIPTS/menu"  
-fi
+	#Параметры запуска отсутствуют
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"GenerateSshKey\"${COLOR_RED} ${COLOR_NC}"
+	#Параметры запуска отсутствуют (конец)
+	fi
+	#Конец проверки существования параметров запуска скрипта
 }
+
 
 
 #Вывод всех пользователей группы ftp-access
@@ -347,4 +385,52 @@ viewUserInGroupByName(){
 			echo -e "${COLOR_LIGHT_RED}Не передан параметр в функцию viewUserInGroupByName в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}"
 			exit 1
 		fi
+}
+
+declare -x -f UseraddSystem #Добавление системного пользователя: ($1-user ;)
+#Добавление системного пользователя
+#$1-user ;
+UseraddSystem() {
+	#Проверка на существование параметров запуска скрипта
+	if [ -n "$1" ]
+	then
+	#Параметры запуска существуют
+	    grep "^$1:" /etc/passwd >/dev/null
+	    #Проверка на успешность выполнения предыдущей команды
+	    if [ $? -ne 0 ]
+	    	then
+	    		#Пользователь не существует
+	    		echo ''
+                echo -e "$COLOR_YELLOW Добавление пользователя $COLOR_NC"
+                mkdir -p $HOMEPATHWEBUSERS/$1
+                mkdir -p $HOMEPATHWEBUSERS/$1/.backups
+                mkdir -p $HOMEPATHWEBUSERS/$1/.backups/autobackup
+                mkdir -p $HOMEPATHWEBUSERS/$1/.backups/userbackup
+                echo "source /etc/profile" >> $HOMEPATHWEBUSERS/$1/.bashrc
+                sed -i '$ a source $SCRIPTS/external_scripts/dev-shell-essentials-master/dev-shell-essentials.sh'  $HOMEPATHWEBUSERS/$1/.bashrc
+                sed -i '$ a source $SCRIPTS/functions/mysql.sh' $HOMEPATHWEBUSERS/$1/.bashrc
+                sed -i '$ a source $SCRIPTS/functions/archive.sh'  $HOMEPATHWEBUSERS/$1/.bashrc
+                sed -i '$ a source $SCRIPTS/functions/site.sh' $HOMEPATHWEBUSERS/$1/.bashrc
+                sed -i '$ a source $SCRIPTS/functions/other.sh'  $HOMEPATHWEBUSERS/$1/.bashrc
+                sed -i '$ a source $SCRIPTS/include/include.sh'  $HOMEPATHWEBUSERS/$1/.bashrc
+
+                useradd -N -g users -d $HOMEPATHWEBUSERS/$1 -s /bin/bash $1
+                chmod 755 $HOMEPATHWEBUSERS/$1
+                chown $1:users $HOMEPATHWEBUSERS/$1
+                touch $HOMEPATHWEBUSERS/$1/.bashrc
+                touch $HOMEPATHWEBUSERS/$1/.sudo_as_admin_successful
+                passwd $1
+	    	else
+	    		#Пользователь уже существует
+	    		echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует${COLOR_NC}"
+	    		#Пользователь уже существует (конец)
+	    fi
+	    #Конец проверки на успешность выполнения предыдущей команды
+	#Параметры запуска существуют (конец)
+	else
+	#Параметры запуска отсутствуют
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"UseraddSystem\"${COLOR_RED} ${COLOR_NC}"
+	#Параметры запуска отсутствуют (конец)
+	fi
+	#Конец проверки существования параметров запуска скрипта
 }

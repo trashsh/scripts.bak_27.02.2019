@@ -1,6 +1,8 @@
 #!/bin/bash
 
-source /my/scripts/functions/archive.sh
-source /my/scripts/functions/mysql.sh
-source /my/scripts/functions/other.sh
-source /my/scripts/functions/users.sh
+source /etc/profile
+source $SCRIPTS/functions/archive.sh
+source $SCRIPTS/functions/mysql.sh
+source $SCRIPTS/functions/other.sh
+source $SCRIPTS/functions/users.sh
+source $SCRIPTS/external_scripts/dev-shell-essentials-master/dev-shell-essentials.sh

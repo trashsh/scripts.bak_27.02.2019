@@ -2,6 +2,7 @@
 
 declare -x -f dbBackupBases #Создание бэкапа всех пользовательских баз данных mysql: ($1-В параметре может быть указан путь к каталогу сохранения бэкапов.Если путь не указан, то выгрузится в $BACKUPFOLDER_DAYS\`date +%Y.%m.%d` ;)
 declare -x -f dbBackupBase #Создание бэкапа указанной базы данных: ($1-dbname ; $2-В параметре $2 может быть установлен каталог выгрузки. По умолчанию грузится в $BACKUPFOLDER_DAYS\`date +%Y.%m.%d` )
+declare -x -f BackupTable #Создание бэкапа отдельной таблицы: ($1-dbname ; $2-tablename ; $3-В параметре $3 может быть установлен каталог выгрузки. По умолчанию грузится в $BACKUPFOLDER_DAYS\`date +%Y.%m.%d`)
 declare -x -f dbBackupBasesOneUser #Создание бэкапа все баз данных указанного систеного пользователя: ($1-user ; $2-В параметре $2 может быть установлен каталог выгрузки. По умолчанию грузится в $BACKUPFOLDER_DAYS\`date +%Y.%m.%d ;)
 declare -x -f dbCheckExportedBase #Проверка успешности выгрузки базы данных mysql $1 в архив $2: ($1-Имя базы данных ; $2-Путь к архиву ;)
 declare -x -f dbCreateUser #Создание пользователя mysql: ($1-user ; $2-password ; $3-type of user ;)
@@ -94,7 +95,7 @@ done
 
 #
 #Создание бэкапа указанной базы данных
-#$1-dbname ; $2-В параметре $2 может быть установлен каталог выгрузки. По умолчанию грузится в $BACKUPFOLDER_DAYS\`date +%Y.%m.%d` ; $3- ; $4- ; $5- ;
+#$1-dbname ; $2-В параметре $2 может быть установлен каталог выгрузки. По умолчанию грузится в $BACKUPFOLDER_DAYS\`date +%Y.%m.%d` ;
 dbBackupBase() {
 	#Проверка на существование параметров запуска скрипта
 	if [ -n "$1" ]
@@ -173,6 +174,86 @@ dbBackupBase() {
     
 }
 
+#Создание бэкапа отдельной таблицы
+#$1-dbname ; $2-tablename ; $3-path-Путь по желанию ; ;
+BackupTable() {
+	#Проверка на существование параметров запуска скрипта
+	if [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ]
+	then
+	#Параметры запуска существуют
+		d=`date +%Y.%m.%d`;
+	    dt=`date +%Y.%m.%d_%H.%M`;
+	    #проверка существования базы данных "$1"
+	    if [[ ! -z "`mysql -qfsBe "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='$1'" 2>&1`" ]];
+	    	then
+	    	#база $1 - существует
+	    		#Проверка на существование параметров запуска скрипта
+	    		if [ -n "$3" ]
+	    		then
+	    		#Параметры запуска существуют
+	    		    DESTINATION=$3
+	    		#Параметры запуска существуют (конец)
+	    		else
+	    		#Параметры запуска отсутствуют
+	    		    DESTINATION=$BACKUPFOLDER_DAYS/$d
+			        mkdir -p $BACKUPFOLDER_DAYS/$d
+	    		#Параметры запуска отсутствуют (конец)
+	    		fi
+	    		#Конец проверки существования параметров запуска скрипта
+
+	    		#пусть к файлу с бэкапом без расширения
+        		FILENAME=$DESTINATION/mysql."$db"-$dt
+
+		#Проверка существования каталога "$DESTINATION"
+		if [ -d $DESTINATION ] ; then
+		    #Каталог "$DESTINATION" существует
+		    mysql -e "mysqldump -c $1 $2 > $FILENAME.sql;"
+#		    mysqldump -c $1 $2 > $FILENAME.sql
+			tar_file_without_structure_remove $FILENAME.sql $FILENAME.tar.gz
+			dbCheckExportedBase $1 $FILENAME.tar.gz
+		    #Каталог "$DESTINATION" существует (конец)
+		else
+		    #Каталог "$DESTINATION" не существует
+		    echo -e "${COLOR_RED} Каталог ${COLOR_YELLOW}\"$DESTINATION\"${COLOR_NC}${COLOR_RED} не найден ${COLOR_NC}. Создать его?"
+			echo -n -e "Введите ${COLOR_BLUE}\"y\"$COLOR_NC для создания каталога ${COLOR_YELLOW}\"$DESTINATION\"${COLOR_nC}, для отмены операции - ${COLOR_BLUE}\"n\"$COLOR_NC: "
+
+			while read
+			do
+			echo -n ": "
+				case "$REPLY" in
+				y|Y)
+					mkdir -p $DESTINATION;
+					mysqldump -c $1 $2 > $FILENAME.sql
+					tar_file_without_structure_remove $FILENAME.sql $FILENAME.tar.gz
+					dbCheckExportedBase $1 $FILENAME.tar.gz
+					break;;
+				n|N)
+					 break;;
+				esac
+			done
+		    #Каталог "$DESTINATION" не существует (конец)
+		fi
+		#Конец проверки существования каталога "$DESTINATION"
+
+
+	    	#база $1 - существует (конец)
+	    	else
+	    	#база $1 - не существует
+	    	    echo -e "${COLOR_RED}Ошибка создания бэкапа базы данных ${COLOR_YELLOW}\"$1\"${COLOR_NC}${COLOR_RED}. Указанная база не существует${COLOR_NC}"
+	    	#база $1 - не существует (конец)
+	    fi
+	    #конец проверки существования базы данных $1
+
+
+	#Параметры запуска существуют (конец)
+	else
+	#Параметры запуска отсутствуют
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"dbBackupBase\"${COLOR_RED} ${COLOR_NC}"
+	#Параметры запуска отсутствуют (конец)
+	fi
+	#Конец проверки существования параметров запуска скрипта
+
+}
 
 
 #
@@ -631,8 +712,6 @@ dbViewUserGrant() {
 	fi
 	#Конец проверки существования параметров запуска скрипта    
 }
-
-declare -x -f dbViewUserInfo #Вывести информацию о пользователе mysql: ($1-user ;)
 
 #
 #Вывести информацию о пользователе mysql $1
