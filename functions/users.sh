@@ -5,6 +5,7 @@ source $SCRIPTS/functions/mysql.sh
 source $SCRIPTS/functions/other.sh
 source $SCRIPTS/functions/site.sh
 
+declare -x -f UseraddSystem #Добавление системного пользователя: ($1-user ;)
 declare -x -f UserAddToGroupSudo #Добавление пользователя в группу sudo: ($1-user)
 declare -x -f UserShowGroup #Вывод списка групп, в которых состоит пользователь: ($1-user ;)
 declare -x -f UserDeleteFromGroup #Удаление пользователя $1 из группы $2: ($1-user ; $2-group ;)
@@ -15,13 +16,23 @@ declare -x -f viewGroupFtpAccessAll						#Вывод всех пользоват
 declare -x -f viewGroupFtpAccessByName					#Вывод всех пользователей группы ftp-access с указанием части имени пользователя ($1-user)
 declare -x -f viewGroupSshAccessAll						#Вывод всех пользователей группы ssh-access
 declare -x -f viewGroupSshAccessByName					#Вывод всех пользователей группы ssh-access с указанием части имени пользователя ($1-user)
-declare -x -f viewGroupUsersAccessAll					#Вывод всех пользователей группы users
 declare -x -f viewGroupUsersAccessByName				#Вывод всех пользователей группы users с указанием части имени пользователя ($1-user)
 declare -x -f viewGroupAdminAccessAll					#Вывод всех пользователей группы admin-access
 declare -x -f viewGroupAdminAccessByName				#Вывод всех пользователей группы admin-access с указанием части имени пользователя ($1-user)
 declare -x -f viewGroupSudoAccessAll					#Вывод всех пользователей группы sudo
 declare -x -f viewGroupSudoAccessByName					#Вывод пользователей группы sudo с указанием части имени пользователя ($1-user)
 declare -x -f viewUserInGroupByName						#Вывод групп, в которых состоит указанный пользователь ($1-user)
+
+#ПРОВЕРЕНО
+declare -x -f viewGroupUsersAccessAll					#Вывод всех пользователей группы users. #$1 - может быть выведен дополнительно текст, предшествующий выводу списка пользователей
+declare -x -f userExistInGroup                          #состоит ли пользователь $1 в группе $2
+                                                        #функция возвращает значение 0-если пользователь состоит в группе "$2", 1- если не состоит в группе "$2"
+                                                        #ничего не выводится
+                                                        #$1-user ; $2-group
+declare -x -f existGroup                                #Существует ли группа $1
+                                                        #функция возвращает значение 0-если группа $1 существует. 1- если группа не существует
+                                                        #ничего не выводится
+                                                        #$1-group
 
 
 
@@ -52,7 +63,7 @@ UserAddToGroupSudo() {
                             echo ""
                             UserShowGroup $1
                             break;;
-                    n|N)  echo -e "\n${COLOR_YELLOW} Пользователь ${COLOR_LIGHT_PURPLE}\"$1\" ${COLOR_NC}${COLOR_YELLOW} создан, но не добавлен в список $COLOR_GREEN\"sudo\"${COLOR_NC}";  break;;
+                    n|N)  echo -e "\n${COLOR_YELLOW} Пользователь ${COLOR_LIGHT_PURPLE}\"$1\" ${COLOR_NC}${COLOR_YELLOW} создан, но не добавлен в список ${COLOR_GREEN}\"sudo\"${COLOR_NC}";  break;;
                     esac
                 done
 	    		#предыдущая команда завершилась успешно (конец)
@@ -258,7 +269,7 @@ GenerateSshKey() {
 				chown $1:users $HOMEPATHWEBUSERS/$1/.ssh
 				chown $1:users $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys
 				usermod -G ssh-access -a $1
-				echo -e "\n${COLOR_YELLOW} Импорт ключа $COLOR_LIGHT_PURPLE\"$key\"${COLOR_YELLOW} пользователю $COLOR_LIGHT_PURPLE\"$1\"${COLOR_YELLOW} выполнен${COLOR_NC}"
+				echo -e "\n${COLOR_YELLOW} Импорт ключа ${COLOR_LIGHT_PURPLE}\"$key\"${COLOR_YELLOW} пользователю ${COLOR_LIGHT_PURPLE}\"$1\"${COLOR_YELLOW} выполнен${COLOR_NC}"
 				break
 				;;
 			*)
@@ -318,10 +329,23 @@ viewGroupSshAccessByName(){
 	fi
 }
 
+#ПРОВЕРНО
 #Вывод всех пользователей группы users
+#$1 - может быть выведен дополнительно текст, предшествующий выводу списка пользователей
 viewGroupUsersAccessAll(){
-	echo -e "\n${COLOR_YELLOW}Список пользователей группы \"users\":${COLOR_NC}"
-	cat /etc/passwd | grep ":100::" | highlight magenta ":100::"
+    #Проверка на существование параметров запуска скрипта
+    if [ -n "$1" ]
+    then
+    #Параметры запуска существуют
+        echo -e "${COLOR_YELLOW}$1${COLOR_NC}"
+        cat /etc/passwd | grep ":100::" | highlight magenta ":100::"
+    #Параметры запуска существуют (конец)
+    else
+    #Параметры запуска отсутствуют
+        cat /etc/passwd | grep ":100::" | highlight magenta ":100::"
+    #Параметры запуска отсутствуют (конец)
+    fi
+    #Конец проверки существования параметров запуска скрипта
 }
 
 #Вывод всех пользователей группы users с указанием части имени пользователя
@@ -387,7 +411,6 @@ viewUserInGroupByName(){
 		fi
 }
 
-declare -x -f UseraddSystem #Добавление системного пользователя: ($1-user ;)
 #Добавление системного пользователя
 #$1-user ;
 UseraddSystem() {
@@ -400,29 +423,28 @@ UseraddSystem() {
 	    if [ $? -ne 0 ]
 	    	then
 	    		#Пользователь не существует
-	    		echo ''
-                echo -e "$COLOR_YELLOW Добавление пользователя $COLOR_NC"
+	    		echo ''                
                 mkdir -p $HOMEPATHWEBUSERS/$1
                 mkdir -p $HOMEPATHWEBUSERS/$1/.backups
                 mkdir -p $HOMEPATHWEBUSERS/$1/.backups/autobackup
                 mkdir -p $HOMEPATHWEBUSERS/$1/.backups/userbackup
                 echo "source /etc/profile" >> $HOMEPATHWEBUSERS/$1/.bashrc
-                sed -i '$ a source $SCRIPTS/external_scripts/dev-shell-essentials-master/dev-shell-essentials.sh'  $HOMEPATHWEBUSERS/$1/.bashrc
-                sed -i '$ a source $SCRIPTS/functions/mysql.sh' $HOMEPATHWEBUSERS/$1/.bashrc
-                sed -i '$ a source $SCRIPTS/functions/archive.sh'  $HOMEPATHWEBUSERS/$1/.bashrc
-                sed -i '$ a source $SCRIPTS/functions/site.sh' $HOMEPATHWEBUSERS/$1/.bashrc
-                sed -i '$ a source $SCRIPTS/functions/other.sh'  $HOMEPATHWEBUSERS/$1/.bashrc
                 sed -i '$ a source $SCRIPTS/include/include.sh'  $HOMEPATHWEBUSERS/$1/.bashrc
 
                 useradd -N -g users -d $HOMEPATHWEBUSERS/$1 -s /bin/bash $1
-                chmod 755 $HOMEPATHWEBUSERS/$1
-                chown $1:users $HOMEPATHWEBUSERS/$1
+                chmod 755 -R $HOMEPATHWEBUSERS/$1
+                #chown $1:users -R $HOMEPATHWEBUSERS/$1
+                find $HOMEPATHWEBUSERS/$1 -type d -exec chown $1:users {} \;
+			    find $HOMEPATHWEBUSERS/$1 -type f -exec chown $1:users {} \;
+
+
                 touch $HOMEPATHWEBUSERS/$1/.bashrc
                 touch $HOMEPATHWEBUSERS/$1/.sudo_as_admin_successful
+                echo -e "${COLOR_YELLOW}Установите пароль для пользователя ${COLOR_GREEN}\"$1\"${COLOR_NC}"
                 passwd $1
 	    	else
 	    		#Пользователь уже существует
-	    		echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует${COLOR_NC}"
+	    		echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_RED} уже существует${COLOR_NC}"
 	    		#Пользователь уже существует (конец)
 	    fi
 	    #Конец проверки на успешность выполнения предыдущей команды
@@ -434,3 +456,81 @@ UseraddSystem() {
 	fi
 	#Конец проверки существования параметров запуска скрипта
 }
+
+
+#состоит ли пользователь $1 в группе $2
+#функция возвращает значение 0-если пользователь состоит в группе "$2", 1- если не состоит в группе "$2"
+#ничего не выводится
+#$1-user ; $2-group
+userExistInGroup() {
+	#Проверка на существование параметров запуска скрипта
+	if [ -n "$1" ] && [ -n "$2" ]
+	then
+	#Параметры запуска существуют
+		#Проверка существования системного пользователя "$1"
+			grep "^$1:" /etc/passwd >/dev/null
+			if ! [ $? -ne 0 ]
+			then
+			#Пользователь $1 существует
+				id $1 | grep -w $2 >/dev/null
+				#Проверка на успешность выполнения предыдущей команды
+				if [ $? -ne 0 ]
+					then
+						#предыдущая команда завершилась с ошибкой
+						return 1
+						#предыдущая команда завершилась с ошибкой (конец)
+					else
+						#предыдущая команда завершилась успешно
+						return 0
+						#предыдущая команда завершилась успешно (конец)
+				fi
+				#Конец проверки на успешность выполнения предыдущей команды
+				return 0
+			#Пользователь $1 существует (конец)
+			else
+			#Пользователь $1 не существует
+				return 1
+			#Пользователь $1 не существует (конец)
+			fi
+		#Конец проверки существования системного пользователя $1
+	#Параметры запуска существуют (конец)
+	else
+	#Параметры запуска отсутствуют
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"UserExistInGroup\"${COLOR_RED} ${COLOR_NC}"
+	#Параметры запуска отсутствуют (конец)
+	fi
+	#Конец проверки существования параметров запуска скрипта
+}
+
+#Существует ли группа $1
+#функция возвращает значение 0-если группа $1 существует. 1- если группа не существует
+#ничего не выводится
+#$1-group
+existGroup() {
+	#Проверка на существование параметров запуска скрипта
+	if [ -n "$1" ]
+	then
+	#Параметры запуска существуют
+		cat /etc/group | grep -w $1
+		#Проверка на успешность выполнения предыдущей команды
+		if [ $? -ne 0 ]
+			then
+				#предыдущая команда завершилась с ошибкой
+				return 1
+				#предыдущая команда завершилась с ошибкой (конец)
+			else
+				#предыдущая команда завершилась успешно
+				return 0
+				#предыдущая команда завершилась успешно (конец)
+		fi
+		#Конец проверки на успешность выполнения предыдущей команды
+	#Параметры запуска существуют (конец)
+	else
+	#Параметры запуска отсутствуют
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"ExistGroup\"${COLOR_RED} ${COLOR_NC}"
+	#Параметры запуска отсутствуют (конец)
+	fi
+	#Конец проверки существования параметров запуска скрипта
+}
+
+
