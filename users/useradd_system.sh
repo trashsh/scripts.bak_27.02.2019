@@ -8,7 +8,7 @@ read -p "Введите имя пользователя: " username
 
 #Проверка существования системного пользователя "$username"
 	grep "^$username:" /etc/passwd >/dev/null
-	if ! [ $? -ne 0 ]
+	if [ $? -eq 0 ]
 	then
 	#Пользователь $username существует
 		echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$username\"${COLOR_RED} уже существует${COLOR_GREEN}${COLOR_NC}"
