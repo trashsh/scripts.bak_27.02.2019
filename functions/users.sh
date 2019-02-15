@@ -5,12 +5,12 @@ source $SCRIPTS/functions/mysql.sh
 source $SCRIPTS/functions/other.sh
 source $SCRIPTS/functions/site.sh
 
-declare -x -f UseraddSystem #Добавление системного пользователя: ($1-user ;)
-declare -x -f UserAddToGroupSudo #Добавление пользователя в группу sudo: ($1-user)
-declare -x -f UserShowGroup #Вывод списка групп, в которых состоит пользователь: ($1-user ;)
-declare -x -f UserDeleteFromGroup #Удаление пользователя $1 из группы $2: ($1-user ; $2-group ;)
-declare -x -f AddAdminSshKeytoSite #Добавить ключ ssh к указанному пользователю: ($1-user ; $2-путь к ключу ssh ;)
-declare -x -f GenerateSshKey #Генерация ssh-ключа пользователю $1: ($1-user ;)
+declare -x -f useraddSystem #Добавление системного пользователя: ($1-user ;)
+declare -x -f userAddToGroupSudo #Добавление пользователя в группу sudo: ($1-user)
+declare -x -f userShowGroup #Вывод списка групп, в которых состоит пользователь: ($1-user ;)
+declare -x -f userDeleteFromGroup #Удаление пользователя $1 из группы $2: ($1-user ; $2-group ;)
+declare -x -f addAdminSshKeytoSite #Добавить ключ ssh к указанному пользователю: ($1-user ; $2-путь к ключу ssh ;)
+declare -x -f generateSshKey #Генерация ssh-ключа пользователю $1: ($1-user ;)
 
 declare -x -f viewGroupFtpAccessAll						#Вывод всех пользователей группы ftp-access
 declare -x -f viewGroupFtpAccessByName					#Вывод всех пользователей группы ftp-access с указанием части имени пользователя ($1-user)
@@ -36,9 +36,10 @@ declare -x -f existGroup                                #Существует л
 
 
 
+
 #Добавление пользователя в группу sudo
 #$1-user
-UserAddToGroupSudo() {
+userAddToGroupSudo() {
 	#Проверка на существование параметров запуска скрипта
 	if [ -n "$1" ]
 	then
@@ -57,7 +58,7 @@ UserAddToGroupSudo() {
                     y|Y)  adduser $1 sudo;
                             echo -e "Пользователь ${COLOR_YELLOW}" $1 "${COLOR_NC} добавлен в список sudo";
                             echo ""
-                            UserShowGroup $1
+                            userShowGroup $1
                             break;;
                     n|N)  echo -e "\n${COLOR_YELLOW} Пользователь ${COLOR_LIGHT_PURPLE}\"$1\" ${COLOR_NC}${COLOR_YELLOW} создан, но не добавлен в список ${COLOR_GREEN}\"sudo\"${COLOR_NC}";  break;;
                     esac
@@ -72,7 +73,7 @@ UserAddToGroupSudo() {
 	#Параметры запуска существуют (конец)
 	else
 	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"UserAddToGroupSudo\"${COLOR_RED} ${COLOR_NC}"
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"userAddToGroupSudo\"${COLOR_RED} ${COLOR_NC}"
 	#Параметры запуска отсутствуют (конец)
 	fi
 	#Конец проверки существования параметров запуска скрипта
@@ -81,7 +82,7 @@ UserAddToGroupSudo() {
 
 #Вывод списка групп, в которых состоит пользователь
 #$1-user ;
-UserShowGroup() {
+userShowGroup() {
 	#Проверка на существование параметров запуска скрипта
 	if [ -n "$1" ]  
 	then
@@ -96,14 +97,14 @@ UserShowGroup() {
 				#предыдущая команда завершилась успешно (конец)
 			else
 				#предыдущая команда завершилась с ошибкой
-				echo -e "${COLOR_RED}Пользователь ${COLOR_YELLOW}\"$1\"${COLOR_RED} не найден. Ошибка выполнения функции UserShowGroup${COLOR_NC}"
+				echo -e "${COLOR_RED}Пользователь ${COLOR_YELLOW}\"$1\"${COLOR_RED} не найден. Ошибка выполнения функции userShowGroup${COLOR_NC}"
 				#предыдущая команда завершилась с ошибкой (конец)
 		fi
 		#Конец проверки на успешность выполнения предыдущей команды
 	#Параметры запуска существуют (конец)
 	else
 	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"UserShowGroup\"${COLOR_RED} ${COLOR_NC}"
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"userShowGroup\"${COLOR_RED} ${COLOR_NC}"
 	#Параметры запуска отсутствуют (конец)
 	fi
 	#Конец проверки существования параметров запуска скрипта    
@@ -111,13 +112,13 @@ UserShowGroup() {
 
 #Удаление пользователя $1 из группы $2
 #$1-user ; $2-group ;
-UserDeleteFromGroup() {
+userDeleteFromGroup() {
 	#Проверка на существование параметров запуска скрипта
 	if [ -n "$1" ] && [ -n "$2" ]
 	then
 	#Параметры запуска существуют
         echo -e "${COLOR_YELLOW} Удаление пользователя ${COLOR_GREEN}\"$1\"${COLOR_YELLOW} из группы  ${COLOR_GREEN}\"$2\"${COLOR_NC}"
-        UserShowGroup $1
+        userShowGroup $1
         grep "^$1:" /etc/passwd >/dev/null
         #Проверка на успешность выполнения предыдущей команды
         if [ $? -eq 0 ]
@@ -131,7 +132,7 @@ UserDeleteFromGroup() {
                         do
                             case "$REPLY" in
                             y|Y)  gpasswd -d $1 $2;
-                                    UserShowGroup $1
+                                    userShowGroup $1
                                     break;;
                             n|N)  echo -e "\n${COLOR_YELLOW} Удаление пользователя ${COLOR_GREEN}\"$1\" ${COLOR_NC}${COLOR_YELLOW} из группы ${COLOR_GREEN}\"$2\"${COLOR_YELLOW} прекращено${COLOR_NC}"
                             break;;
@@ -140,7 +141,7 @@ UserDeleteFromGroup() {
                         done
 
                 else
-                    echo -e "${COLOR_RED}Группа ${COLOR_GREEN}$2${COLOR_RED} не существует. Ошибка выполнения функции UserDeleteFromGroup${COLOR_NC}"
+                    echo -e "${COLOR_RED}Группа ${COLOR_GREEN}$2${COLOR_RED} не существует. Ошибка выполнения функции userDeleteFromGroup${COLOR_NC}"
                 fi
         		#предыдущая команда завершилась успешно (конец)
         	else
@@ -160,7 +161,7 @@ UserDeleteFromGroup() {
 
 #Добавить ключ ssh к указанному пользователю
 #$1-user ; $2-путь к ключу ssh ;
-AddAdminSshKeytoSite() {
+addAdminSshKeytoSite() {
 	#Проверка на существование параметров запуска скрипта
 	if [ -n "$1" ] && [ -n "$2" ] 
 	then
@@ -202,7 +203,7 @@ AddAdminSshKeytoSite() {
 	#Параметры запуска существуют (конец)
 	else
 	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"AddAdminSshKeytoSite\"${COLOR_RED} ${COLOR_NC}"
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"addAdminSshKeytoSite\"${COLOR_RED} ${COLOR_NC}"
 	#Параметры запуска отсутствуют (конец)
 	fi
 	#Конец проверки существования параметров запуска скрипта    
@@ -210,7 +211,7 @@ AddAdminSshKeytoSite() {
 
 #Генерация ssh-ключа пользователю $1
 #$1-user ;
-GenerateSshKey() {
+generateSshKey() {
 	#Проверка на существование параметров запуска скрипта
 	if [ -n "$1" ]
 	then
@@ -282,7 +283,7 @@ GenerateSshKey() {
 	#Параметры запуска существуют (конец)
 	else
 	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"GenerateSshKey\"${COLOR_RED} ${COLOR_NC}"
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"generateSshKey\"${COLOR_RED} ${COLOR_NC}"
 	#Параметры запуска отсутствуют (конец)
 	fi
 	#Конец проверки существования параметров запуска скрипта
@@ -412,7 +413,7 @@ viewUserInGroupByName(){
 
 #Добавление системного пользователя
 #$1-user ;
-UseraddSystem() {
+useraddSystem() {
 	#Проверка на существование параметров запуска скрипта
 	if [ -n "$1" ]
 	then
@@ -450,7 +451,7 @@ UseraddSystem() {
 	#Параметры запуска существуют (конец)
 	else
 	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"UseraddSystem\"${COLOR_RED} ${COLOR_NC}"
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"useraddSystem\"${COLOR_RED} ${COLOR_NC}"
 	#Параметры запуска отсутствуют (конец)
 	fi
 	#Конец проверки существования параметров запуска скрипта

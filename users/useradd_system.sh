@@ -2,6 +2,8 @@
 source $SCRIPTS/include/include.sh
 
 
+
+
 viewGroupUsersAccessAll "Текущие пользователи системы:"
 echo -e "${COLOR_YELLOW}"Создание системного пользователя"${COLOR_NC}"
 read -p "Введите имя пользователя: " username
@@ -12,6 +14,7 @@ read -p "Введите имя пользователя: " username
 	then
 	#Пользователь $username существует
 		echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$username\"${COLOR_RED} уже существует${COLOR_GREEN}${COLOR_NC}"
+		return 1
 	#Пользователь $username существует (конец)
 	else
 	#Пользователь $username не существует
