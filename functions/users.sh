@@ -5,7 +5,7 @@ source $SCRIPTS/functions/mysql.sh
 source $SCRIPTS/functions/other.sh
 source $SCRIPTS/functions/site.sh
 
-declare -x -f useraddSystem #Добавление системного пользователя: ($1-user ;)
+declare -x -f userAddSystem #Добавление системного пользователя: ($1-user ;)
 declare -x -f userAddToGroupSudo #Добавление пользователя в группу sudo: ($1-user)
 declare -x -f userShowGroup #Вывод списка групп, в которых состоит пользователь: ($1-user ;)
 declare -x -f userDeleteFromGroup #Удаление пользователя $1 из группы $2: ($1-user ; $2-group ;)
@@ -332,6 +332,7 @@ viewGroupSshAccessByName(){
 #ПРОВЕРНО
 #Вывод всех пользователей группы users
 #$1 - может быть выведен дополнительно текст, предшествующий выводу списка пользователей
+#return 0 - успешно, 1 - неуспешно, параметр $1 передан, 2 - неуспешно, параметр $1 не передан
 viewGroupUsersAccessAll(){
     #Проверка на существование параметров запуска скрипта
     if [ -n "$1" ]
@@ -339,10 +340,34 @@ viewGroupUsersAccessAll(){
     #Параметры запуска существуют
         echo -e "${COLOR_YELLOW}$1${COLOR_NC}"
         cat /etc/passwd | grep ":100::" | highlight magenta ":100::"
+        #Проверка на успешность выполнения предыдущей команды
+        if [ $? -eq 0 ]
+        	then
+        		#предыдущая команда завершилась успешно
+        		return  0
+        		#предыдущая команда завершилась успешно (конец)		
+        	else
+        		#предыдущая команда завершилась с ошибкой
+        		return 1
+        		#предыдущая команда завершилась с ошибкой (конец)
+        fi
+        #Конец проверки на успешность выполнения предыдущей команды
     #Параметры запуска существуют (конец)
     else
     #Параметры запуска отсутствуют
         cat /etc/passwd | grep ":100::" | highlight magenta ":100::"
+        #Проверка на успешность выполнения предыдущей команды
+        if [ $? -eq 0 ]
+        	then
+        		#предыдущая команда завершилась успешно
+        		return 0
+        		#предыдущая команда завершилась успешно (конец)		
+        	else
+        		#предыдущая команда завершилась с ошибкой
+        		return 2
+        		#предыдущая команда завершилась с ошибкой (конец)
+        fi
+        #Конец проверки на успешность выполнения предыдущей команды
     #Параметры запуска отсутствуют (конец)
     fi
     #Конец проверки существования параметров запуска скрипта
@@ -405,6 +430,7 @@ viewUserInGroupByName(){
 	if [ -n "$1" ]
 		then
 			cat /etc/group | grep -P $1 | highlight green $1 | highlight magenta "ssh-access" | highlight magenta "ftp-access" | highlight magenta "sudo" | highlight magenta "admin-access"
+			return 0
 		else
 			echo -e "${COLOR_LIGHT_RED}Не передан параметр в функцию viewUserInGroupByName в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}"
 			exit 1
@@ -413,7 +439,7 @@ viewUserInGroupByName(){
 
 #Добавление системного пользователя
 #$1-user ;
-useraddSystem() {
+userAddSystem() {
 	#Проверка на существование параметров запуска скрипта
 	if [ -n "$1" ]
 	then
@@ -424,34 +450,19 @@ useraddSystem() {
 	    	then
 	    		#Пользователь уже существует
 	    		echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_RED} уже существует${COLOR_NC}"
+	    		viewUserInGroupByName $1
+	    		viewGroupUsersAccessAll
 	    		#Пользователь уже существует (конец)
 	    	else
 	    		#Пользователь не существует и будет добавлен
-	    		echo ''
-                mkdir -p $HOMEPATHWEBUSERS/$1
-                mkdir -p $HOMEPATHWEBUSERS/$1/.backups
-                mkdir -p $HOMEPATHWEBUSERS/$1/.backups/autobackup
-                mkdir -p $HOMEPATHWEBUSERS/$1/.backups/userbackup
-                echo "source /etc/profile" >> $HOMEPATHWEBUSERS/$1/.bashrc
-                sed -i '$ a source $SCRIPTS/include/include.sh'  $HOMEPATHWEBUSERS/$1/.bashrc
-
-                useradd -N -g users -d $HOMEPATHWEBUSERS/$1 -s /bin/bash $1
-                chmod 755 -R $HOMEPATHWEBUSERS/$1
-                #chown $1:users -R $HOMEPATHWEBUSERS/$1
-                find $HOMEPATHWEBUSERS/$1 -type d -exec chown $1:users {} \;
-			    find $HOMEPATHWEBUSERS/$1 -type f -exec chown $1:users {} \;
-
-                touch $HOMEPATHWEBUSERS/$1/.bashrc
-                touch $HOMEPATHWEBUSERS/$1/.sudo_as_admin_successful
-                echo -e "${COLOR_YELLOW}Установите пароль для пользователя ${COLOR_GREEN}\"$1\"${COLOR_NC}"
-                passwd $1
+                echo ""
                 #Пользователь не существует и будет добавлен (конец)
 	    fi
 	    #Конец проверки на успешность выполнения предыдущей команды
 	#Параметры запуска существуют (конец)
 	else
 	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"useraddSystem\"${COLOR_RED} ${COLOR_NC}"
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"userAddSystem\"${COLOR_RED} ${COLOR_NC}"
 	#Параметры запуска отсутствуют (конец)
 	fi
 	#Конец проверки существования параметров запуска скрипта
