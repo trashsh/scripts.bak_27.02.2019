@@ -531,16 +531,20 @@ userAddSystem() {
                                 #переменная имеет пустое значение (конец)
                             else
                                 #переменная имеет не пустое значение
-                                mkdir -p $HOMEPATHWEBUSERS/$username
-                                mkdir -p $HOMEPATHWEBUSERS/$username/.backups
+                                useradd -N -g users -G ftp-access -d $HOMEPATHWEBUSERS/$username -s /bin/bash $username
+                                mkdirWithOwner $HOMEPATHWEBUSERS/$username $username users 755
+                                mkdirWithOwner $HOMEPATHWEBUSERS/$username $username users 755
+                                #mkdir -p $HOMEPATHWEBUSERS/$username/.backups
+                                mkdirWithOwner $HOMEPATHWEBUSERS/$username/.backups $username users 755
                                 echo "source /etc/profile" >> $HOMEPATHWEBUSERS/$username/.bashrc
                                 sed -i '$ a source $SCRIPTS/include/include.sh'  $HOMEPATHWEBUSERS/$username/.bashrc
-                                useradd -N -g users -G ftp-access -d $HOMEPATHWEBUSERS/$username -s /bin/bash $username
                                 #Проверка на успешность выполнения предыдущей команды
                                 echo "$username:$password" | chpasswd
-                                chModAndOwn $HOMEPATHWEBUSERS/$username 755 644 $username users
-                                touch $HOMEPATHWEBUSERS/$username/.bashrc
-                                touch $HOMEPATHWEBUSERS/$username/.sudo_as_admin_successful
+                                chModAndOwnFolderAndFiles $HOMEPATHWEBUSERS/$username 755 644 $username users
+                                touchFileWithOwner $HOMEPATHWEBUSERS/$username/.bashrc $username users 644
+                                #touch $HOMEPATHWEBUSERS/$username/.bashrc
+                                #touch $HOMEPATHWEBUSERS/$username/.sudo_as_admin_successful
+                                touchFileWithOwner $HOMEPATHWEBUSERS/$username/.sudo_as_admin_successful $username users 644
                                 dbSetMyCnfFile $username $password
                                 echo -e "${COLOR_GREEN}Пользователь ${COLOR_YELLOW}\"$username\"${COLOR_GREEN} успешно добавлен${COLOR_YELLOW}\"\"${COLOR_GREEN} ${COLOR_NC}"
 
@@ -562,7 +566,6 @@ userAddSystem() {
                            ;;
                     esac
                 done
-
 
 	##Здесь описать порядок действий при создании пользователя
 	return 0
@@ -846,17 +849,22 @@ sshKeyAddToUser() {
                 fi
     		fi
 
-    		     mkdir -p $HOMEPATHWEBUSERS/$1/.ssh
+
+    		     mkdirWithOwner $HOMEPATHWEBUSERS/$1/.ssh $1 users 700
+    		     #mkdir -p $HOMEPATHWEBUSERS/$1/.ssh
+    		     #chmod 700 $HOMEPATHWEBUSERS/$1/.ssh
     		     DATE=`date '+%Y-%m-%d__%H-%M'`
-				 mkdir -p $BACKUPFOLDER_IMPORTANT/ssh/$1
-				 chown $1:users $BACKUPFOLDER_IMPORTANT/ssh/$1
+				 #mkdir -p $BACKUPFOLDER_IMPORTANT/ssh/$1
+				 mkdirWithOwner $BACKUPFOLDER_IMPORTANT/ssh/$1 $1 users 755
+				 #chown $1:users $BACKUPFOLDER_IMPORTANT/ssh/$1
 				 tar_file_structure $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys $BACKUPFOLDER_IMPORTANT/ssh/$1/authorized_keys_$DATE.tar.gz
+				 
 				 chown $1:users $BACKUPFOLDER_IMPORTANT/ssh/$1/authorized_keys_$DATE.tar.gz
 				 cat $key >> $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys
-				# echo "" >> $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys
+				 #echo "" >> $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys
 				 #cat $SETTINGS/ssh/keys/lamer >> $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys
 
-				 chmod 700 $HOMEPATHWEBUSERS/$1/.ssh
+
 				 chmod 600 $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys
 				 chown $1:users $HOMEPATHWEBUSERS/$1/.ssh
 				 chown $1:users $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys
