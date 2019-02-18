@@ -5,9 +5,6 @@ source $SCRIPTS/functions/mysql.sh
 source $SCRIPTS/functions/other.sh
 source $SCRIPTS/functions/site.sh
 
-declare -x -f userAddSystem #Добавление системного пользователя: ($1-user ;)
-declare -x -f userAddToGroupSudo #Добавление пользователя в группу sudo: ($1-user)
-declare -x -f userShowGroup #Вывод списка групп, в которых состоит пользователь: ($1-user ;)
 declare -x -f userDeleteFromGroup #Удаление пользователя $1 из группы $2: ($1-user ; $2-group ;)
 declare -x -f addAdminSshKeytoSite #Добавить ключ ssh к указанному пользователю: ($1-user ; $2-путь к ключу ssh ;)
 declare -x -f generateSshKey #Генерация ssh-ключа пользователю $1: ($1-user ;)
@@ -23,20 +20,33 @@ declare -x -f viewGroupSudoAccessAll					#Вывод всех пользоват
 declare -x -f viewGroupSudoAccessByName					#Вывод пользователей группы sudo с указанием части имени пользователя ($1-user)
 declare -x -f viewUserInGroupByName						#Вывод групп, в которых состоит указанный пользователь ($1-user)
 
+
+
+
+
 #описать функцию
 declare -x -f showUserFullInfo #Отображение полной информации о пользователе: ($1-user)
 
-#ПРОВЕРЕНО
+
+
+#Полностью проверено
+declare -x -f existGroup                                #Существует ли группа $1
+                                                        #функция возвращает значение 0-если группа $1 существует. 1- если группа не существует
+                                                        #Если передан параметр $2, равный 1, то выведется текст сообщения о существовании группы
+                                                        #$1-group
+                                                        #return 0 - группа $1 существует, 1 - группа $1 не существует
+declare -x -f userAddSystem #Добавление системного пользователя: ($1-user ;)
 declare -x -f viewGroupUsersAccessAll					#Вывод всех пользователей группы users. #$1 - может быть выведен дополнительно текст, предшествующий выводу списка пользователей
 declare -x -f userExistInGroup                          #состоит ли пользователь $1 в группе $2
                                                         #функция возвращает значение 0-если пользователь состоит в группе "$2", 1- если не состоит в группе "$2"
                                                         #ничего не выводится
-                                                        #$1-user ; $2-group
-declare -x -f existGroup                                #Существует ли группа $1
-                                                        #функция возвращает значение 0-если группа $1 существует. 1- если группа не существует
-                                                        #ничего не выводится
-                                                        #$1-group
-
+                                                        #$1-user ; $2-group; $3-может быть передан параметр 3, равеный 1, тогда выведется сообщение о присутствии или отсутствии пользвоателя в группе
+                                                        #return 0 - нет ошибок, 1 - пользователь не существует, 2 - не переданы параметры
+declare -x -f showUserGroups                            #Вывод списка групп, в которых состоит пользователь (полное совпадение): ($1-user ;)
+declare -x -f userAddToGroup                            #Добавить пользователя в группу sudo
+                                                        #$1-user ; $2-группа
+                                                        #return 0 - успешно выполнено; 1 - не существует пользователь; 2 - отмена пользователем
+                                                        #3 - пользователь уже присутствует в группе $1
 
 
 
@@ -52,6 +62,7 @@ showUserFullInfo() {
 			if  [ $? -eq 0 ]
 			then
 			#Пользователь $1 существует
+			    showUserGroups $1
 				echo "Описать функцию showUserFullInfo. Пользователь $1 существует"
 			#Пользователь $1 существует (конец)
 			else
@@ -70,52 +81,12 @@ showUserFullInfo() {
 	#Конец проверки существования параметров запуска скрипта
 }
 
-#Добавление пользователя в группу sudo
-#$1-user
-userAddToGroupSudo() {
-	#Проверка на существование параметров запуска скрипта
-	if [ -n "$1" ]
-	then
-	#Параметры запуска существуют
-        echo -e "${COLOR_YELLOW} Добавление пользователя в группу sudo ${COLOR_NC}"
-	    grep "^$1:" /etc/passwd >/dev/null
-	    #Проверка на успешность выполнения предыдущей команды
-	    if [ $? -eq 0 ]
-	    	then
-	    		#предыдущая команда завершилась успешно
-	    		echo -n -e "Добавить пользователя ${COLOR_YELLOW}\""$1"\"${COLOR_NC} в список ${COLOR_YELLOW}\"sudo\"${COLOR_NC}? введите ${COLOR_BLUE}\"y\"${COLOR_NC} для подтверждения, для выхода - ${COLOR_BLUE}\"n\"${COLOR_NC}: "
-
-                while read
-                do
-                    case "$REPLY" in
-                    y|Y)  adduser $1 sudo;
-                            echo -e "Пользователь ${COLOR_YELLOW}" $1 "${COLOR_NC} добавлен в список sudo";
-                            echo ""
-                            userShowGroup $1
-                            break;;
-                    n|N)  echo -e "\n${COLOR_YELLOW} Пользователь ${COLOR_LIGHT_PURPLE}\"$1\" ${COLOR_NC}${COLOR_YELLOW} создан, но не добавлен в список ${COLOR_GREEN}\"sudo\"${COLOR_NC}";  break;;
-                    esac
-                done
-	    		#предыдущая команда завершилась успешно (конец)
-	    	else
-	    		#предыдущая команда завершилась с ошибкой
-	    		echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует${COLOR_NC}"
-	    		#предыдущая команда завершилась с ошибкой (конец)
-	    fi
-	    #Конец проверки на успешность выполнения предыдущей команды
-	#Параметры запуска существуют (конец)
-	else
-	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"userAddToGroupSudo\"${COLOR_RED} ${COLOR_NC}"
-	#Параметры запуска отсутствуют (конец)
-	fi
-	#Конец проверки существования параметров запуска скрипта
-}
 
 
+#Проте
 #Вывод списка групп, в которых состоит пользователь
 #$1-user ;
-userShowGroup() {
+showUserGroups() {
 	#Проверка на существование параметров запуска скрипта
 	if [ -n "$1" ]  
 	then
@@ -127,17 +98,29 @@ userShowGroup() {
 				#предыдущая команда завершилась успешно
 				echo -e "${COLOR_YELLOW}Список групп, в которых состоит пользователь ${COLOR_GREEN}\""$1"\"${COLOR_NC}: "
 		        grep "$1" /etc/group | highlight green "$1"
+
+		        #Проверка наличия пользователя в группе users
+		        userExistInGroup $1 users
+		        #Проверка на успешность выполнения предыдущей команды
+		        if [ $? -eq 0 ]
+		        	then
+		        		#предыдущая команда завершилась успешно
+		        		echo -e "users:x:100:$1" | highlight green "$1"
+		        		#предыдущая команда завершилась успешно (конец)
+		        fi
+		        #Конец проверки на успешность выполнения предыдущей команды
+
 				#предыдущая команда завершилась успешно (конец)
 			else
 				#предыдущая команда завершилась с ошибкой
-				echo -e "${COLOR_RED}Пользователь ${COLOR_YELLOW}\"$1\"${COLOR_RED} не найден. Ошибка выполнения функции userShowGroup${COLOR_NC}"
+				echo -e "${COLOR_RED}Пользователь ${COLOR_YELLOW}\"$1\"${COLOR_RED} не найден. Ошибка выполнения функции showUserGroups${COLOR_NC}"
 				#предыдущая команда завершилась с ошибкой (конец)
 		fi
 		#Конец проверки на успешность выполнения предыдущей команды
 	#Параметры запуска существуют (конец)
 	else
 	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"userShowGroup\"${COLOR_RED} ${COLOR_NC}"
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"showUserGroups\"${COLOR_RED} ${COLOR_NC}"
 	#Параметры запуска отсутствуют (конец)
 	fi
 	#Конец проверки существования параметров запуска скрипта    
@@ -145,48 +128,78 @@ userShowGroup() {
 
 #Удаление пользователя $1 из группы $2
 #$1-user ; $2-group ;
+#return 0 - пользователь удален; 2 - отмена удаления
 userDeleteFromGroup() {
 	#Проверка на существование параметров запуска скрипта
 	if [ -n "$1" ] && [ -n "$2" ]
 	then
 	#Параметры запуска существуют
-        echo -e "${COLOR_YELLOW} Удаление пользователя ${COLOR_GREEN}\"$1\"${COLOR_YELLOW} из группы  ${COLOR_GREEN}\"$2\"${COLOR_NC}"
-        userShowGroup $1
-        grep "^$1:" /etc/passwd >/dev/null
-        #Проверка на успешность выполнения предыдущей команды
-        if [ $? -eq 0 ]
-        	then
-        		#предыдущая команда завершилась успешно
-        		if grep -q $2 /etc/group
-                then
-                     echo -n -e "Удалить пользователя ${COLOR_YELLOW}\""$1"\"${COLOR_NC} из группы ${COLOR_YELLOW}\"$2\"${COLOR_NC}? введите ${COLOR_BLUE}\"y\"${COLOR_NC} для подтверждения, для выхода - ${COLOR_BLUE}\"n\"${COLOR_NC}: "
 
-                        while read
-                        do
-                            case "$REPLY" in
-                            y|Y)  gpasswd -d $1 $2;
-                                    userShowGroup $1
-                                    break;;
-                            n|N)  echo -e "\n${COLOR_YELLOW} Удаление пользователя ${COLOR_GREEN}\"$1\" ${COLOR_NC}${COLOR_YELLOW} из группы ${COLOR_GREEN}\"$2\"${COLOR_YELLOW} прекращено${COLOR_NC}"
-                            break;;
+	#Проверка существования системного пользователя "$1"
+		grep "^$1:" /etc/passwd >/dev/null
+		if  [ $? -eq 0 ]
+		then
+		#Пользователь $1 существует
 
-                            esac
-                        done
+		    existGroup $2
+		    #Проверка на успешность выполнения предыдущей команды
+		    if [ $? -eq 0 ]
+		    	then
+		    		#если группа $1 существует
+		    		#проверка на наличие пользователя в группе $2
+                    userExistInGroup $1 $2
+                    #Проверка на успешность выполнения предыдущей команды (наличие пользователя в группе)
+                    if [ $? -eq 0 ]
+                        then
+                            #предыдущая команда завершилась успешно
+                            echo -e "${COLOR_YELLOW}Удалить пользователя ${COLOR_GREEN}\"$1\"${COLOR_YELLOW} из группы ${COLOR_GREEN}\"$2\"${COLOR_YELLOW}? ${COLOR_NC}"
+                            echo -n -e "${COLOR_YELLOW}Введите ${COLOR_GREEN}\"y\"${COLOR_YELLOW} для подтверждения или ${COLOR_GREEN}\"n\"${COLOR_YELLOW} - для отмены: ${COLOR_NC}: "
+                            while read
+                            do
+                                case "$REPLY" in
+                                    y|Y)
+                                        gpasswd -d $1 $2
+                                        echo -e "${COLOR_GREEN}Пользователь ${COLOR_YELLOW}\"$1\"${COLOR_GREEN} успешно удален из группы ${COLOR_YELLOW}\"$2\" ${COLOR_NC}"
+                                        return 0
+                                        #break
+                                        ;;
+                                    n|N)
+                                        return 2
+                                        #break
+                                        ;;
+                                    *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2
+                                       ;;
+                                esac
+                            done
 
-                else
-                    echo -e "${COLOR_RED}Группа ${COLOR_GREEN}$2${COLOR_RED} не существует. Ошибка выполнения функции userDeleteFromGroup${COLOR_NC}"
-                fi
-        		#предыдущая команда завершилась успешно (конец)
-        	else
-        		#предыдущая команда завершилась с ошибкой
-        		echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует${COLOR_NC}"
-        		#предыдущая команда завершилась с ошибкой (конец)
-            fi
-        #Конец проверки на успешность выполнения предыдущей команды
+                            #предыдущая команда завершилась успешно (конец)
+                        else
+                            #предыдущая команда завершилась с ошибкой
+                            echo -e "${COLOR_YELLOW}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_YELLOW} не присутствует в группе ${COLOR_GREEN}\"$2\" ${COLOR_NC}"
+                                    #предыдущая команда завершилась с ошибкой (конец)
+                        fi
+                            #Конец проверки на успешность выполнения предыдущей команды
+                    #проверка на наличие пользователя в группе sudo (конец)
+                #если группа $1 существует (конец)
+		    	else
+		    		#если группа $1 не существует
+		    		echo -e "${COLOR_RED}Группа ${COLOR_GREEN}\"$2\"${COLOR_RED} не существует. Ошибка выполнения функции ${COLOR_YELLOW}\"userDeleteFromGroup\"${COLOR_NC}"
+		    		#если группа $1 не существует (конец)
+		    fi
+		    #Конец проверки на успешность выполнения предыдущей команды
+		#Пользователь $1 существует (конец)
+		else
+		#Пользователь $1 не существует
+		    echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует. Ошибка выполнения функции ${COLOR_YELLOW}\"userDeleteFromGroup\"${COLOR_NC}"
+            return 1
+		#Пользователь $1 не существует (конец)
+		fi
+	#Конец проверки существования системного пользователя $1
+
 	#Параметры запуска существуют (конец)
 	else
 	#Параметры запуска отсутствуют
-	    echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"\"${COLOR_RED} ${COLOR_NC}"
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"userDeleteFromGroup\"${COLOR_RED} ${COLOR_NC}"
 	#Параметры запуска отсутствуют (конец)
 	fi
 	#Конец проверки существования параметров запуска скрипта
@@ -362,7 +375,7 @@ viewGroupSshAccessByName(){
 	fi
 }
 
-#ПРОВЕРНО
+#Полностью готово
 #Вывод всех пользователей группы users
 #$1 - может быть выведен дополнительно текст, предшествующий выводу списка пользователей
 #return 0 - успешно, 1 - неуспешно, параметр $1 передан, 2 - неуспешно, параметр $1 не передан
@@ -449,7 +462,7 @@ viewGroupSudoAccessAll(){
 viewGroupSudoAccessByName(){
 	if [ -n "$1" ]
 	then
-		echo -e "\n${COLOR_YELLOW}Список пользователей группы \"sudo\", содержащих в названии {COLOR_YELLOW}\"$1\"{COLOR_NC}:${COLOR_NC}"
+		echo -e "\n${COLOR_YELLOW}Список пользователей группы \"sudo\", содержащих в названии ${COLOR_YELLOW}\"$1\"${COLOR_NC}:${COLOR_NC}"
 		more /etc/group | grep sudo: | highlight green "$1" | highlight magenta "sudo"
 	else
 		echo -e "${COLOR_LIGHT_RED}Не передан параметр в функцию viewGroupSudoAccessByName в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}"
@@ -470,126 +483,97 @@ viewUserInGroupByName(){
 		fi
 }
 
+#Готово. Можно добавить доп.функционал
 #Добавление системного пользователя
 #$1-user ;
 #return 0 - выполнено успешно, 1 - пользователь уже существует
 #2 - пользователь отменил создание пользователя
-#3 - ошибка в команде useradd
 userAddSystem() {
 	#Проверка на существование параметров запуска скрипта
 	if [ -n "$1" ]
 	then
 	#Параметры запуска существуют
-	 username=$1
-	    grep "^$1:" /etc/passwd >/dev/null
-	    #Проверка на успешность выполнения предыдущей команды
-	    if [ $? -eq 0 ]
-	    	then
-	    		#Пользователь уже существует
-	    		echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_RED} уже существует${COLOR_NC}"
-	    		showUserFullInfo $1
-	    		return 1
-	    		#Пользователь уже существует (конец)
-	    #else
-	    		#Пользователь не существует и будет добавлен
-                #username=$1
-                echo $username
-                #Пользователь не существует и будет добавлен (конец)
-	    fi
-	    #Конец проверки на успешность выполнения предыдущей команды
-	#Параметры запуска существуют (конец)
+	    username=$1
+
 	else
-	#Параметры запуска отсутствуют
-		echo -e -n "${COLOR_BLUE}"Введите имя пользователя: "${COLOR_NC}"
+	    echo -e -n "${COLOR_BLUE}"Введите имя пользователя: "${COLOR_NC}"
 		read username
-		grep "^$username:" /etc/passwd >/dev/null
+	fi
+	    grep "^$username:" /etc/passwd >/dev/null
+
 	    #Проверка на успешность выполнения предыдущей команды
 	    if [ $? -eq 0 ]
 	    	then
 	    		#Пользователь уже существует
-	    		echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$username_reg\"${COLOR_RED} уже существует${COLOR_NC}"
-	    		showUserFullInfo $1
+	    		echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$username\"${COLOR_RED} уже существует${COLOR_NC}"
 	    		return 1
 	    		#Пользователь уже существует (конец)
-	    ##	else
-	    		#Пользователь не существует и будет добавлен
+	    else
+                #Пользователь не существует и будет добавлен
+                echo -n -e "${COLOR_YELLOW}Подтвердите добавление пользователя ${COLOR_GREEN}\"$username\"${COLOR_YELLOW} введя ${COLOR_BLUE}\"y\"${COLOR_YELLOW}, или для отмены операции ${COLOR_BLUE}\"n\"${COLOR_NC}: "
+                while read
+                do
+                    case "$REPLY" in
+                        y|Y)
+                            echo -e "${COLOR_YELLOW}Выполнение операций по созданию пользователя ${COLOR_GREEN}\"$username\"${COLOR_NC}"
+                            echo -n -e "${COLOR_YELLOW}Установите пароль пользователя ${COLOR_GREEN}$username: ${COLOR_NC}: "
+                            read password
 
-                #Пользователь не существует и будет добавлен (конец)
-	    fi
-	    #Конец проверки на успешность выполнения предыдущей команды
-	#Параметры запуска отсутствуют (конец)
-	fi
-	#Конец проверки существования параметров запуска скрипта
-    echo -n -e "${COLOR_YELLOW}Подтвердите добавление пользователя ${COLOR_GREEN}\"$username\"${COLOR_YELLOW} введя ${COLOR_BLUE}\"y\"${COLOR_YELLOW}, или для отмены операции ${COLOR_BLUE}\"n\"${COLOR_NC}: "
-        while read
-        do
-            case "$REPLY" in
-                y|Y) 		
-                    echo -e "${COLOR_YELLOW}Выполнение операций по созданию пользователя ${COLOR_GREEN}\"$username\"${COLOR_NC}"
-                    echo -n -e "${COLOR_YELLOW}Установите пароль пользователя ${COLOR_GREEN}$username: ${COLOR_NC}: "
-                    read password
-
-                    #Проверка на пустое значение переменной
-                    if [[ -z "$password" ]]; then
-                        #переменная имеет пустое значение
-                        echo -e "${COLOR_RED}"Пароль не может быть пустым. Отмена создания пользователя"${COLOR_NC}"
-                        #переменная имеет пустое значение (конец)
-                    else
-                        #переменная имеет не пустое значение
-                        mkdir -p $HOMEPATHWEBUSERS/$username
-                        mkdir -p $HOMEPATHWEBUSERS/$username/.backups
-                        echo "source /etc/profile" >> $HOMEPATHWEBUSERS/$username/.bashrc
-                        sed -i '$ a source $SCRIPTS/include/include.sh'  $HOMEPATHWEBUSERS/$username/.bashrc
-                        useradd -N -g users -G ftp-access -d $HOMEPATHWEBUSERS/$username -s /bin/bash $username
-                        #Проверка на успешность выполнения предыдущей команды
-                        if [ $? -eq 0 ]
-                        	then
-                        		#предыдущая команда завершилась успешно
-                        		echo "$username:$password" | chpasswd
+                            #Проверка на пустое значение переменной
+                            if [[ -z "$password" ]]; then
+                                #переменная имеет пустое значение
+                                echo -e "${COLOR_RED}"Пароль не может быть пустым. Отмена создания пользователя"${COLOR_NC}"
+                                #переменная имеет пустое значение (конец)
+                            else
+                                #переменная имеет не пустое значение
+                                mkdir -p $HOMEPATHWEBUSERS/$username
+                                mkdir -p $HOMEPATHWEBUSERS/$username/.backups
+                                echo "source /etc/profile" >> $HOMEPATHWEBUSERS/$username/.bashrc
+                                sed -i '$ a source $SCRIPTS/include/include.sh'  $HOMEPATHWEBUSERS/$username/.bashrc
+                                useradd -N -g users -G ftp-access -d $HOMEPATHWEBUSERS/$username -s /bin/bash $username
+                                #Проверка на успешность выполнения предыдущей команды
+                                echo "$username:$password" | chpasswd
                                 chModAndOwn $HOMEPATHWEBUSERS/$username 755 644 $username users
                                 touch $HOMEPATHWEBUSERS/$username/.bashrc
                                 touch $HOMEPATHWEBUSERS/$username/.sudo_as_admin_successful
-                                 dbSetMyCnfFile $username $password
-                                 #группы
+                                dbSetMyCnfFile $username $password
+                                echo -e "${COLOR_GREEN}Пользователь ${COLOR_YELLOW}\"$username\"${COLOR_GREEN} успешно добавлен${COLOR_YELLOW}\"\"${COLOR_GREEN} ${COLOR_NC}"
+                                showUserFullInfo $username
+                            fi
+                            #Проверка на пустое значение переменной (конец)
 
-                        		#предыдущая команда завершилась успешно (конец)
-                        	else
-                        		#предыдущая команда завершилась с ошибкой
-                                return 3
-                        		#предыдущая команда завершилась с ошибкой (конец)
-                        fi
-                        #Конец проверки на успешность выполнения предыдущей команды
-                        #переменная имеет не пустое значение (конец)
-                    fi
-                    #Проверка на пустое значение переменной (конец)
-
-                    break
-                    ;;
-                n|N) 		
-                    echo -e "${COLOR_RED}Отмена создания пользователя ${COLOR_GREEN}\"$username\"${COLOR_NC}"
-                    return 2
-                    break
-                    ;;           
-                *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2
-                   ;;
-            esac
-        done
+                            break
+                            ;;
+                        n|N)
+                            echo -e "${COLOR_RED}Отмена создания пользователя ${COLOR_GREEN}\"$username\"${COLOR_NC}"
+                            return 2
+                            break
+                            ;;
+                        *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2
+                           ;;
+                    esac
+                done
 
 
 	##Здесь описать порядок действий при создании пользователя
 	return 0
+                #Пользователь не существует и будет добавлен (конец)
+	    fi
+	    #Конец проверки на успешность выполнения предыдущей команды
+	#Параметры запуска существуют (конец)
+
 }
 
-
+#Полностью проверно
 #состоит ли пользователь $1 в группе $2
 #функция возвращает значение 0-если пользователь состоит в группе "$2", 1- если не состоит в группе "$2"
 #ничего не выводится
-#$1-user ; $2-group
+#$1-user ; $2-group; $3-может быть передан параметр 3, равеный 1, тогда выведется сообщение о присутствии или отсутствии пользвоателя в группе
 #return 0 - нет ошибок, 1 - пользователь не существует, 2 - не переданы параметры
 userExistInGroup() {
 	#Проверка на существование параметров запуска скрипта
 	if [ -n "$1" ] && [ -n "$2" ]
-	then
+	then	    
 	#Параметры запуска существуют
 		#Проверка существования системного пользователя "$1"
 			grep "^$1:" /etc/passwd >/dev/null
@@ -601,10 +585,20 @@ userExistInGroup() {
 				if [ $? -eq 0 ]
 					then
 						#предыдущая команда завершилась успешно
+						#Если передан параметр 3 и он равен 1
+                        if [ "$3" == "1" ]
+                        then
+                            echo -e "${COLOR_GREEN}Пользователь ${COLOR_YELLOW}\"$1 \"${COLOR_GREEN}входит в группу ${COLOR_YELLOW}\"$2\"${COLOR_GREEN} ${COLOR_NC}"
+                        fi
 						return 0
 						#предыдущая команда завершилась успешно (конец)
 					else
 						#предыдущая команда завершилась с ошибкой
+						#Если передан параметр 3 и он равен 1
+                        if [ "$3" == "1" ]
+                        then
+                            echo -e "${COLOR_RED}Пользователь ${COLOR_YELLOW}\"$1 \"${COLOR_RED}не входит в группу ${COLOR_YELLOW}\"$2\" ${COLOR_NC}"
+                        fi
 						return 1
 						#предыдущая команда завершилась с ошибкой (конец)
 				fi
@@ -613,6 +607,7 @@ userExistInGroup() {
 			#Пользователь $1 существует (конец)
 			else
 			#Пользователь $1 не существует
+			    echo -e "${COLOR_RED}Пользователь ${COLOR_YELLOW}\"$1 \"${COLOR_RED}не существует${COLOR_NC}"
 				return 1
 			#Пользователь $1 не существует (конец)
 			fi
@@ -629,23 +624,35 @@ userExistInGroup() {
 
 #Существует ли группа $1
 #функция возвращает значение 0-если группа $1 существует. 1- если группа не существует
-#ничего не выводится
+#Если передан параметр $2, равный 1, то выведется текст сообщения о существовании группы
 #$1-group
-#return 0 - не ошибок, 1 -
+#return 0 - группа $1 существует, 1 - группа $1 не существует
 existGroup() {
 	#Проверка на существование параметров запуска скрипта
 	if [ -n "$1" ]
 	then
 	#Параметры запуска существуют
-		cat /etc/group | grep -w $1
+		cat /etc/group | grep -w $1 >/dev/null
 		#Проверка на успешность выполнения предыдущей команды
 		if [ $? -eq 0 ]
 			then
 				#предыдущая команда завершилась успешно
+				#Проверка наличия параметра $2, равного 1
+				if [ "$2" == "1" ]
+				then
+				     echo -e "${COLOR_GREEN}Группа ${COLOR_YELLOW}\"$1 \"${COLOR_GREEN}существует${COLOR_NC}"
+				fi
+				#Проверка наличия параметра $2, равного 1 (конец)
 				return 0
 				#предыдущая команда завершилась успешно (конец)
 			else
 				#предыдущая команда завершилась с ошибкой
+				#Проверка наличия параметра $2, равного 1
+				if [ "$2" == "1" ]
+				then
+				     echo -e "${COLOR_RED}Группа ${COLOR_YELLOW}\"$1 \"${COLOR_RED}не существует${COLOR_NC}"
+				fi
+				#Проверка наличия параметра $2, равного 1 (конец)
 				return 1
 				#предыдущая команда завершилась с ошибкой (конец)
 		fi
@@ -658,4 +665,85 @@ existGroup() {
 	fi
 	#Конец проверки существования параметров запуска скрипта
 }
+
+#Добавить пользователя в группу sudo
+#$1-user ; $2-группа
+#return 0 - успешно выполнено; 1 - не существует пользователь; 2 - отмена пользователем
+#3 - пользователь уже присутствует в группе $1
+userAddToGroup() {
+	#Проверка на существование параметров запуска скрипта
+	if [ -n "$1" ] && [ -n "$2" ]
+	then
+	#Параметры запуска существуют
+
+	#Проверка существования системного пользователя "$1"
+		grep "^$1:" /etc/passwd >/dev/null
+		if  [ $? -eq 0 ]
+		then
+		#Пользователь $1 существует
+
+		    existGroup $2
+		    #Проверка на успешность выполнения предыдущей команды
+		    if [ $? -eq 0 ]
+		    	then
+		    		#если группа $1 существует
+		    		#проверка на наличие пользователя в группе $2
+                    userExistInGroup $1 $2
+                    #Проверка на успешность выполнения предыдущей команды (наличие пользователя в группе)
+                    if [ $? -eq 0 ]
+                        then
+                            #предыдущая команда завершилась успешно
+                            echo -e "${COLOR_YELLOW}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_YELLOW} уже присутствует в группе ${COLOR_GREEN}\"$2\"${COLOR_NC}"
+                            return 3
+                            #предыдущая команда завершилась успешно (конец)
+                        else
+                            #предыдущая команда завершилась с ошибкой
+                            echo -e "${COLOR_YELLOW}Добавить пользователя ${COLOR_GREEN}\"$1\"${COLOR_YELLOW} в группу ${COLOR_GREEN}\"$2\"${COLOR_YELLOW}? ${COLOR_NC}"
+                            echo -n -e "${COLOR_YELLOW}Введите ${COLOR_GREEN}\"y\"${COLOR_YELLOW} для подтверждения или ${COLOR_GREEN}\"n\"${COLOR_YELLOW} - для отмены: ${COLOR_NC}: "
+                            while read
+                            do
+                                case "$REPLY" in
+                                    y|Y)
+                                        adduser $1 $2;
+                                        echo -e "${COLOR_GREEN}Пользователь ${COLOR_YELLOW}\"$1\"${COLOR_GREEN} успешно добавлен в группу ${COLOR_YELLOW}\"$2\"${COLOR_NC}"
+                                        return 0
+                                        #break
+                                        ;;
+                                    n|N)
+                                        return 2
+                                        #break
+                                        ;;
+                                    *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2
+                                       ;;
+                                esac
+                            done
+                                    #предыдущая команда завершилась с ошибкой (конец)
+                            fi
+                            #Конец проверки на успешность выполнения предыдущей команды
+                    #проверка на наличие пользователя в группе sudo (конец)
+                #если группа $1 существует (конец)
+		    	else
+		    		#если группа $1 не существует
+		    		echo -e "${COLOR_RED}Группа ${COLOR_GREEN}\"$2\"${COLOR_RED} не существует. Ошибка выполнения функции ${COLOR_YELLOW}\"userAddToGroup\"${COLOR_NC}"
+		    		#если группа $1 не существует (конец)
+		    fi
+		    #Конец проверки на успешность выполнения предыдущей команды
+		#Пользователь $1 существует (конец)
+		else
+		#Пользователь $1 не существует
+		    echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует. Ошибка выполнения функции ${COLOR_YELLOW}\"userAddToGroup\"${COLOR_NC}"
+            return 1
+		#Пользователь $1 не существует (конец)
+		fi
+	#Конец проверки существования системного пользователя $1
+
+	#Параметры запуска существуют (конец)
+	else
+	#Параметры запуска отсутствуют
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"userAddToGroup\"${COLOR_RED} ${COLOR_NC}"
+	#Параметры запуска отсутствуют (конец)
+	fi
+	#Конец проверки существования параметров запуска скрипта
+}
+
 
