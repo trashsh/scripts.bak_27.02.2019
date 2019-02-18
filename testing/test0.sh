@@ -1,6 +1,6 @@
 #!/bin/bash
 source $SCRIPTS/include/include.sh
 
-#userAddSystem $1
-userDeleteFromGroup $1 $2
+#userAddSystem  $1 $2
+mkdirWithOwner $1 $2 $3 $4
 
