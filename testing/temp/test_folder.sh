@@ -12,4 +12,4 @@ source $SCRIPTS/functions/users.sh
 #UserAddToGroupSudo $1
 #UserShowGroup $1
 
-FileExistWithInfo $1 $2
+fileExistWithInfo $1 $2

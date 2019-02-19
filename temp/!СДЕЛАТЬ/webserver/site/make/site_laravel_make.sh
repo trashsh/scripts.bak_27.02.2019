@@ -84,7 +84,7 @@ else
     echo "--------------------------------------"
     echo "Параметры запуска не найдены. Необходимы параметры: домен, имя пользователя,путь к папке с сайтом,название шаблона apache,название шаблона nginx."
     echo "Например $0 domain.ru user /home/webusers/domain.ru php.conf php.conf"
-    FileParamsNotFound "$1" "Для запуска главного введите" "$SCRIPTS/menu"  
+    fileParamsNotFound "$1" "Для запуска главного введите" "$SCRIPTS/menu"
 fi
 
 

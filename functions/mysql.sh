@@ -2,7 +2,7 @@
 
 declare -x -f dbBackupBases #Создание бэкапа всех пользовательских баз данных mysql: ($1-В параметре может быть указан путь к каталогу сохранения бэкапов.Если путь не указан, то выгрузится в $BACKUPFOLDER_DAYS\`date +%Y.%m.%d` ;)
 declare -x -f dbBackupBase #Создание бэкапа указанной базы данных: ($1-dbname ; $2-В параметре $2 может быть установлен каталог выгрузки. По умолчанию грузится в $BACKUPFOLDER_DAYS\`date +%Y.%m.%d` )
-declare -x -f BackupTable #Создание бэкапа отдельной таблицы: ($1-dbname ; $2-tablename ; $3-В параметре $3 может быть установлен каталог выгрузки. По умолчанию грузится в $BACKUPFOLDER_DAYS\`date +%Y.%m.%d`)
+declare -x -f dbBackupTable #Создание бэкапа отдельной таблицы: ($1-dbname ; $2-tablename ; $3-В параметре $3 может быть установлен каталог выгрузки. По умолчанию грузится в $BACKUPFOLDER_DAYS\`date +%Y.%m.%d`)
 declare -x -f dbBackupBasesOneUser #Создание бэкапа все баз данных указанного систеного пользователя: ($1-user ; $2-В параметре $2 может быть установлен каталог выгрузки. По умолчанию грузится в $BACKUPFOLDER_DAYS\`date +%Y.%m.%d ;)
 declare -x -f dbCheckExportedBase #Проверка успешности выгрузки базы данных mysql $1 в архив $2: ($1-Имя базы данных ; $2-Путь к архиву ;)
 declare -x -f dbCreateUser #Создание пользователя mysql: ($1-user ; $2-password ; $3-type of user ;)
@@ -176,7 +176,7 @@ dbBackupBase() {
 
 #Создание бэкапа отдельной таблицы
 #$1-dbname ; $2-tablename ; $3-path-Путь по желанию ; ;
-BackupTable() {
+dbBackupTable() {
 	#Проверка на существование параметров запуска скрипта
 	if [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ]
 	then

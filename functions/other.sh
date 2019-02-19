@@ -1,9 +1,9 @@
 #!/bin/bash
 
 
-declare -x -f FileParamsNotFound	#Вывод сообщения с предложением запуска указанного в параметре 3 меню. #$1-user; $2-сообщение; $3-ссылка на скрипт меню для запуска
-declare -x -f FolderExistWithInfo #проверка существования папки с выводом информации о ее существовании: ($1-path ; $2-type (create/exist))
-declare -x -f FileExistWithInfo	#проверка существования файла с выводом информации о ее существовании: ($1-path ; $2-type (create/exist))
+declare -x -f fileParamsNotFound	#Вывод сообщения с предложением запуска указанного в параметре 3 меню. #$1-user; $2-сообщение; $3-ссылка на скрипт меню для запуска
+declare -x -f folderExistWithInfo #проверка существования папки с выводом информации о ее существовании: ($1-path ; $2-type (create/exist))
+declare -x -f fileExistWithInfo	#проверка существования файла с выводом информации о ее существовании: ($1-path ; $2-type (create/exist))
 declare -x -f viewPHPVersion #вывод информации о версии PHP
 declare -x -f ufwAddPort #Добавление порта с исключением в firewall ufw: ($1-port ; $2-protocol ; $3-комментарий ;)
 declare -x -f ufwOpenPorts #Вывод открытых портов ufw:
@@ -11,13 +11,13 @@ declare -x -f webserverRestart #Перезапуск Веб-сервера
 
 
 #Полностью протестировано
-declare -x -f mkdirWithOwner #Создание папки и применение ей владельца и прав доступа: ($1-путь к папке ; $2-user ; $3-group ; $4-разрешения )
+declare -x -f mkdirWithOwn #Создание папки и применение ей владельца и прав доступа: ($1-путь к папке ; $2-user ; $3-group ; $4-разрешения )
                                 #return 1 - не переданы параметры, 2 - пользователь не существует, 3 - группа не существует
 
 #Создание папки и применение ей владельца и прав доступа
 #$1-путь к папке ; $2-user ; $3-group ; $4-разрешения ;
 #return 1 - не переданы параметры, 2 - пользователь не существует, 3 - группа не существует
-mkdirWithOwner() {
+mkdirWithOwn() {
 	#Проверка на существование параметров запуска скрипта
 	if [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ] && [ -n "$4" ]
 	then
@@ -37,7 +37,7 @@ mkdirWithOwner() {
 		    		        #Группа "$3" существует (конец)
 		    		    else
 		    		        #Группа "$3" не существует
-		    		        echo -e "${COLOR_RED}Группа ${COLOR_GREEN}\"$3\"${COLOR_RED} не существует. Ошибка в функции ${COLOR_GREEN}\"mkdirWithOwner\"${COLOR_NC}"
+		    		        echo -e "${COLOR_RED}Группа ${COLOR_GREEN}\"$3\"${COLOR_RED} не существует. Ошибка в функции ${COLOR_GREEN}\"mkdirWithOwn\"${COLOR_NC}"
                             return 3
 		    				#Группа "$3" не существует (конец)
 		    		    fi
@@ -45,7 +45,7 @@ mkdirWithOwner() {
 		    	#Пользователь $2 существует (конец)
 		    	else
 		    	#Пользователь $2 не существует
-		    	    echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$2\"${COLOR_RED} не существует. Ошибка в функции ${COLOR_GREEN}\"mkdirWithOwner\"${COLOR_NC}"
+		    	    echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$2\"${COLOR_RED} не существует. Ошибка в функции ${COLOR_GREEN}\"mkdirWithOwn\"${COLOR_NC}"
 		    	    return 2
 		    	#Пользователь $2 не существует (конец)
 		    	fi
@@ -55,7 +55,7 @@ mkdirWithOwner() {
 	#Параметры запуска существуют (конец)
 	else
 	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"mkdirWithOwner\"${COLOR_RED} ${COLOR_NC}"
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"mkdirWithOwn\"${COLOR_RED} ${COLOR_NC}"
 		return 1
 	#Параметры запуска отсутствуют (конец)
 	fi
@@ -64,7 +64,7 @@ mkdirWithOwner() {
 
 #Вывод сообщения с предложением запуска указанного в параметре 3 меню
 #$1-user; $2-сообщение; $3-ссылка на скрипт меню для запуска
-FileParamsNotFound(){
+fileParamsNotFound(){
 echo -n -e "${COLOR_YELLOW}$2 ${COLOR_BLUE}\"y\"${COLOR_YELLOW}, для выхода введите ${COLOR_BLUE}\"n\"${COLOR_NC}:"
 	while read
 		do
@@ -82,7 +82,7 @@ echo -n -e "${COLOR_YELLOW}$2 ${COLOR_BLUE}\"y\"${COLOR_YELLOW}, для выхо
 
 #проверка существования папки с выводом информации о ее существовании
 #$1-path ; $2-type (create/exist)
-FolderExistWithInfo() {
+folderExistWithInfo() {
 	#Проверка на существование параметров запуска скрипта
 	if [ -n "$1" ] && [ -n "$2" ]
 	then
@@ -103,12 +103,12 @@ FolderExistWithInfo() {
 					fi
 					;;
 				*)
-					echo -e "${COLOR_GREEN}Ошибка параметров в функции ${COLOR_YELLOW}\"FolderExistWithInfo\"${COLOR_NC}";;
+					echo -e "${COLOR_GREEN}Ошибка параметров в функции ${COLOR_YELLOW}\"folderExistWithInfo\"${COLOR_NC}";;
 				esac
 	#Параметры запуска существуют (конец)
 	else
 	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"FolderExistWithInfo\"${COLOR_RED} ${COLOR_NC}"
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"folderExistWithInfo\"${COLOR_RED} ${COLOR_NC}"
 	#Параметры запуска отсутствуют (конец)
 	fi
 	#Конец проверки существования параметров запуска скрипта
@@ -117,7 +117,7 @@ FolderExistWithInfo() {
 
 #проверка существования файла с выводом информации.
 #$1-path, $2-type (create/exist)
-FileExistWithInfo(){
+fileExistWithInfo(){
 	case "$2" in
 				"create") 	
 					if ! [ -f $1 ] ; then
@@ -134,7 +134,7 @@ FileExistWithInfo(){
 					fi
 					;;
 				*) 
-					echo -e "${COLOR_GREEN}Ошибка параметров в функции ${COLOR_YELLOW}\"FolderExistWithInfo\"${COLOR_NC}";;
+					echo -e "${COLOR_GREEN}Ошибка параметров в функции ${COLOR_YELLOW}\"folderExistWithInfo\"${COLOR_NC}";;
 				esac
 }
 

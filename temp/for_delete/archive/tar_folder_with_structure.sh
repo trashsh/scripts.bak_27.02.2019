@@ -15,7 +15,7 @@ if [ -d $2 ] ; then
 
 else
     echo -e "\n${COLOR_YELLOW}Параметры запуска не найдены${COLOR_NC}. Необходимы параметры: 1-USERNAME process; 2- путь к каталогу, файлы в котором подлежат архивации; 3-каталог размещения архива; 4 - имя архива"
-    FileParamsNotFound "$1" "Для запуска главного меню введите" "$SCRIPTS/menu"
+    fileParamsNotFound "$1" "Для запуска главного меню введите" "$SCRIPTS/menu"
 
 fi
 

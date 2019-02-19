@@ -22,7 +22,7 @@ declare -x -f sshKeyAddToUser                           #$1-user ; $2-Если �
                                                         #3- ошибка передачи параметра $3, 4 - не передан путь к файлу при тихом режиме
 
 #описать функцию
-declare -x -f showUserFullInfo #Отображение полной информации о пользователе: ($1-user)
+declare -x -f viewUserFullInfo #Отображение полной информации о пользователе: ($1-user)
 
 
 
@@ -39,7 +39,7 @@ declare -x -f userExistInGroup                          #состоит ли п�
                                                         #ничего не выводится
                                                         #$1-user ; $2-group; $3-может быть передан параметр 3, равеный 1, тогда выведется сообщение о присутствии или отсутствии пользвоателя в группе
                                                         #return 0 - нет ошибок, 1 - пользователь не существует, 2 - не переданы параметры
-declare -x -f showUserGroups                            #Вывод списка групп, в которых состоит пользователь (полное совпадение): ($1-user ;)
+declare -x -f viewUserGroups                            #Вывод списка групп, в которых состоит пользователь (полное совпадение): ($1-user ;)
 declare -x -f userAddToGroup                            #Добавить пользователя в группу sudo
                                                         #$1-user ; $2-группа; Если есть параметр 3, равный 1, то добавление происходит с запросом подтверждения, если без - в тихом режиме
                                                         #return 0 - успешно выполнено; 1 - не существует пользователь; 2 - отмена пользователем
@@ -48,14 +48,14 @@ declare -x -f userDeleteFromGroup                       #Удаление пол
                                                         #$1-user ; $2-group ;
                                                         #return 0 - пользователь удален; 1 - отмена удаления пользователем
                                                         #2 - пользователя $1 нет в группе $2; 3 - группа $2 не существует
-declare -x -f SshKeyGenerateToUser                      #Генерация ssh-ключа для пользователя: ($1-user)
+declare -x -f sshKeyGenerateToUser                      #Генерация ssh-ключа для пользователя: ($1-user)
                                                         #return 0 - выполнено без ошибок, 1 - отсутствуют параметры запуска
                                                         #2 - нет указанного пользователя
 
 
 #Отображение полной информации о пользователе
 #$1-user ;
-showUserFullInfo() {
+viewUserFullInfo() {
 	#Проверка на существование параметров запуска скрипта
 	if [ -n "$1" ]
 	then
@@ -65,8 +65,8 @@ showUserFullInfo() {
 			if  [ $? -eq 0 ]
 			then
 			#Пользователь $1 существует
-			    showUserGroups $1
-				echo "Описать функцию showUserFullInfo. Пользователь $1 существует"
+			    viewUserGroups $1
+				echo "Описать функцию viewUserFullInfo. Пользователь $1 существует"
 			#Пользователь $1 существует (конец)
 			else
 			#Пользователь $1 не существует
@@ -78,7 +78,7 @@ showUserFullInfo() {
 	#Параметры запуска существуют (конец)
 	else
 	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"showUserFullInfo\"${COLOR_RED} ${COLOR_NC}"
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"viewUserFullInfo\"${COLOR_RED} ${COLOR_NC}"
 	#Параметры запуска отсутствуют (конец)
 	fi
 	#Конец проверки существования параметров запуска скрипта
@@ -89,7 +89,7 @@ showUserFullInfo() {
 #Проте
 #Вывод списка групп, в которых состоит пользователь
 #$1-user ;
-showUserGroups() {
+viewUserGroups() {
 	#Проверка на существование параметров запуска скрипта
 	if [ -n "$1" ]  
 	then
@@ -116,14 +116,14 @@ showUserGroups() {
 				#предыдущая команда завершилась успешно (конец)
 			else
 				#предыдущая команда завершилась с ошибкой
-				echo -e "${COLOR_RED}Пользователь ${COLOR_YELLOW}\"$1\"${COLOR_RED} не найден. Ошибка выполнения функции showUserGroups${COLOR_NC}"
+				echo -e "${COLOR_RED}Пользователь ${COLOR_YELLOW}\"$1\"${COLOR_RED} не найден. Ошибка выполнения функции viewUserGroups${COLOR_NC}"
 				#предыдущая команда завершилась с ошибкой (конец)
 		fi
 		#Конец проверки на успешность выполнения предыдущей команды
 	#Параметры запуска существуют (конец)
 	else
 	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"showUserGroups\"${COLOR_RED} ${COLOR_NC}"
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"viewUserGroups\"${COLOR_RED} ${COLOR_NC}"
 	#Параметры запуска отсутствуют (конец)
 	fi
 	#Конец проверки существования параметров запуска скрипта    
@@ -363,6 +363,7 @@ viewUserInGroupByName(){
 #return 0 - выполнено успешно, 1 - пользователь уже существует
 #2 - пользователь отменил создание пользователя
 userAddSystem() {
+	viewGroupUsersAccessAll
 	#Проверка на существование параметров запуска скрипта
 	if [ -n "$1" ]
 	then
@@ -400,23 +401,19 @@ userAddSystem() {
                                 #переменная имеет пустое значение (конец)
                             else
                                 #переменная имеет не пустое значение
+                                mkdir -p $HOMEPATHWEBUSERS/$username
                                 useradd -N -g users -G ftp-access -d $HOMEPATHWEBUSERS/$username -s /bin/bash $username
-                                mkdirWithOwner $HOMEPATHWEBUSERS/$username $username users 755
-                                mkdirWithOwner $HOMEPATHWEBUSERS/$username $username users 755
-                                #mkdir -p $HOMEPATHWEBUSERS/$username/.backups
-                                mkdirWithOwner $HOMEPATHWEBUSERS/$username/.backups $username users 755
+                                echo "$username:$password" | chpasswd
+                                mkdirWithOwn $HOMEPATHWEBUSERS/$username/backups $username users 777
+                                mkdirWithOwn $HOMEPATHWEBUSERS/$username/backups/auto $username users 755
+                                mkdirWithOwn $HOMEPATHWEBUSERS/$username/backups/manually $username users 755
+                                touchFileWithModAndOwn $HOMEPATHWEBUSERS/$username/.bashrc $username users 644
+                                touchFileWithModAndOwn $HOMEPATHWEBUSERS/$username/.sudo_as_admin_successful $username users 644
                                 echo "source /etc/profile" >> $HOMEPATHWEBUSERS/$username/.bashrc
                                 sed -i '$ a source $SCRIPTS/include/include.sh'  $HOMEPATHWEBUSERS/$username/.bashrc
-                                #Проверка на успешность выполнения предыдущей команды
-                                echo "$username:$password" | chpasswd
-                                chModAndOwnFolderAndFiles $HOMEPATHWEBUSERS/$username 755 644 $username users
-                                touchFileWithOwner $HOMEPATHWEBUSERS/$username/.bashrc $username users 644
-                                #touch $HOMEPATHWEBUSERS/$username/.bashrc
-                                #touch $HOMEPATHWEBUSERS/$username/.sudo_as_admin_successful
-                                touchFileWithOwner $HOMEPATHWEBUSERS/$username/.sudo_as_admin_successful $username users 644
                                 dbSetMyCnfFile $username $password
-                                echo -e "${COLOR_GREEN}Пользователь ${COLOR_YELLOW}\"$username\"${COLOR_GREEN} успешно добавлен${COLOR_YELLOW}\"\"${COLOR_GREEN} ${COLOR_NC}"
-
+                                chModAndOwnFile $HOMEPATHWEBUSERS/$username/.my.cnf $username users 600
+                                #chModAndOwnFolderAndFiles $HOMEPATHWEBUSERS/$username 755 644 $username users
                                 #добавление в группу sudo
                                 userAddToGroup $username sudo 1
 
@@ -425,7 +422,7 @@ userAddSystem() {
                                 	do
                                     	echo -n ": "
                                     	case "$REPLY" in
-                                	    	g|G) SshKeyGenerateToUser $username;
+                                	    	g|G) sshKeyGenerateToUser $username;
                                 	    	     sshKeyAddToUser $username 0 $sshAdminKeyFilePath;
                                 		    	break;;
                                 		    i|I)
@@ -438,7 +435,9 @@ userAddSystem() {
                                 	    esac
                                 	done
 
-                                showUserFullInfo $username
+                                echo -e "${COLOR_GREEN}Пользователь ${COLOR_YELLOW}\"$username\"${COLOR_GREEN} успешно добавлен${COLOR_YELLOW}\"\"${COLOR_GREEN} ${COLOR_NC}"
+
+                                viewUserFullInfo $username
                             fi
                             #Проверка на пустое значение переменной (конец)
 
@@ -732,14 +731,15 @@ sshKeyAddToUser() {
                 fi
     		fi
 
-    		     mkdirWithOwner $HOMEPATHWEBUSERS/$1/.ssh $1 users 766
-    		     DATE=`date '+%Y-%m-%d__%H-%M'`
-				 mkdirWithOwner $BACKUPFOLDER_IMPORTANT/ssh/$1 $1 users 766
+                 mkdirWithOwn $HOMEPATHWEBUSERS/$1/ $1 users 755
+    		     mkdirWithOwn $HOMEPATHWEBUSERS/$1/.ssh $1 users 755
+    		     DATE=`date '+%Y-%m-%d__%H-%M-%S'`
+				 mkdirWithOwn $BACKUPFOLDER_IMPORTANT/ssh/$1 $1 users 755
 				 cat $key >> $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys
 				 echo "" >> $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys
 				 tar_file_structure $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys $BACKUPFOLDER_IMPORTANT/ssh/$1/authorized_keys_$DATE.tar.gz
 				 chModAndOwnFile $BACKUPFOLDER_IMPORTANT/ssh/$1/authorized_keys_$DATE.tar.gz $1 users 644
-				 chModAndOwnFile $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys $1 users 666
+				 chModAndOwnFile $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys $1 users 600
 				 chown $1:users $HOMEPATHWEBUSERS/$1/.ssh
 				 usermod -G ssh-access -a $1
 				 echo -e "\n${COLOR_YELLOW} Импорт ключа ${COLOR_LIGHT_PURPLE}\"$key\"${COLOR_YELLOW} пользователю ${COLOR_LIGHT_PURPLE}\"$1\"${COLOR_YELLOW} выполнен${COLOR_NC}"
@@ -763,11 +763,12 @@ sshKeyAddToUser() {
 	#Конец проверки существования параметров запуска скрипта    
 }
 
+
 #Генерация ssh-ключа для пользователя
 #$1-user ;
 #return 0 - выполнено без ошибок, 1 - отсутствуют параметры запуска
 #2 - нет указанного пользователя
-SshKeyGenerateToUser() {
+sshKeyGenerateToUser() {
 	#Проверка на существование параметров запуска скрипта
 	if [ -n "$1" ]   
 	then
@@ -788,24 +789,24 @@ SshKeyGenerateToUser() {
                 fi
             #Конец проверки существования каталога "$HOMEPATHWEBUSERS/$1/.ssh"
 				#mkdir -p $HOMEPATHWEBUSERS/$1/.ssh
-				mkdirWithOwner $HOMEPATHWEBUSERS/$1/.ssh $1 users 766
+				mkdirWithOwn $HOMEPATHWEBUSERS/$1/.ssh $1 users 766
 				cd $HOMEPATHWEBUSERS/$1/.ssh
 				echo -e "\n${COLOR_YELLOW} Генерация ключа. Сейчас необходимо будет установить пароль на ключевой файл.Минимум - 5 символов${COLOR_NC}"
 				ssh-keygen -t rsa -f ssh_$1 -C "ssh_$1 ($DATE_TYPE2)"
 				#echo -e "\n${COLOR_YELLOW} Конвертация ключа в формат программы Putty. Необходимо ввести пароль на ключевой файл, установленный на предыдушем шаге ${COLOR_NC}"
 				sudo puttygen $HOMEPATHWEBUSERS/$1/.ssh/ssh_$1 -C "ssh_$1 ($DATE_TYPE2)" -o $HOMEPATHWEBUSERS/$1/.ssh/ssh_$1.ppk
-				mkdirWithOwner $BACKUPFOLDER_IMPORTANT/ssh/$1 $1 users 766
+				mkdirWithOwn $BACKUPFOLDER_IMPORTANT/ssh/$1 $1 users 766
 				cat $HOMEPATHWEBUSERS/$1/.ssh/ssh_$1.pub >> $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys
 				tar_folder_structure $HOMEPATHWEBUSERS/$1/.ssh/ $BACKUPFOLDER_IMPORTANT/ssh/$1/ssh_generated_$DATE.tar.gz
-                chOwn $BACKUPFOLDER_IMPORTANT/ssh/$1/ssh_generated_$DATE.tar.gz $1 users
+                chModAndOwnFile $BACKUPFOLDER_IMPORTANT/ssh/$1/ssh_generated_$DATE.tar.gz $1 users 644
 
-                chModAndOwnFolderAndFiles $HOMEPATHWEBUSERS/$1/.ssh 700 600 $1 users
+                #chModAndOwnFolderAndFiles $HOMEPATHWEBUSERS/$1/.ssh 700 600 $1 users
 				usermod -G ssh-access -a $1
 				return 0
 		#Пользователь $1 существует (конец)
 		else
 		#Пользователь $1 не существует
-		    echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует. Ошибка в функции ${COLOR_GREEN}\"SshKeyGenerateToUser\"${COLOR_NC}"
+		    echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует. Ошибка в функции ${COLOR_GREEN}\"sshKeyGenerateToUser\"${COLOR_NC}"
 			return 2
 		#Пользователь $1 не существует (конец)
 		fi
@@ -813,9 +814,10 @@ SshKeyGenerateToUser() {
 	#Параметры запуска существуют (конец)
 	else
 	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в функции ${COLOR_GREEN}\"SshKeyGenerateToUser\"${COLOR_RED} ${COLOR_NC}"
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в функции ${COLOR_GREEN}\"sshKeyGenerateToUser\"${COLOR_RED} ${COLOR_NC}"
 		return 1
 	#Параметры запуска отсутствуют (конец)
 	fi
 	#Конец проверки существования параметров запуска скрипта    
 }
+

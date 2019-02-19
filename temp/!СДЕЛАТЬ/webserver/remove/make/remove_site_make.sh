@@ -158,5 +158,5 @@ else
     echo "Например domain.ru /home/webusers/lamer/domain.ru user"
     echo "Список доменов на сервере пользователя $1:"
     ls $HOMEPATHWEBUSERS/$1
-    FileParamsNotFound "$1" "Для запуска главного введите" "$SCRIPTS/menu"  
+    fileParamsNotFound "$1" "Для запуска главного введите" "$SCRIPTS/menu"
 fi

@@ -16,7 +16,7 @@ userAddSystem() {
 	    	then
 	    		#Пользователь уже существует
 	    		echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_RED} уже существует${COLOR_NC}"
-	    		showUserFullInfo $1
+	    		viewUserFullInfo $1
 	    		return 1
 	    		#Пользователь уже существует (конец)
 	    	else
@@ -37,7 +37,7 @@ userAddSystem() {
 	    	then
 	    		#Пользователь уже существует
 	    		echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$username_reg\"${COLOR_RED} уже существует${COLOR_NC}"
-	    		showUserFullInfo $1
+	    		viewUserFullInfo $1
 	    		return 1
 	    		#Пользователь уже существует (конец)
 	    	else
