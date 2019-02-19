@@ -419,6 +419,23 @@ userAddSystem() {
                                 #добавление в группу sudo
                                 userAddToGroup $username sudo 1
 
+                                echo -n -e "${COLOR_YELLOW}Введите ${COLOR_BLUE}\"g\"${COLOR_NC}${COLOR_YELLOW} для генерации ssh-ключа, ${COLOR_GREEN}\"i\"${COLOR_NC}${COLOR_YELLOW} - для импорта существующего на сервер ключа, ${COLOR_BLUE}\"q\"${COLOR_YELLOW} - для отмены добавления ssh-ключа${COLOR_NC}: "
+                                	while read
+                                	do
+                                    	echo -n ": "
+                                    	case "$REPLY" in
+                                	    	g|G) SshKeyGenerateToUser $username;
+                                		    	break;;
+                                		    i|I)
+
+                                		    	break;;
+                                		    q|Q)
+
+                                			    break;;
+                                	    esac
+                                	done
+
+
                                 showUserFullInfo $username
                             fi
                             #Проверка на пустое значение переменной (конец)
@@ -720,7 +737,7 @@ sshKeyAddToUser() {
 				 chModAndOwnFile $BACKUPFOLDER_IMPORTANT/ssh/$1/authorized_keys_$DATE.tar.gz $1 users 644
 				 cat $key >> $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys
 				 echo "" >> $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys
-                 chModAndOwnFile $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys $1 users 644
+                 chModAndOwnFile $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys $1 users 666
 				 chown $1:users $HOMEPATHWEBUSERS/$1/.ssh
 				 usermod -G ssh-access -a $1
 				 echo -e "\n${COLOR_YELLOW} Импорт ключа ${COLOR_LIGHT_PURPLE}\"$key\"${COLOR_YELLOW} пользователю ${COLOR_LIGHT_PURPLE}\"$1\"${COLOR_YELLOW} выполнен${COLOR_NC}"
