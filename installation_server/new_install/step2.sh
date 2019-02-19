@@ -21,5 +21,7 @@ mount -o remount /
 quotacheck -cum /
 quotaon /
 
+apt-get install p7zip-rar p7zip-full
+
 
 sed -i '$ a export sshAdminKeyFilePath=\"\/my\/scripts\/.config\/settings\/ssh\/keys\/lamer\"'  /etc/profile
