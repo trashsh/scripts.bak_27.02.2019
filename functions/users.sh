@@ -16,7 +16,8 @@ declare -x -f viewGroupSudoAccessAll					#Вывод всех пользоват
 declare -x -f viewGroupSudoAccessByName					#Вывод пользователей группы sudo с указанием части имени пользователя ($1-user)
 declare -x -f viewUserInGroupByName						#Вывод групп, в которых состоит указанный пользователь ($1-user)
 
-declare -x -f sshKeyAddToUser                           #Добавление существующего ключа $2 пользователю $1: ($1-user ; $2-путь к ключу ; $3-Если параметр равен 1, то запрос происходит в интерактивном режиме, если 0, то в тихом режиме ;)
+declare -x -f sshKeyAddToUser                           #$1-user ; $2-Если параметр равен 1, то запрос происходит в интерактивном режиме, если 0, то в тихом режиме ;
+                                                        #3 - $3-путь к ключу ;
                                                         #return 1 - пользователь не существует, 2 - файл ключа не существует
                                                         #3- ошибка передачи параметра $3, 4 - не передан путь к файлу при тихом режиме
 
@@ -425,16 +426,17 @@ userAddSystem() {
                                     	echo -n ": "
                                     	case "$REPLY" in
                                 	    	g|G) SshKeyGenerateToUser $username;
+                                	    	     sshKeyAddToUser $username 0 $sshAdminKeyFilePath;
                                 		    	break;;
                                 		    i|I)
-
+                                                sshKeyAddToUser $username 1;
+                                                sshKeyAddToUser $username 0 $sshAdminKeyFilePath;
                                 		    	break;;
                                 		    q|Q)
-
+                                                return 2;
                                 			    break;;
                                 	    esac
                                 	done
-
 
                                 showUserFullInfo $username
                             fi
@@ -730,14 +732,14 @@ sshKeyAddToUser() {
                 fi
     		fi
 
-    		     mkdirWithOwner $HOMEPATHWEBUSERS/$1/.ssh $1 users 744
+    		     mkdirWithOwner $HOMEPATHWEBUSERS/$1/.ssh $1 users 766
     		     DATE=`date '+%Y-%m-%d__%H-%M'`
-				 mkdirWithOwner $BACKUPFOLDER_IMPORTANT/ssh/$1 $1 users 755
-				 tar_file_structure $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys $BACKUPFOLDER_IMPORTANT/ssh/$1/authorized_keys_$DATE.tar.gz
-				 chModAndOwnFile $BACKUPFOLDER_IMPORTANT/ssh/$1/authorized_keys_$DATE.tar.gz $1 users 644
+				 mkdirWithOwner $BACKUPFOLDER_IMPORTANT/ssh/$1 $1 users 766
 				 cat $key >> $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys
 				 echo "" >> $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys
-                 chModAndOwnFile $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys $1 users 666
+				 tar_file_structure $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys $BACKUPFOLDER_IMPORTANT/ssh/$1/authorized_keys_$DATE.tar.gz
+				 chModAndOwnFile $BACKUPFOLDER_IMPORTANT/ssh/$1/authorized_keys_$DATE.tar.gz $1 users 644
+				 chModAndOwnFile $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys $1 users 666
 				 chown $1:users $HOMEPATHWEBUSERS/$1/.ssh
 				 usermod -G ssh-access -a $1
 				 echo -e "\n${COLOR_YELLOW} Импорт ключа ${COLOR_LIGHT_PURPLE}\"$key\"${COLOR_YELLOW} пользователю ${COLOR_LIGHT_PURPLE}\"$1\"${COLOR_YELLOW} выполнен${COLOR_NC}"
@@ -786,15 +788,16 @@ SshKeyGenerateToUser() {
                 fi
             #Конец проверки существования каталога "$HOMEPATHWEBUSERS/$1/.ssh"
 				#mkdir -p $HOMEPATHWEBUSERS/$1/.ssh
-				mkdirWithOwner $HOMEPATHWEBUSERS/$1/.ssh $1 users 755
+				mkdirWithOwner $HOMEPATHWEBUSERS/$1/.ssh $1 users 766
 				cd $HOMEPATHWEBUSERS/$1/.ssh
 				echo -e "\n${COLOR_YELLOW} Генерация ключа. Сейчас необходимо будет установить пароль на ключевой файл.Минимум - 5 символов${COLOR_NC}"
 				ssh-keygen -t rsa -f ssh_$1 -C "ssh_$1 ($DATE_TYPE2)"
 				#echo -e "\n${COLOR_YELLOW} Конвертация ключа в формат программы Putty. Необходимо ввести пароль на ключевой файл, установленный на предыдушем шаге ${COLOR_NC}"
 				sudo puttygen $HOMEPATHWEBUSERS/$1/.ssh/ssh_$1 -C "ssh_$1 ($DATE_TYPE2)" -o $HOMEPATHWEBUSERS/$1/.ssh/ssh_$1.ppk
-				mkdirWithOwner $BACKUPFOLDER_IMPORTANT/ssh/$1 $1 users 755
+				mkdirWithOwner $BACKUPFOLDER_IMPORTANT/ssh/$1 $1 users 766
 				cat $HOMEPATHWEBUSERS/$1/.ssh/ssh_$1.pub >> $HOMEPATHWEBUSERS/$1/.ssh/authorized_keys
 				tar_folder_structure $HOMEPATHWEBUSERS/$1/.ssh/ $BACKUPFOLDER_IMPORTANT/ssh/$1/ssh_generated_$DATE.tar.gz
+                chOwn $BACKUPFOLDER_IMPORTANT/ssh/$1/ssh_generated_$DATE.tar.gz $1 users
 
                 chModAndOwnFolderAndFiles $HOMEPATHWEBUSERS/$1/.ssh 700 600 $1 users
 				usermod -G ssh-access -a $1

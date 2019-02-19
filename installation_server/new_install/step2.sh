@@ -20,3 +20,6 @@ sed -i -e "s/=remount-ro /=remount-ro,usrquota /" /etc/fstab
 mount -o remount /
 quotacheck -cum /
 quotaon /
+
+
+sed -i '$ a export sshAdminKeyFilePath=\"\/my\/scripts\/.config\/settings\/ssh\/keys\/lamer\"'  /etc/profile
