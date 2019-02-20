@@ -4,7 +4,7 @@ source ~/.bashrc
 # $1-username process;
 #создание резервной копии конкретной базы данных
 
-d=`date +%Y%m%d`;
+d=`date +%Y.%m.%d`;
 dt=`date +%Y%m%d_%H%M`;
 BACKUPPATH=$BACKUPFOLDER_DAYS/$d/mysql/
 

@@ -9,7 +9,7 @@ if [ -n "$1" ] && [ -n "$2" ]
 then
 
 		mysql -e "show databases LIKE '$1_%';"
-		d=`date +%Y%m%d`;
+		d=`date +%Y.%m.%d`;
 		dt=`date +%Y%m%d_%H%M`;
 
 		#rm "BACKUPPATH/*gz" > /dev/null 2>&1

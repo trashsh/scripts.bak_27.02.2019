@@ -296,7 +296,7 @@ viewSiteFoldersByName(){
 #Вывод бэкапов за сегодня
 viewBackupsToday(){
 	echo ""
-	DATE=$(date +%Y%m%d)
+	DATE=$(date +%Y.%m.%d)
 	if [ -d "$BACKUPFOLDER_DAYS"/"$DATE"/"mysql" ] ; then
 		echo -e "${COLOR_YELLOW}"Список бэкапов за сегодня - $DATE" ${COLOR_NC}"
 		echo -e "${COLOR_BROWN}"$BACKUPFOLDER_DAYS/$DATE/mysql:" ${COLOR_NC}"
@@ -310,7 +310,7 @@ viewBackupsToday(){
 #Вывод бэкапов за вчерашний день
 viewBackupsYestoday(){
 	echo ""
-	DATE=$(date --date yesterday "+%Y%m%d")
+	DATE=$(date --date yesterday "+%Y.%m.%d")
 	 if [ -d "$BACKUPFOLDER_DAYS"/"$DATE"/"mysql" ] ; then
 		echo -e "${COLOR_YELLOW}"Список бэкапов за сегодня - $DATE" ${COLOR_NC}"
 		echo -e "${COLOR_BROWN}"$BACKUPFOLDER_DAYS/$DATE/mysql:" ${COLOR_NC}"
@@ -323,13 +323,13 @@ viewBackupsYestoday(){
 #Вывод бэкапов за последнюю неделю
 viewBackupsWeek(){
 	echo ""
-	TODAY=$(date +%Y%m%d)
-	DATE=$(date --date='7 days ago' "+%Y%m%d")
+	TODAY=$(date +%Y.%m.%d)
+	DATE=$(date --date='7 days ago' "+%Y.%m.%d")
 	echo -e "$COLOR_YELLOW"Список бэкапов за Неделю - $DATE-$TODAY" $COLOR_NC"
 
 	for ((i=0; i<7; i++))
 	do
-		DATE=$(date --date=''$i' days ago' "+%Y%m%d");
+		DATE=$(date --date=''$i' days ago' "+%Y.%m.%d");
 		if [ -d "$BACKUPFOLDER_DAYS"/"$DATE" ] ; then
 			echo -e "$COLOR_BROWN"$DATE:" $COLOR_NC"
 			ls -l $BACKUPFOLDER_DAYS/$DATE/mysql
@@ -349,7 +349,7 @@ then
         echo -e "$COLOR_BROWN"$1 - Базы данных mysql:" $COLOR_NC"
         ls -l $BACKUPFOLDER_DAYS/$1/mysql
     else
-        echo -e "$COLOR_REDБэкапы mysql за $(date --date $1 "+%Y.%m.%d") отсутствуют$COLOR_NC"
+        echo -e "${COLOR_RED}Бэкапы mysql за $(date --date $1 "+%Y.%m.%d") отсутствуют$COLOR_NC"
     fi
 #Параметры запуска существуют (конец)
 else
@@ -376,7 +376,7 @@ viewBackupsRangeInput(){
         n=0
         for ((i=0; i<${range#-}+1; i++))
         do
-            DATE=$(date --date=''$i' days ago' "+%Y%m%d");
+            DATE=$(date --date=''$i' days ago' "+%Y.%m.%d");
             if [ -d "$BACKUPFOLDER_DAYS"/"$DATE" ] ; then
                 echo -e "$COLOR_BROWN"$DATE:" $COLOR_NC"
                 ls -l $BACKUPFOLDER_DAYS/$DATE/

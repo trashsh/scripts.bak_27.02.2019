@@ -19,7 +19,7 @@ echo -e "$COLOR_BROWN" Базы данных mysql:" $COLOR_NC"
 n=0
 for ((i=0; i<${range#-}+1; i++)) 
 do 
-	DATE=$(date --date=''$i' days ago' "+%Y%m%d");
+	DATE=$(date --date=''$i' days ago' "+%Y.%m.%d");
 	if [ -d "$BACKUPFOLDER_DAYS"/"$DATE" ] ; then
 		echo -e "$COLOR_BROWN"$DATE:" $COLOR_NC"
 		ls -l $BACKUPFOLDER_DAYS/$DATE/mysql

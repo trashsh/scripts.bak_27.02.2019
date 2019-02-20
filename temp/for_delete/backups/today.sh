@@ -4,7 +4,7 @@ source /etc/profile
 source ~/.bashrc
 
 echo ''
-DATE=$(date +%Y%m%d)
+DATE=$(date +%Y.%m.%d)
 
  if [ -d "$BACKUPFOLDER_DAYS"/"$DATE"/"mysql" ] ; then
     echo -e "$COLOR_YELLOW"Список бэкапов за сегодня - $DATE" $COLOR_NC"
