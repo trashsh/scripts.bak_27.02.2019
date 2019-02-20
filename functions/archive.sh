@@ -41,7 +41,7 @@ tar_folder_structure() {
 		    #Проверка существования каталога "`dirname $2`"
 		    if [ -d `dirname $2` ] ; then
 		        #Каталог "`dirname $2`" существует    
-		        tar -czpf $2 -P $1 --format=posix
+		        tar -czpf $2 -P $1
 		        #Каталог "`dirname $2`" существует (конец)
 		    else
 		        #Каталог "`dirname $2`" не существует   
@@ -54,7 +54,7 @@ tar_folder_structure() {
 				case "$REPLY" in
 				y|Y)
 					mkdir -p `dirname $2`;
-					tar -czpf $2 -P $1 --format=posix ;
+					tar -czpf $2 -P $1  ;
 					break;;
 				n|N)
 				     return 3;
