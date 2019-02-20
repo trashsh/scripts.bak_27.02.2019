@@ -5,16 +5,8 @@ source $SCRIPTS/functions/mysql.sh
 source $SCRIPTS/functions/other.sh
 source $SCRIPTS/functions/site.sh
 
-declare -x -f viewGroupFtpAccessAll						#Вывод всех пользователей группы ftp-access
-declare -x -f viewGroupFtpAccessByName					#Вывод всех пользователей группы ftp-access с указанием части имени пользователя ($1-user)
-declare -x -f viewGroupSshAccessAll						#Вывод всех пользователей группы ssh-access
-declare -x -f viewGroupSshAccessByName					#Вывод всех пользователей группы ssh-access с указанием части имени пользователя ($1-user)
-declare -x -f viewGroupUsersAccessByName				#Вывод всех пользователей группы users с указанием части имени пользователя ($1-user)
-declare -x -f viewGroupAdminAccessAll					#Вывод всех пользователей группы admin-access
-declare -x -f viewGroupAdminAccessByName				#Вывод всех пользователей группы admin-access с указанием части имени пользователя ($1-user)
-declare -x -f viewGroupSudoAccessAll					#Вывод всех пользователей группы sudo
-declare -x -f viewGroupSudoAccessByName					#Вывод пользователей группы sudo с указанием части имени пользователя ($1-user)
-declare -x -f viewUserInGroupByName						#Вывод групп, в которых состоит указанный пользователь ($1-user)
+
+
 
 declare -x -f sshKeyAddToUser                           #$1-user ; $2-Если параметр равен 1, то запрос происходит в интерактивном режиме, если 0, то в тихом режиме ;
                                                         #3 - $3-путь к ключу ;
@@ -51,7 +43,17 @@ declare -x -f userDeleteFromGroup                       #Удаление пол
 declare -x -f sshKeyGenerateToUser                      #Генерация ssh-ключа для пользователя: ($1-user)
                                                         #return 0 - выполнено без ошибок, 1 - отсутствуют параметры запуска
                                                         #2 - нет указанного пользователя
-
+declare -x -f viewUsersInGroup                            #Вывод списка пользователей, входящих в группу $1: ($1-группа ;)
+                                                        #return 0 - выполнено успешно,  1- отсутствуют параметры, 2 - группа не существует
+declare -x -f viewUsersInGroupByPartName                  #Вывод списка пользователей, входящих в группу $2 по части имени пользователя $1
+                                                        #$1-часть имени ; $2 - название группы
+                                                        #return 0 - выполнено успешно,  1- отсутствуют параметры, 2 - группа не существует
+declare -x -f viewUserInGroupUsersByPartName            #Вывод списка пользователей, входящих в группу users по части имени пользователя $1
+                                                        #$1-часть имени
+                                                        #return 0 - выполнено успешно,  1- отсутствуют параметры, 2 - группа не существует
+declare -x -f viewUserInGroupByName						#Вывод групп, в которых состоит указанный пользователь
+                                                        # $1 - имя пользователя
+                                                        #return 0 - выполнено успешно, 1 - не передан параметр
 
 #Отображение полной информации о пользователе
 #$1-user ;
@@ -215,43 +217,7 @@ userDeleteFromGroup() {
 	#Конец проверки существования параметров запуска скрипта
 }
 
-#Вывод всех пользователей группы ftp-access
-viewGroupFtpAccessAll(){
-	echo -e "\n${COLOR_YELLOW}Список пользователей группы \"ftp-access\":${COLOR_NC}"
-	more /etc/group | grep "ftp-access:" | highlight magenta "ftp-access"
-}
 
-#Вывод всех пользователей группы ftp-access с указанием части имени пользователя
-# $1 - имя пользователя
-viewGroupFtpAccessByName(){
-	if [ -n "$1" ]
-	then
-		echo -e "\n${COLOR_YELLOW}Список пользователей группы \"ftp-access\", содержащих в имени \"$1\"${COLOR_NC}"
-		more /etc/group | grep -E "ftp-access.*$1" | highlight green "$1" | highlight magenta "ftp-access"
-	else
-		echo -e "${COLOR_LIGHT_RED}Не передан параметр в функцию viewGroupFtpAccessByName в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}"
-		exit 1
-	fi
-}
-
-#Вывод всех пользователей группы ssh-access
-viewGroupSshAccessAll(){
-	echo -e "\n${COLOR_YELLOW}Список пользователей группы \"ssh-access\":${COLOR_NC}"
-	more /etc/group | grep ssh-access: | highlight magenta "ssh-access"
-}
-
-#Вывод всех пользователей группы ssh-access с указанием части имени пользователя
-# $1 - имя пользователя
-viewGroupSshAccessByName(){
-	if [ -n "$1" ]
-	then
-		echo -e "\n${COLOR_YELLOW}Список пользователей группы \"ssh-access\", содержащих в имени \"$1\"${COLOR_NC}"
-		more /etc/group | grep -E "ssh-access.*$1" | highlight green "$1" | highlight magenta "ssh-access"
-	else
-		echo -e "${COLOR_LIGHT_RED}Не передан параметр в функцию viewGroupSshAccessByName в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}"
-		exit 1
-	fi
-}
 
 #Полностью готово
 #Вывод всех пользователей группы users
@@ -297,18 +263,7 @@ viewGroupUsersAccessAll(){
     #Конец проверки существования параметров запуска скрипта
 }
 
-#Вывод всех пользователей группы users с указанием части имени пользователя
-# $1 - имя пользователя
-viewGroupUsersAccessByName(){
-	if [ -n "$1" ]
-	then
-		echo -e "\n${COLOR_YELLOW}Список пользователей группы \"users\", содержащих в имени \"$1\"${COLOR_NC}"
-		more /etc/passwd | grep -E ":100::.*$1" | highlight green "$1"
-	else
-		echo -e "${COLOR_LIGHT_RED}Не передан параметр в функцию viewGroupUsersAccessByName в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}"
-		exit 1
-	fi
-}
+
 
 #Вывод всех пользователей группы admin-access
 viewGroupAdminAccessAll(){
@@ -346,19 +301,6 @@ viewGroupSudoAccessByName(){
 		echo -e "${COLOR_LIGHT_RED}Не передан параметр в функцию viewGroupSudoAccessByName в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}"
 		exit 1
 	fi
-}
-
-#Вывод групп, в которых состоит указанный пользователь
-# $1 - имя пользователя
-viewUserInGroupByName(){
-	if [ -n "$1" ]
-		then
-			cat /etc/group | grep -P $1 | highlight green $1 | highlight magenta "ssh-access" | highlight magenta "ftp-access" | highlight magenta "sudo" | highlight magenta "admin-access"
-			return 0
-		else
-			echo -e "${COLOR_LIGHT_RED}Не передан параметр в функцию viewUserInGroupByName в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}"
-			exit 1
-		fi
 }
 
 #Готово. Можно добавить доп.функционал
@@ -825,3 +767,121 @@ sshKeyGenerateToUser() {
 	#Конец проверки существования параметров запуска скрипта    
 }
 
+#Вывод списка пользователей, входящих в группу $1
+#$1-группа ;
+#return 0 - выполнено успешно,  1- отсутствуют параметры, 2 - группа не существует
+viewUsersInGroup() {
+	#Проверка на существование параметров запуска скрипта
+	if [ -n "$1" ]
+	then
+	#Параметры запуска существуют
+		#Проверка существования системной группы пользователей "$1"
+		if grep -q $1 /etc/group
+		    then
+		        #Группа "$1" существует
+		         echo -e "\n${COLOR_YELLOW}Список пользователей группы ${COLOR_GREEN}\"$1\":${COLOR_NC}"
+	             more /etc/group | grep "$1:" | highlight magenta "$1"
+	             return 0
+		        #Группа "$1" существует (конец)
+		    else
+		        #Группа "$1" не существует
+		        echo -e "${COLOR_RED}Группа ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует${COLOR_NC}"
+				return 2
+				#Группа "$1" не существует (конец)
+		    fi
+		#Конец проверки существования системного пользователя $1
+
+	#Параметры запуска существуют (конец)
+	else
+	#Параметры запуска отсутствуют
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"viewUsersInGroup\"${COLOR_RED} ${COLOR_NC}"
+		return 1
+	#Параметры запуска отсутствуют (конец)
+	fi
+	#Конец проверки существования параметров запуска скрипта
+}
+
+
+#Вывод списка пользователей, входящих в группу $2 по части имени пользователя $1
+#$1-часть имени ; $2 - название группы
+#return 0 - выполнено успешно,  1- отсутствуют параметры, 2 - группа не существует
+viewUsersInGroupByPartName() {
+	#Проверка на существование параметров запуска скрипта
+	if [ -n "$1" ] && [ -n "$2" ]
+	then
+	#Параметры запуска существуют
+
+		#Проверка существования системной группы пользователей "$1"
+		if grep -q $2: /etc/group
+		    then
+		        #Группа "$2" существует
+		         echo -e "\n${COLOR_YELLOW}Список пользователей группы \"$2\", содержащих в имени \"$1\"${COLOR_NC}"
+		         more /etc/group | grep -E "$2.*$1" | highlight green "$1" | highlight magenta "$2"
+	             return 0
+		        #Группа "$2" существует (конец)
+		    else
+		        #Группа "$2" не существует
+		        echo -e "${COLOR_RED}Группа ${COLOR_GREEN}\"$2\"${COLOR_RED} не существует${COLOR_NC}"
+				return 2
+				#Группа "$2" не существует (конец)
+		    fi
+		#Конец проверки существования системного пользователя $1
+
+	#Параметры запуска существуют (конец)
+	else
+	#Параметры запуска отсутствуют
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"viewUsersInGroupByPartName\"${COLOR_RED} ${COLOR_NC}"
+		return 1
+	#Параметры запуска отсутствуют (конец)
+	fi
+	#Конец проверки существования параметров запуска скрипта
+}
+
+#Вывод списка пользователей, входящих в группу users по части имени пользователя $1
+#$1-часть имени
+#return 0 - выполнено успешно,  1- отсутствуют параметры, 2 - группа не существует
+viewUserInGroupUsersByPartName() {
+	#Проверка на существование параметров запуска скрипта
+	if [ -n "$1" ]
+	then
+	#Параметры запуска существуют
+
+		#Проверка существования системной группы пользователей "$1"
+		if grep -q users: /etc/group
+		    then
+		        #Группа "$2" существует
+		         echo -e "\n${COLOR_YELLOW}Список пользователей группы \"users\", содержащих в имени \"$1\"${COLOR_NC}"
+		            more /etc/passwd | grep -E ":100::.*$1" | highlight green "$1"
+	             return 0
+		        #Группа "$2" существует (конец)
+		    else
+		        #Группа "$2" не существует
+		        echo -e "${COLOR_RED}Группа ${COLOR_GREEN}\"$2\"${COLOR_RED} не существует${COLOR_NC}"
+				return 2
+				#Группа "$2" не существует (конец)
+		    fi
+		#Конец проверки существования системного пользователя $1
+
+	#Параметры запуска существуют (конец)
+	else
+	#Параметры запуска отсутствуют
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"viewUserInGroupUsersByPartName\"${COLOR_RED} ${COLOR_NC}"
+		return 1
+	#Параметры запуска отсутствуют (конец)
+	fi
+	#Конец проверки существования параметров запуска скрипта
+}
+
+#Вывод групп, в которых состоит указанный пользователь
+# $1 - имя пользователя
+#return 0 - выполнено успешно, 1 - не передан параметр
+viewUserInGroupByName(){
+	if [ -n "$1" ]
+		then
+			cat /etc/group | grep -P $1 | highlight green $1 | highlight magenta "ssh-access" | highlight magenta "ftp-access" | highlight magenta "sudo" | highlight magenta "admin-access"
+			return 0
+		else
+			echo -e "${COLOR_LIGHT_RED}Не передан параметр в функцию viewUserInGroupByName в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}"
+			return 1
+		fi
+}

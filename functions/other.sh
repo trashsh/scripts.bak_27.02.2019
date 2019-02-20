@@ -2,19 +2,23 @@
 
 
 declare -x -f fileParamsNotFound	#Вывод сообщения с предложением запуска указанного в параметре 3 меню. #$1-user; $2-сообщение; $3-ссылка на скрипт меню для запуска
-declare -x -f folderExistWithInfo #проверка существования папки с выводом информации о ее существовании: ($1-path ; $2-type (create/exist))
-declare -x -f fileExistWithInfo	#проверка существования файла с выводом информации о ее существовании: ($1-path ; $2-type (create/exist))
-declare -x -f viewPHPVersion #вывод информации о версии PHP
-declare -x -f ufwAddPort #Добавление порта с исключением в firewall ufw: ($1-port ; $2-protocol ; $3-комментарий ;)
-declare -x -f ufwOpenPorts #Вывод открытых портов ufw:
-declare -x -f webserverRestart #Перезапуск Веб-сервера
+
 
 
 #######Полностью протестировано
 declare -x -f mkdirWithOwn #Создание папки и применение ей владельца и прав доступа: ($1-путь к папке ; $2-user ; $3-group ; $4-разрешения )
                            #return 0 - выполнено успешно, 1 - не переданы параметры, 2 - пользователь не существует, 3 - группа не существует
-
-
+declare -x -f folderExistWithInfo   #проверка существования папки с выводом информации о ее существовании: ($1-path ; $2-type (create/exist))
+                                    #return 0 - выполнено успешно, 1 - не переданы параметры,2 - ошибка передачи параметров
+                                    #3 - каталог не создан, 4 -каталог создан, 5 - каталог не существует, 6 - каталог существует
+declare -x -f fileExistWithInfo	    #проверка существования файла с выводом информации о ее существовании: ($1-path ; $2-type (create/exist))
+                                    #return 0 - выполнено успешно, 1 - не переданы параметры,2 - ошибка передачи параметров
+                                    #3 - файл не создан, 4 -файл создан, 5 - файл не существует, 6 - файл существует
+declare -x -f ufwOpenPorts          #Вывод открытых портов ufw
+declare -x -f ufwAddPort            #Добавление порта с исключением в firewall ufw: ($1-port ; $2-protocol ; $3-комментарий ;)
+                                    #return 0 - выполнено успешно, 1 - не переданы параметры
+declare -x -f viewPHPVersion        #вывод информации о версии PHP
+declare -x -f webserverRestart      #Перезапуск Веб-сервера
 
 
 #Вывод сообщения с предложением запуска указанного в параметре 3 меню
@@ -33,104 +37,6 @@ echo -n -e "${COLOR_YELLOW}$2 ${COLOR_BLUE}\"y\"${COLOR_YELLOW}, для выхо
 		done
 		
 }
-
-
-#проверка существования папки с выводом информации о ее существовании
-#$1-path ; $2-type (create/exist)
-folderExistWithInfo() {
-	#Проверка на существование параметров запуска скрипта
-	if [ -n "$1" ] && [ -n "$2" ]
-	then
-	#Параметры запуска существуют
-		case "$2" in
-				"create")
-					if ! [ -d $1 ] ; then
-						echo -e "${COLOR_RED}Каталог ${COLOR_GREEN}\"$1\"${COLOR_RED} не создан${COLOR_NC}"
-					else
-						echo -e "${COLOR_GREEN}Каталог ${COLOR_YELLOW}\"$1\"${COLOR_GREEN} создан успешно${COLOR_NC}"
-					fi
-						;;
-				"exist")
-					if ! [ -d $1 ] ; then
-						echo -e "${COLOR_RED}Каталог ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует${COLOR_NC}"
-					else
-						echo -e "${COLOR_GREEN}Каталог ${COLOR_YELLOW}\"$1\"${COLOR_GREEN} существует${COLOR_NC}"
-					fi
-					;;
-				*)
-					echo -e "${COLOR_GREEN}Ошибка параметров в функции ${COLOR_YELLOW}\"folderExistWithInfo\"${COLOR_NC}";;
-				esac
-	#Параметры запуска существуют (конец)
-	else
-	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"folderExistWithInfo\"${COLOR_RED} ${COLOR_NC}"
-	#Параметры запуска отсутствуют (конец)
-	fi
-	#Конец проверки существования параметров запуска скрипта
-}
-
-
-#проверка существования файла с выводом информации.
-#$1-path, $2-type (create/exist)
-fileExistWithInfo(){
-	case "$2" in
-				"create") 	
-					if ! [ -f $1 ] ; then
-						echo -e "${COLOR_RED}Файл ${COLOR_GREEN}\"$1\"${COLOR_RED} не создан${COLOR_NC}"
-					else 
-						echo -e "${COLOR_GREEN}Файл ${COLOR_YELLOW}\"$1\"${COLOR_GREEN} создан успешно${COLOR_NC}"
-					fi
-						;;			
-				"exist")
-					if ! [ -f $1 ] ; then 
-						echo -e "${COLOR_RED}Файл ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует${COLOR_NC}"
-					else 
-						echo -e "${COLOR_GREEN}Файл ${COLOR_YELLOW}\"$1\"${COLOR_GREEN} существует${COLOR_NC}"
-					fi
-					;;
-				*) 
-					echo -e "${COLOR_GREEN}Ошибка параметров в функции ${COLOR_YELLOW}\"folderExistWithInfo\"${COLOR_NC}";;
-				esac
-}
-
-#вывод информации о версии PHP
-viewPHPVersion(){
-	echo ""
-	echo "Версия PHP:"
-	php -v
-	echo ""
-}
-
-#Добавление порта с исключением в firewall ufw
-#$1-port ; $2-protocol ; $3-комментарий ;
-ufwAddPort() {
-	#Проверка на существование параметров запуска скрипта
-	if [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ]
-	then
-	#Параметры запуска существуют
-		ufw allow $1/$2 comment $3
-	#Параметры запуска существуют (конец)
-	else
-	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"ufwAddPort\"${COLOR_RED} ${COLOR_NC}"
-	#Параметры запуска отсутствуют (конец)
-	fi
-	#Конец проверки существования параметров запуска скрипта    
-}
-
-#Вывод открытых портов ufw
-ufwOpenPorts() {
-    netstat -ntulp
-}
-
-#Перезапуск Веб-сервера
-webserverRestart() {
-    /etc/init.d/apache2 restart
-    /etc/init.d/nginx restart
-}
-
-
-
 
 ##################################полностью готово#################################
 #Создание папки и применение ей владельца и прав доступа
@@ -180,4 +86,131 @@ mkdirWithOwn() {
 	#Параметры запуска отсутствуют (конец)
 	fi
 	#Конец проверки существования параметров запуска скрипта
+}
+
+
+
+
+#проверка существования папки с выводом информации о ее существовании
+#$1-path ; $2-type (create/exist)
+#return 1 - не переданы параметры,2 - ошибка передачи параметров
+#3 - каталог не создан, 4 -каталог создан, 5 - каталог не существует, 6 - каталог существует
+folderExistWithInfo() {
+	#Проверка на существование параметров запуска скрипта
+	if [ -n "$1" ] && [ -n "$2" ]
+	then
+	#Параметры запуска существуют
+		case "$2" in
+				"create")
+					if ! [ -d $1 ] ; then
+						echo -e "${COLOR_RED}Каталог ${COLOR_GREEN}\"$1\"${COLOR_RED} не создан${COLOR_NC}"
+						return 3
+					else
+						echo -e "${COLOR_GREEN}Каталог ${COLOR_YELLOW}\"$1\"${COLOR_GREEN} создан успешно${COLOR_NC}"
+						return 4
+					fi
+						;;
+				"exist")
+					if ! [ -d $1 ] ; then
+						echo -e "${COLOR_RED}Каталог ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует${COLOR_NC}"
+						return 5
+					else
+						echo -e "${COLOR_GREEN}Каталог ${COLOR_YELLOW}\"$1\"${COLOR_GREEN} существует${COLOR_NC}"
+						return 6
+					fi
+					;;
+				*)
+					echo -e "${COLOR_GREEN}Ошибка параметров в функции ${COLOR_YELLOW}\"folderExistWithInfo\"${COLOR_NC}"
+					return 2;;
+				esac
+	#Параметры запуска существуют (конец)
+	else
+	#Параметры запуска отсутствуют
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"folderExistWithInfo\"${COLOR_RED} ${COLOR_NC}"
+		return 1
+	#Параметры запуска отсутствуют (конец)
+	fi
+	#Конец проверки существования параметров запуска скрипта
+}
+
+#проверка существования файла с выводом информации.
+#$1-path, $2-type (create/exist)
+#return 0 - выполнено успешно, 1 - не переданы параметры,2 - ошибка передачи параметров
+#3 - файл не создан, 4 -файл создан, 5 - файл не существует, 6 - файл существует
+fileExistWithInfo(){
+
+	#Проверка на существование параметров запуска скрипта
+	if [ -n "$1" ] && [ -n "$2" ]
+	then
+	#Параметры запуска существуют
+	    case "$2" in
+				"create")
+					if ! [ -f $1 ] ; then
+						echo -e "${COLOR_RED}Файл ${COLOR_GREEN}\"$1\"${COLOR_RED} не создан${COLOR_NC}"
+						return 3
+					else
+						echo -e "${COLOR_GREEN}Файл ${COLOR_YELLOW}\"$1\"${COLOR_GREEN} создан успешно${COLOR_NC}"
+						return 4
+					fi
+						;;
+				"exist")
+					if ! [ -f $1 ] ; then
+						echo -e "${COLOR_RED}Файл ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует${COLOR_NC}"
+						return 5
+					else
+						echo -e "${COLOR_GREEN}Файл ${COLOR_YELLOW}\"$1\"${COLOR_GREEN} существует${COLOR_NC}"
+						return 6
+					fi
+					;;
+				*)
+					echo -e "${COLOR_GREEN}Ошибка параметров в функции ${COLOR_YELLOW}\"folderExistWithInfo\"${COLOR_NC}"
+					return 2;;
+	esac
+	#Параметры запуска существуют (конец)
+	else
+	#Параметры запуска отсутствуют
+	    echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"fileExistWithInfo\"${COLOR_RED} ${COLOR_NC}"
+	    return 1
+	#Параметры запуска отсутствуют (конец)
+	fi
+	#Конец проверки существования параметров запуска скрипта
+}
+
+#Вывод открытых портов ufw
+ufwOpenPorts() {
+    netstat -ntulp
+}
+
+#Добавление порта с исключением в firewall ufw
+#$1-port ; $2-protocol ; $3-комментарий ;
+#return 0 - выполнено успешно, 1 - не переданы параметры
+ufwAddPort() {
+	#Проверка на существование параметров запуска скрипта
+	if [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ]
+	then
+	#Параметры запуска существуют
+		ufw allow $1/$2 comment $3
+		return 0
+	#Параметры запуска существуют (конец)
+	else
+	#Параметры запуска отсутствуют
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"ufwAddPort\"${COLOR_RED} ${COLOR_NC}"
+		return 1
+	#Параметры запуска отсутствуют (конец)
+	fi
+	#Конец проверки существования параметров запуска скрипта
+}
+
+#вывод информации о версии PHP
+viewPHPVersion(){
+	echo ""
+	echo "Версия PHP:"
+	php -v
+	echo ""
+}
+
+#Перезапуск Веб-сервера
+webserverRestart() {
+    /etc/init.d/apache2 restart
+    /etc/init.d/nginx restart
 }

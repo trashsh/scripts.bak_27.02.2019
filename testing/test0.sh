@@ -6,6 +6,7 @@ source $SCRIPTS/include/include.sh
 #echo $?
 
 #dbUseradd $1 $2 $3 $4 $5
-dbDropUser $1  $2 $3
+viewUserInGroupUsersByPartName $1 $2
+echo $?
 
 
