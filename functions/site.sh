@@ -154,7 +154,7 @@ chModAndOwnFile() {
 		    		        #Группа "$3" существует (конец)
 		    		    else
 		    		        #Группа "$3" не существует
-		    		        echo -e "${COLOR_RED}Группа ${COLOR_GREEN}\"$3\"${COLOR_RED} не существует. Ошибка в функции ${COLOR_GREEN}\"mkdirWithOwn\"${COLOR_NC}"
+		    		        echo -e "${COLOR_RED}Группа ${COLOR_GREEN}\"$3\"${COLOR_RED} не существует. Ошибка выполнения функции ${COLOR_GREEN}\"mkdirWithOwn\"${COLOR_NC}"
                             return 4
 		    				#Группа "$3" не существует (конец)
 		    		    fi
@@ -162,7 +162,7 @@ chModAndOwnFile() {
 		    	#Пользователь $2 существует (конец)
 		    	else
 		    	#Пользователь $2 не существует
-		    	    echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$2\"${COLOR_RED} не существует. Ошибка в функции ${COLOR_GREEN}\"mkdirWithOwn\"${COLOR_NC}"
+		    	    echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$2\"${COLOR_RED} не существует. Ошибка выполнения функции ${COLOR_GREEN}\"mkdirWithOwn\"${COLOR_NC}"
 		    	    return 3
 		    	#Пользователь $2 не существует (конец)
 		    	fi
@@ -209,7 +209,7 @@ mkdirWithOwn() {
 		    		        #Группа "$3" существует (конец)
 		    		    else
 		    		        #Группа "$3" не существует
-		    		        echo -e "${COLOR_RED}Группа ${COLOR_GREEN}\"$3\"${COLOR_RED} не существует. Ошибка в функции ${COLOR_GREEN}\"mkdirWithOwn\"${COLOR_NC}"
+		    		        echo -e "${COLOR_RED}Группа ${COLOR_GREEN}\"$3\"${COLOR_RED} не существует. Ошибка выполнения функции ${COLOR_GREEN}\"mkdirWithOwn\"${COLOR_NC}"
                             return 3
 		    				#Группа "$3" не существует (конец)
 		    		    fi
@@ -217,7 +217,7 @@ mkdirWithOwn() {
 		    	#Пользователь $2 существует (конец)
 		    	else
 		    	#Пользователь $2 не существует
-		    	    echo -e "\n${COLOR_RED}Пользователь ${COLOR_GREEN}\"$2\"${COLOR_RED} не существует. Ошибка в функции ${COLOR_GREEN}\"mkdirWithOwn\"${COLOR_NC}"
+		    	    echo -e "\n${COLOR_RED}Пользователь ${COLOR_GREEN}\"$2\"${COLOR_RED} не существует. Ошибка выполнения функции ${COLOR_GREEN}\"mkdirWithOwn\"${COLOR_NC}"
 		    	    return 2
 		    	#Пользователь $2 не существует (конец)
 		    	fi
@@ -282,7 +282,7 @@ chModAndOwnFolderAndFiles() {
          #Каталог "$1" существует (конец)
      else
          #Каталог "$1" не существует
-         echo -e "${COLOR_RED}Каталог ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует. Ошибка в функции ${COLOR_GREEN}\"chModAndOwnFolderAndFiles\"${COLOR_NC}"
+         echo -e "${COLOR_RED}Каталог ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует. Ошибка выполнения функции ${COLOR_GREEN}\"chModAndOwnFolderAndFiles\"${COLOR_NC}"
          return 2
          #Каталог "$1" не существует (конец)
      fi
@@ -343,7 +343,7 @@ chOwnFolderAndFiles() {
          #Каталог "$1" существует (конец)
      else
          #Каталог "$1" не существует
-         echo -e "${COLOR_RED}Каталог ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует. Ошибка в функции ${COLOR_GREEN}\"chOwnFolderAndFiles\"${COLOR_NC}"
+         echo -e "${COLOR_RED}Каталог ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует. Ошибка выполнения функции ${COLOR_GREEN}\"chOwnFolderAndFiles\"${COLOR_NC}"
          return 1
          #Каталог "$1" не существует (конец)
      fi
@@ -431,7 +431,7 @@ viewSiteConfigsByName(){
             echo -e "\nСписок сайтов в каталоге пользователя ${COLOR_YELLOW}\"$1\"${COLOR_NC}" $HOMEPATHWEBUSERS/$1:
 			ls $HOMEPATHWEBUSERS/$1 | echo ""
 		else
-		    echo -e "${COLOR_RED}Каталог  ${COLOR_GREEN}\"$HOMEPATHWEBUSERS/$1\"${COLOR_RED} не найден.Ошибка в функции ${COLOR_GREEN}\"viewSiteConfigsByName\"${COLOR_RED}  ${COLOR_NC}"
+		    echo -e "${COLOR_RED}Каталог  ${COLOR_GREEN}\"$HOMEPATHWEBUSERS/$1\"${COLOR_RED} не найден.Ошибка выполнения функции ${COLOR_GREEN}\"viewSiteConfigsByName\"${COLOR_RED}  ${COLOR_NC}"
 		    return 2
         fi
 
@@ -462,7 +462,7 @@ viewSiteFoldersByName(){
 			ls $HOMEPATHWEBUSERS/$1/
 			retun 0
 		else
-			echo -e "${COLOR_RED}Каталог $HOMEPATHWEBUSERS/$1/ не существует. Ошибка в функции viewSiteFoldersByName ${COLOR_NC}"
+			echo -e "${COLOR_RED}Каталог $HOMEPATHWEBUSERS/$1/ не существует. Ошибка выполнения функции viewSiteFoldersByName ${COLOR_NC}"
 			return 2
         fi
 	else
@@ -509,7 +509,7 @@ touchFileWithModAndOwn() {
 т
 		    			    else
 		    			        #Группа "$3" не существует
-		    			        echo -e "${COLOR_RED}Группа ${COLOR_GREEN}\"$3\"${COLOR_RED} не существует. Ошибка в функции ${COLOR_GREEN}\"touchFileWithModAndOwn\"${COLOR_NC}"
+		    			        echo -e "${COLOR_RED}Группа ${COLOR_GREEN}\"$3\"${COLOR_RED} не существует. Ошибка выполнения функции ${COLOR_GREEN}\"touchFileWithModAndOwn\"${COLOR_NC}"
 		    					return 3
 		    					#Группа "$3" не существует (конец)
 		    			    fi
@@ -518,7 +518,7 @@ touchFileWithModAndOwn() {
 		    		#Пользователь $2 существует (конец)
 		    		else
 		    		#Пользователь $2 не существует
-		    		    echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$2\"${COLOR_RED} не существует. Ошибка в функции ${COLOR_GREEN}\"touchFileWithModAndOwn\"${COLOR_NC}"
+		    		    echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$2\"${COLOR_RED} не существует. Ошибка выполнения функции ${COLOR_GREEN}\"touchFileWithModAndOwn\"${COLOR_NC}"
 		    			return 2
 		    		#Пользователь $2 не существует (конец)
 		    		fi

@@ -81,7 +81,7 @@ tar_folder_structure() {
 		    #Каталог "$1" существует (конец)
 		else
 		    #Каталог "$1" не существует   
-		    echo -e "${COLOR_RED}Отсутствует каталог ${COLOR_GREEN}\"$1\"${COLOR_RED} для архивации в ${COLOR_GREEN}\"$2\". ${COLOR_RED}Ошибка в функции ${COLOR_GREEN}\"tar_folder_structure\"${COLOR_NC}"
+		    echo -e "${COLOR_RED}Отсутствует каталог ${COLOR_GREEN}\"$1\"${COLOR_RED} для архивации в ${COLOR_GREEN}\"$2\". ${COLOR_RED}Ошибка выполнения функции ${COLOR_GREEN}\"tar_folder_structure\"${COLOR_NC}"
 		    return 2
 		    #Каталог "$1" не существует (конец)
 		fi

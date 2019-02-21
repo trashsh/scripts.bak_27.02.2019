@@ -1,10 +1,9 @@
 #!/bin/bash
 
 declare -x -f backupImportantFile #Создание бэкапа в папку BACKUPFOLDER_IMPORTANT: ($1-user ; $2-destination_folder ; $3-архивируемый файл ;)
-declare -x -f dbBackupBases #Создание бэкапа всех пользовательских баз данных mysql: ($1-В параметре может быть указан путь к каталогу сохранения бэкапов.Если путь не указан, то выгрузится в $BACKUPFOLDER_DAYS\`date +%Y.%m.%d` ;)
 declare -x -f dbBackupBase #Создание бэкапа указанной базы данных: ($1-dbname ; $2-В параметре $2 может быть установлен каталог выгрузки. По умолчанию грузится в $BACKUPFOLDER_DAYS\`date +%Y.%m.%d` )
 declare -x -f dbBackupTable #Создание бэкапа отдельной таблицы: ($1-dbname ; $2-tablename ; $3-В параметре $3 может быть установлен каталог выгрузки. По умолчанию грузится в $BACKUPFOLDER_DAYS\`date +%Y.%m.%d`)
-declare -x -f dbBackupBasesOneUser #Создание бэкапа все баз данных указанного систеного пользователя: ($1-user ; $2-В параметре $2 может быть установлен каталог выгрузки. По умолчанию грузится в $BACKUPFOLDER_DAYS\`date +%Y.%m.%d ;)
+
 
 ######ПОЛНОСТЬЮ ПРОТЕСТИРОВАНО
 declare -x -f viewBackupsRange          #Вывод бэкапов конкретный день ($1-DATE)
@@ -20,7 +19,114 @@ declare -x -f viewBackupsWeek           #Вывод бэкапов за посл
 declare -x -f viewBackupsRangeInput     #Вывод бэкапов за указанный диапазон дат ($1-date1, $2-data2)
                                         #Вывод бэкапов за указанный диапазон дат ($1-date1, $2-data2)
                                         #return 0 - выполнено, 1 - отсутствуют параметры
+declare -x -f dbBackupBases             #Создание бэкапа всех пользовательских баз данных mysql:
+                                        #$1-user ; $2-В параметре $2 может быть установлен каталог выгрузки. По умолчанию грузится в $BACKUPFOLDER_DAYS\`date +%Y.%m.%d ;
+                                        #return 0 - выполнено успешно, 1 - не переданы параметры, 2 - пользователь не существует, 3 - пользователь отменил создание папки
+declare -x -f dbBackupBasesOneUser #Создание бэкапа все баз данных указанного пользователя mysql:
+                                    #return 0 - выполнено успешно, 1 - не переданы параметры, 2 - пользователь не существует, 3 - пользователь отменил создание папки
 
+declare -x -f backupSiteFiles #Создание бэкапа файлов сайта: ($1-user ; $2-domain ; $3-path)
+#Создание бэкапа файлов сайта
+#$1-user ; $2-domain ; $3-path ;
+#return 0 - выполнено успешно, 1 - отсутствуют параметры запуска, 2 - пользователь не существует, 3 - каталог не существует,4 - пользователь отменил создание каталога
+backupSiteFiles() {
+    d=`date +%Y.%m.%d`;
+	dt=`date +%Y.%m.%d_%H.%M`;
+	#Проверка на существование параметров запуска скрипта
+	if [ -n "$1" ] && [ -n "$2" ]
+	then
+	#Параметры запуска существуют
+		#Проверка существования системного пользователя "$1"
+			grep "^$1:" /etc/passwd >/dev/null
+			if  [ $? -eq 0 ]
+			then
+			#Пользователь $1 существует
+				#Проверка существования каталога "$HOMEPATHWEBUSERS/$1/$1_$2"
+				if [ -d $HOMEPATHWEBUSERS/$1/$1_$2 ] ; then
+				    #Каталог "$HOMEPATHWEBUSERS/$1/$1_$2" существует
+
+				    #Проверка на существование параметров запуска скрипта
+                        if [ -n "$3" ]
+                        then
+                        #Параметры запуска существуют
+                            #Проверка существования каталога "$2"
+                            if ! [ -d $3 ] ; then
+                                #Каталог "$2" не существует
+                                echo -e "${COLOR_RED} Каталог \"$3\" не найден ${COLOR_NC}. Создать его?"
+                                echo -n -e "Введите ${COLOR_BLUE}\"y\"${COLOR_NC} для создания каталога ${COLOR_YELLOW}\"$3\"${COLOR_NC}, для отмены операции - ${COLOR_BLUE}\"n\"${COLOR_NC}: "
+
+                                while read
+                                do
+                                echo -n ": "
+                                    case "$REPLY" in
+                                    y|Y)
+                                        mkdir -p "$3";
+                                        DESTINATION=$3
+                                        break;;
+                                    n|N)
+                                         return 4;;
+                                    esac
+                                done
+                                #Каталог "$2" не существует (конец)
+                            else
+                                DESTINATION=$3
+                            fi
+                            #Конец проверки существования каталога "$2"
+                        else
+                            DESTINATION=$BACKUPFOLDER_DAYS/$d/
+                        fi
+                        #Конец проверки существования параметров запуска скрипта
+
+
+                #Проверка существования каталога "$DESTINATION"
+                    if ! [ -d $DESTINATION ] ; then
+                        #Каталог "$DESTINATION" не существует
+                        mkdir -p "$DESTINATION"
+                        #Каталог "$DESTINATION" не существует (конец)
+                    fi
+                #Конец проверки существования каталога "$DESTINATION"
+
+                tar_folder_structure $HOMEPATHWEBUSERS/$1/$1_$2 $DESTINATION/site.$1_$2_$dt.tar.gz
+
+                #Проверка существования файла "$DESTINATION/site.$1_$2_$dt.tar.gz"
+                if [ -f $DESTINATION/site.$1_$2_$dt.tar.gz ] ; then
+                    #Файл "$DESTINATION/site.$1_$2_$dt.tar.gz" существует
+                    return 0
+                    #Файл "$DESTINATION/site.$1_$2_$dt.tar.gz" существует (конец)
+                else
+                    #Файл "$DESTINATION/site.$1_$2_$dt.tar.gz" не существует
+                    echo -e "${COLOR_RED}Произошла ошибка при создании бэкапа сайта ${COLOR_GREEN}\"$HOMEPATHWEBUSERS/$1/$1_$2\"${COLOR_RED} в архив ${COLOR_GREEN}\"$DESTINATION/site.$1_$2_$dt.tar.gz\"${COLOR_NC}"
+                    #Файл "$DESTINATION/site.$1_$2_$dt.tar.gz" не существует (конец)
+                fi
+                #Конец проверки существования файла "$DESTINATION/site.$1_$2_$dt.tar.gz"
+
+
+				    #Каталог "$HOMEPATHWEBUSERS/$1/$1_$2" существует (конец)
+				else
+				    #Каталог "$HOMEPATHWEBUSERS/$1/$1_$2" не существует
+				    echo -e "${COLOR_RED}Каталог ${COLOR_GREEN}\"$HOMEPATHWEBUSERS/$1/$1_$2\"${COLOR_RED} не существует${COLOR_NC}. Ошибка выполнения функции ${COLOR_GREEN}\"backupSiteFiles\"${COLOR_NC}"
+				    return 3
+				    #Каталог "$HOMEPATHWEBUSERS/$1/$1_$2" не существует (конец)
+				fi
+				#Конец проверки существования каталога "$HOMEPATHWEBUSERS/$1/$1_$2"
+
+			#Пользователь $1 существует (конец)
+			else
+			#Пользователь $1 не существует
+			    echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует. Ошибка выполнения функции ${COLOR_GREEN}\"backupSiteFiles\"${COLOR_RED}${COLOR_NC}"
+				return 2
+			#Пользователь $1 не существует (конец)
+			fi
+		#Конец проверки существования системного пользователя $1
+	#Параметры запуска существуют (конец)
+	else
+	#Параметры запуска отсутствуют
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"backupSiteFiles\"${COLOR_RED} ${COLOR_NC}"
+		return
+	#Параметры запуска отсутствуют (конец)
+	fi
+	#Конец проверки существования параметров запуска скрипта
+}
 
 #
 #Создание бэкапа в папку BACKUPFOLDER_IMPORTANT
@@ -61,13 +167,16 @@ backupImportantFile() {
 #
 #Создание бэкапа указанной базы данных
 #$1-dbname ; $2-В параметре $2 может быть установлен каталог выгрузки. По умолчанию грузится в $BACKUPFOLDER_DAYS\`date +%Y.%m.%d` ;
+#return 0 - выполнено успешно, 1 - отсутствутю параметры, 2 - отсутствует база данных, 3 - отменено пользователем создание каталога
+#4 - ошибка при финальной проверке создания бэкапа
 dbBackupBase() {
 	#Проверка на существование параметров запуска скрипта
+	d=`date +%Y.%m.%d`;
+	dt=`date +%Y.%m.%d_%H.%M`;
 	if [ -n "$1" ]
 	then
 	#Параметры запуска существуют
-		d=`date +%Y.%m.%d`;
-	    dt=`date +%Y.%m.%d_%H.%M`;
+
 	    #проверка существования базы данных "$1"
 	    if [[ ! -z "`mysql -qfsBe "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='$1'" 2>&1`" ]];
 	    	then
@@ -87,13 +196,13 @@ dbBackupBase() {
 	    		#Конец проверки существования параметров запуска скрипта
 
 	    		#пусть к файлу с бэкапом без расширения
-        		FILENAME=$DESTINATION/mysql."$db"-$dt
+        		FILENAME=$DESTINATION/mysql."$1"-$dt.sql
 
 		#Проверка существования каталога "$DESTINATION"
 		if [ -d $DESTINATION ] ; then
 		    #Каталог "$DESTINATION" существует
-		    mysqldump --databases $1 > $FILENAME.sql
-			tar_file_without_structure_remove $FILENAME.sql $FILENAME.tar.gz
+		    mysqldump --databases $1 > $FILENAME
+			tar_file_without_structure_remove $FILENAME $FILENAME.tar.gz
 			dbCheckExportedBase $1 $FILENAME.tar.gz
 		    #Каталог "$DESTINATION" существует (конец)
 		else
@@ -107,23 +216,37 @@ dbBackupBase() {
 				case "$REPLY" in
 				y|Y)
 					mkdir -p $DESTINATION;
-					mysqldump --databases $1 > $FILENAME.sql
-					tar_file_without_structure_remove $FILENAME.sql $FILENAME.tar.gz
+					mysqldump --databases $1 > $FILENAME
+					tar_file_without_structure_remove $FILENAME $FILENAME.tar.gz
 					dbCheckExportedBase $1 $FILENAME.tar.gz
 					break;;
 				n|N)
-					 break;;
+					 return 3;;
 				esac
 			done
 		    #Каталог "$DESTINATION" не существует (конец)
 		fi
 		#Конец проверки существования каталога "$DESTINATION"
 
+        #Проверка существования файла "$FILENAME.tar.gz"
+        if [ -f $FILENAME.tar.gz ] ; then
+            #Файл "$FILENAME.tar.gz" существует
+            return 0
+            #Файл "$FILENAME.tar.gz" существует (конец)
+        else
+            #Файл "$FILENAME.tar.gz" не существует
+            echo -e "${COLOR_RED}Произошла ошибка при создании бэкапа базы данных ${COLOR_GREEN}\"$1\"${COLOR_RED} в файл ${COLOR_GREEN}\"$FILENAME.tar.gz\"${COLOR_RED}  ${COLOR_NC}"
+            return 4
+            #Файл "$FILENAME.tar.gz" не существует (конец)
+        fi
+        #Конец проверки существования файла "$FILENAME.tar.gz"
+
 
 	    	#база $1 - существует (конец)
 	    	else
 	    	#база $1 - не существует
 	    	    echo -e "${COLOR_RED}Ошибка создания бэкапа базы данных ${COLOR_YELLOW}\"$1\"${COLOR_NC}${COLOR_RED}. Указанная база не существует${COLOR_NC}"
+	    	    return 2
 	    	#база $1 - не существует (конец)
 	    fi
 	    #конец проверки существования базы данных $1
@@ -133,6 +256,7 @@ dbBackupBase() {
 	else
 	#Параметры запуска отсутствуют
 		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"dbBackupBase\"${COLOR_RED} ${COLOR_NC}"
+		return 1
 	#Параметры запуска отсутствуют (конец)
 	fi
 	#Конец проверки существования параметров запуска скрипта
@@ -174,8 +298,8 @@ dbBackupTable() {
 		    #Каталог "$DESTINATION" существует
 		    mysql -e "mysqldump -c $1 $2 > $FILENAME.sql;"
 #		    mysqldump -c $1 $2 > $FILENAME.sql
-			tar_file_without_structure_remove $FILENAME.sql $FILENAME.tar.gz
-			dbCheckExportedBase $1 $FILENAME.tar.gz
+			tar_file_without_structure_remove $FILENAME.sql $FILENAME.sql.tar.gz
+			dbCheckExportedBase $1 $FILENAME.sql.tar.gz
 		    #Каталог "$DESTINATION" существует (конец)
 		else
 		    #Каталог "$DESTINATION" не существует
@@ -189,8 +313,8 @@ dbBackupTable() {
 				y|Y)
 					mkdir -p $DESTINATION;
 					mysqldump -c $1 $2 > $FILENAME.sql
-					tar_file_without_structure_remove $FILENAME.sql $FILENAME.tar.gz
-					dbCheckExportedBase $1 $FILENAME.tar.gz
+					tar_file_without_structure_remove $FILENAME.sql $FILENAME.sql.tar.gz
+					dbCheckExportedBase $1 $FILENAME.sql.tar.gz
 					break;;
 				n|N)
 					 break;;
@@ -220,82 +344,6 @@ dbBackupTable() {
 
 }
 
-
-#
-#Создание бэкапа все баз данных указанного систеного пользователя
-#$1-user ; $2-В параметре $2 может быть установлен каталог выгрузки. По умолчанию грузится в $BACKUPFOLDER_DAYS\`date +%Y.%m.%d ; $3- ; $4- ; $5- ;
-dbBackupBasesOneUser() {
-	#проверка существования базы данных "$1"
-	if [[ ! -z "`mysql -qfsBe "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='$1'" 2>&1`" ]];
-		then
-		#база $1 - существует
-			#Проверка на существование параметров запуска скрипта
-			if [ -n "$2" ]
-			then
-			#Параметры запуска существуют
-                #Проверка существования каталога "$2"
-                if ! [ -d $2 ] ; then
-                    #Каталог "$2" не существует
-                    echo -e "${COLOR_RED} Каталог \"$2\" не найден ${COLOR_NC}. Создать его?"
-                    echo -n -e "Введите ${COLOR_BLUE}\"y\"${COLOR_NC} для создания каталога ${COLOR_YELLOW}\"$2\"${COLOR_NC}, для отмены операции - ${COLOR_BLUE}\"n\"${COLOR_NC}: "
-
-                    while read
-                    do
-                    echo -n ": "
-                        case "$REPLY" in
-                        y|Y)
-                            mkdir -p "$2";
-                        DESTINATION=$2
-                        echo $DESTINATION
-                            break;;
-                        n|N)
-                             break;;
-                        esac
-                    done
-                    #Каталог "$2" не существует (конец)
-                else
-                    DESTINATION=$2
-                fi
-                #Конец проверки существования каталога "$2"
-
-			#Параметры запуска существуют (конец)
-			else
-			#Параметры запуска отсутствуют
-			    echo -e ""
-			#Параметры запуска отсутствуют (конец)
-			fi
-			#Конец проверки существования параметров запуска скрипта
-
-		databases=`mysql -e "SHOW DATABASES LIKE '"$1"_%';" | tr -d "| " | grep -v Database`
-		#Проверка существования каталога "$DESTINATION"
-		if ! [ -d $DESTINATION ] ; then
-		    #Каталог "$DESTINATION" не существует
-            mkdir -p "$DESTINATION"
-		    #Каталог "$DESTINATION" не существует (конец)
-		fi
-		#Конец проверки существования каталога "$DESTINATION"
-
-		#выгрузка баз данных
-        for db in $databases; do
-            FILENAME=$DESTINATION/mysql."$db"-$dt
-            echo $FILENAME
-            if [[ "$db" != "information_schema" ]] && [[ "$db" != "performance_schema" ]] && [[ "$db" != "mysql" ]] && [[ "$db" != _* ]] && [[ "$db" != "phpmyadmin" ]] && [[ "$db" != "sys" ]] ; then
-                echo -e "---\nВыгрузка базы данных MYSQL: ${COLOR_YELLOW}$db${COLOR_NC}"
-                mysqldump --databases $db > $FILENAME.sql
-    #архивация выгруженной базы и удаление оригинального файла sql
-                tar_file_without_structure_remove	$FILENAME.sql $FILENAME.tar.gz
-    #проверка на существование выгруженных и заархививанных баз данных
-        fi
-    done
-
-		#база $1 - существует (конец)
-	else
-		#база $1 - не существует
-		    echo -e "${COLOR_RED}Указанная база данных ${COLOR_YELLOW}\"$1\"${COLOR_RED} не существует${COLOR_NC}"
-		#база $1 - не существует (конец)
-	fi
-	#конец проверки существования базы данных $1
-}
 
 
 ######ПОЛНОСТЬЮ ПРОТЕСТИРОВАНО
@@ -419,4 +467,183 @@ else
 #Параметры запуска отсутствуют (конец)
 fi
 #Конец проверки существования параметров запуска скрипта
+}
+
+#Создание бэкапа всех пользовательских баз данных mysql
+#$1-В параметре может быть указан путь к каталогу сохранения бэкапов.Если путь не указан, то выгрузится в $BACKUPFOLDER_DAYS\`date +%Y.%m.%d` ;
+#return - 0 - выполнено успешно;
+dbBackupBases() {
+	d=`date +%Y.%m.%d`;
+	dt=`date +%Y.%m.%d_%H.%M`;
+
+	#Проверка на существование параметров запуска скрипта
+	if [ -n "$1" ]
+	then
+	#Параметры запуска существуют
+
+	    #Проверка существования файла "$1"
+	    if ! [ -f $1 ] ; then
+	        #Файл "$1" не существует
+	        echo -e "${COLOR_RED} Каталог \"$1\" не найден для создания бэкапа всех баз данных mysql. Создать его?${COLOR_NC}"
+			echo -n -e "Введите ${COLOR_BLUE}\"y\"${COLOR_NC} для создания каталога ${COLOR_YELLOW}\"$1\"${COLOR_NC}, для отмены операции - ${COLOR_BLUE}\"n\"${COLOR_NC}: "
+
+			while read
+			do
+			echo -n ": "
+				case "$REPLY" in
+				y|Y)
+					mkdir -p "$1";
+				DESTINATION=$1
+				echo $DESTINATION
+					break;;
+				n|N)
+					 break;;
+				esac
+			done
+	        #Файл "$1" не существует (конец)
+	    else
+	        #Файл "$1" существует
+			DESTINATION=$1
+	        #Файл "$1" существует (конец)
+	    fi
+	    #Конец проверки существования файла "$1"
+
+	#Параметры запуска существуют (конец)
+	else
+	#Параметры запуска отсутствуют
+		#каталог устанавливается по умолчанию
+		DESTINATION=$BACKUPFOLDER_DAYS/$d
+	#Параметры запуска отсутствуют (конец)
+	fi
+	#Конец проверки существования параметров запуска скрипта
+
+    databases=`mysql -e "SHOW DATABASES;" | tr -d "| " | grep -v Database`
+
+    #Проверка существования каталога "$DESTINATION"
+    if ! [ -d $DESTINATION ] ; then
+        #Каталог "$DESTINATION" не существует
+        mkdir -p "$DESTINATION"
+    fi
+    #Конец проверки существования каталога "$DESTINATION"
+
+#выгрузка баз данных
+	for db in $databases; do
+		if [[ "$db" != "information_schema" ]] && [[ "$db" != "performance_schema" ]] && [[ "$db" != "mysql" ]] && [[ "$db" != _* ]] && [[ "$db" != "phpmyadmin" ]] && [[ "$db" != "sys" ]] ; then
+			echo -e "---\nВыгрузка базы данных MYSQL: ${COLOR_YELLOW}$db${COLOR_NC}"
+			filename=mysql."$db"-$dt.sql
+			mysqldump --databases $db > $DESTINATION/$filename
+#архивация выгруженной базы и удаление оригинального файла sql
+			tar_file_without_structure_remove	$DESTINATION/$filename $DESTINATION/$filename.tar.gz
+#проверка на существование выгруженных и заархививанных баз данных
+			if  [ -f "$DESTINATION/$filename.tar.gz" ] ; then
+				echo -e "${COLOR_GREEN}Выгрузка базы данных MYSQL:${COLOR_NC} ${COLOR_YELLOW}$db${COLOR_NC} ${COLOR_GREEN}успешно завершилась в файл${COLOR_NC}${COLOR_YELLOW} \"$DESTINATION/$filename.tar.gz\"${COLOR_NC}\n---"
+			else
+				echo -e "${COLOR_RED}Выгрузка базы данных: ${COLOR_NC}${COLOR_YELLOW}$db${COLOR_NC} ${COLOR_RED}завершилась с ошибкой${COLOR_NC}\n---"
+			fi
+	    fi
+    done
+    return 0
+}
+
+#
+#Создание бэкапа все баз данных указанного пользователя mysql
+#$1-user ; $2-В параметре $2 может быть установлен каталог выгрузки. По умолчанию грузится в $BACKUPFOLDER_DAYS\`date +%Y.%m.%d ;
+#return 0 - выполнено успешно, 1 - не переданы параметры, 2 - пользователь не существует, 3 - пользователь отменил создание папки
+dbBackupBasesOneUser() {
+    #Проверка на существование параметров запуска скрипта
+    d=`date +%Y.%m.%d`;
+    dt=`date +%Y.%m.%d_%H.%M`;
+
+    if [ -n "$1" ]
+    then
+    #Параметры запуска существуют
+        #Проверка на существование пользователя mysql "$1"
+        if [[ ! -z "`mysql -qfsBe "SELECT User FROM mysql.user WHERE User='$1'" 2>&1`" ]];
+        then
+        #Пользователь mysql "$1" существует
+
+                #Проверка на существование параметров запуска скрипта
+                if [ -n "$2" ]
+                then
+                #Параметры запуска существуют
+                    if ! [ -d $2 ] ; then
+                        #каталог "$2" не существует
+                        echo -e "${COLOR_RED} Каталог ${COLOR_GREEN}\"$2\"${COLOR_RED} не найден. Создать его?${COLOR_NC}"
+                        echo -n -e "Введите ${COLOR_BLUE}\"y\"${COLOR_NC} для создания каталога ${COLOR_YELLOW}\"$2\"${COLOR_NC}, для отмены операции - ${COLOR_BLUE}\"n\"${COLOR_NC}: "
+
+                        while read
+                        do
+                        echo -n ": "
+                            case "$REPLY" in
+                            y|Y)
+                                mkdir -p "$2";
+                                DESTINATION=$2
+                            echo $DESTINATION
+                                break;;
+                            n|N)
+                                 return 3;;
+                            esac
+                        done
+                        #каталог "$2" не существует (конец)
+                    else
+                    #каталог "$2" существует
+                    DESTINATION=$2
+                    #Файл "$2" существует (конец)
+                    fi
+                    #Конец проверки существования каталога "$2"
+
+
+                #Параметры запуска существуют (конец)
+                else
+                #Параметры запуска отсутствуют
+                    DESTINATION=$BACKUPFOLDER_DAYS/$d/$1
+                #Параметры запуска отсутствуют (конец)
+                fi
+                #Конец проверки существования параметров запуска скрипта
+
+                #Проверка существования каталога "$DESTINATION"
+                if ! [ -d $DESTINATION ] ; then
+                    #Каталог "$DESTINATION" не существует
+                    mkdir -p "$DESTINATION"
+                fi
+                #Конец проверки существования каталога "$DESTINATION"
+
+
+
+                databases=`mysql -e "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME like '$1_%'" | tr -d "| " | grep -v SCHEMA_NAME`
+
+                #выгрузка баз данных
+                    for db in $databases; do
+                        if [[ "$db" != "information_schema" ]] && [[ "$db" != "performance_schema" ]] && [[ "$db" != "mysql" ]] && [[ "$db" != _* ]] && [[ "$db" != "phpmyadmin" ]] && [[ "$db" != "sys" ]] ; then
+                            echo -e "---\nВыгрузка базы данных MYSQL: ${COLOR_YELLOW}$db${COLOR_NC}"
+                            filename=mysql."$db"-$dt.sql
+                            mysqldump --databases $db > $DESTINATION/$filename
+                #архивация выгруженной базы и удаление оригинального файла sql
+                            tar_file_without_structure_remove	$DESTINATION/$filename $DESTINATION/$filename.tar.gz
+                #проверка на существование выгруженных и заархививанных баз данных
+                            if  [ -f "$DESTINATION/$filename.tar.gz" ] ; then
+                                echo -e "${COLOR_GREEN}Выгрузка базы данных MYSQL:${COLOR_NC} ${COLOR_YELLOW}$db${COLOR_NC} ${COLOR_GREEN}успешно завершилась в файл${COLOR_NC}${COLOR_YELLOW} \"$DESTINATION/$filename.tar.gz\"${COLOR_NC}\n---"
+                            else
+                                echo -e "${COLOR_RED}Выгрузка базы данных: ${COLOR_NC}${COLOR_YELLOW}$db${COLOR_NC} ${COLOR_RED}завершилась с ошибкой${COLOR_NC}\n---"
+                            fi
+                         fi
+                    done
+
+
+        #Пользователь mysql "$1" существует (конец)
+        else
+        #Пользователь mysql "$1" не существует
+            echo -e "${COLOR_RED}Пользователь mysql ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует ${COLOR_NC}"
+            return 2
+        #Пользователь mysql "$1" не существует (конец)
+        fi
+        #Конец проверки на существование пользователя mysql "$1"
+    #Параметры запуска существуют (конец)
+    else
+    #Параметры запуска отсутствуют
+        echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"dbBackupBasesOneUser\"${COLOR_RED} ${COLOR_NC}"
+        return 1
+    #Параметры запуска отсутствуют (конец)
+    fi
+    #Конец проверки существования параметров запуска скрипта
 }
