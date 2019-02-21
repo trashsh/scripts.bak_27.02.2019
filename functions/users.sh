@@ -757,7 +757,7 @@ sshKeyGenerateToUser() {
 		#Пользователь $1 существует (конец)
 		else
 		#Пользователь $1 не существует
-		    echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует. Ошибка в функции ${COLOR_GREEN}\"sshKeyGenerateToUser\"${COLOR_NC}"
+		    echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует. Ошибка выполнения функции ${COLOR_GREEN}\"sshKeyGenerateToUser\"${COLOR_NC}"
 			return 2
 		#Пользователь $1 не существует (конец)
 		fi

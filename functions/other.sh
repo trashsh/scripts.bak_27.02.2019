@@ -63,7 +63,7 @@ mkdirWithOwn() {
 		    		        #Группа "$3" существует (конец)
 		    		    else
 		    		        #Группа "$3" не существует
-		    		        echo -e "${COLOR_RED}Группа ${COLOR_GREEN}\"$3\"${COLOR_RED} не существует. Ошибка в функции ${COLOR_GREEN}\"mkdirWithOwn\"${COLOR_NC}"
+		    		        echo -e "${COLOR_RED}Группа ${COLOR_GREEN}\"$3\"${COLOR_RED} не существует. Ошибка выполнения функции ${COLOR_GREEN}\"mkdirWithOwn\"${COLOR_NC}"
                             return 3
 		    				#Группа "$3" не существует (конец)
 		    		    fi
@@ -71,7 +71,7 @@ mkdirWithOwn() {
 		    	#Пользователь $2 существует (конец)
 		    	else
 		    	#Пользователь $2 не существует
-		    	    echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$2\"${COLOR_RED} не существует. Ошибка в функции ${COLOR_GREEN}\"mkdirWithOwn\"${COLOR_NC}"
+		    	    echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$2\"${COLOR_RED} не существует. Ошибка выполнения функции ${COLOR_GREEN}\"mkdirWithOwn\"${COLOR_NC}"
 		    	    return 2
 		    	#Пользователь $2 не существует (конец)
 		    	fi
