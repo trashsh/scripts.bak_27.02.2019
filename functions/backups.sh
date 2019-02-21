@@ -30,109 +30,6 @@ declare -x -f backupSiteFiles #Создание бэкапа файлов сай
                                         #return 0 - выполнено успешно, 1 - отсутствуют параметры запуска, 2 - пользователь не существует, 3 - каталог не существует,4 - пользователь отменил создание каталога
 
 
-#Создание бэкапа файлов сайта
-#$1-user ; $2-domain ; $3-path ;
-#return 0 - выполнено успешно, 1 - отсутствуют параметры запуска, 2 - пользователь не существует, 3 - каталог не существует,4 - пользователь отменил создание каталога
-backupSiteFiles() {
-    d=`date +%Y.%m.%d`;
-	dt=`date +%Y.%m.%d_%H.%M.%S`;
-	#Проверка на существование параметров запуска скрипта
-	if [ -n "$1" ] && [ -n "$2" ]
-	then
-	#Параметры запуска существуют
-		#Проверка существования системного пользователя "$1"
-			grep "^$1:" /etc/passwd >/dev/null
-			if  [ $? -eq 0 ]
-			then
-			#Пользователь $1 существует
-				#Проверка существования каталога "$HOMEPATHWEBUSERS/$1/$1_$2"
-				if [ -d $HOMEPATHWEBUSERS/$1/$1_$2 ] ; then
-				    #Каталог "$HOMEPATHWEBUSERS/$1/$1_$2" существует
-
-				    #Проверка на существование параметров запуска скрипта
-                        if [ -n "$3" ]
-                        then
-                        #Параметры запуска существуют
-                            #Проверка существования каталога "$2"
-                            if ! [ -d $3 ] ; then
-                                #Каталог "$2" не существует
-                                echo -e "${COLOR_RED} Каталог \"$3\" не найден. Создать его? Функция ${COLOR_GREEN}\"backupSiteFiles\"${COLOR_NC}"
-                                echo -n -e "Введите ${COLOR_BLUE}\"y\"${COLOR_NC} для создания каталога ${COLOR_YELLOW}\"$3\"${COLOR_NC}, для отмены операции - ${COLOR_BLUE}\"n\"${COLOR_NC}: "
-
-                                while read
-                                do
-                                echo -n ": "
-                                    case "$REPLY" in
-                                    y|Y)
-                                        mkdir -p "$3";
-                                        DESTINATION=$3
-                                        break;;
-                                    n|N)
-                                         return 4;;
-                                    esac
-                                done
-                                #Каталог "$2" не существует (конец)
-                            else
-                                DESTINATION=$3
-                            fi
-                            #Конец проверки существования каталога "$2"
-                        else
-                            DESTINATION=$BACKUPFOLDER_DAYS/$1/$2/$d/
-                        fi
-                        #Конец проверки существования параметров запуска скрипта
-
-
-                #Проверка существования каталога "$DESTINATION"
-                    if ! [ -d $DESTINATION ] ; then
-                        #Каталог "$DESTINATION" не существует
-                        mkdir -p "$DESTINATION"
-                        #Каталог "$DESTINATION" не существует (конец)
-                    fi
-                #Конец проверки существования каталога "$DESTINATION"
-                FILENAME=site.$1_$2_$dt.tar.gz
-                tar_folder_structure $HOMEPATHWEBUSERS/$1/$1_$2 $DESTINATION/$FILENAME
-                chModAndOwnFile $DESTINATION/$FILENAME $1 users 644
-
-                #Проверка существования файла "$DESTINATION/$FILENAME"
-                if [ -f $DESTINATION/$FILENAME ] ; then
-                    #Файл "$DESTINATION/$FILENAME" существует
-                    return 0
-                    #Файл "$DESTINATION/$FILENAME" существует (конец)
-                else
-                    #Файл "$DESTINATION/$FILENAME" не существует
-                    echo -e "${COLOR_RED}Произошла ошибка при создании бэкапа сайта ${COLOR_GREEN}\"$HOMEPATHWEBUSERS/$1/$1_$2\"${COLOR_RED} в архив ${COLOR_GREEN}\"$DESTINATION/$FILENAME\"${COLOR_NC}"
-                    #Файл "$DESTINATION/$FILENAME" не существует (конец)
-                fi
-                #Конец проверки существования файла "$DESTINATION/$FILENAME"
-
-
-				    #Каталог "$HOMEPATHWEBUSERS/$1/$1_$2" существует (конец)
-				else
-				    #Каталог "$HOMEPATHWEBUSERS/$1/$1_$2" не существует
-				    echo -e "${COLOR_RED}Каталог ${COLOR_GREEN}\"$HOMEPATHWEBUSERS/$1/$1_$2\"${COLOR_RED} не существует${COLOR_NC}. Ошибка выполнения функции ${COLOR_GREEN}\"backupSiteFiles\"${COLOR_NC}"
-				    return 3
-				    #Каталог "$HOMEPATHWEBUSERS/$1/$1_$2" не существует (конец)
-				fi
-				#Конец проверки существования каталога "$HOMEPATHWEBUSERS/$1/$1_$2"
-
-			#Пользователь $1 существует (конец)
-			else
-			#Пользователь $1 не существует
-			    echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует. Ошибка выполнения функции ${COLOR_GREEN}\"backupSiteFiles\"${COLOR_RED}${COLOR_NC}"
-				return 2
-			#Пользователь $1 не существует (конец)
-			fi
-		#Конец проверки существования системного пользователя $1
-	#Параметры запуска существуют (конец)
-	else
-	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"backupSiteFiles\"${COLOR_RED} ${COLOR_NC}"
-		return
-	#Параметры запуска отсутствуют (конец)
-	fi
-	#Конец проверки существования параметров запуска скрипта
-}
-
 
 declare -x -f backupUserSitesFiles #Создание бэкапов файлов всех сайтов указанного пользователя: ($1-username ; $2-path)
 #Создание бэкапов файлов всех сайтов указанного пользователя
@@ -149,11 +46,14 @@ backupUserSitesFiles() {
 			then
 			#Пользователь $1 существует
 				i=1
-                ls -D $HOMEPATHWEBUSERS/$1/ | while read line >>/dev/null
+                ls -d $HOMEPATHWEBUSERS/$1/$1_* | cut -d'_' -f 2 | while read line >>/dev/null
                 do
-                    array[$i]="$line"
-                    (( i++ ))
+                    #array[$i]="$line"
+                    #temp=$line
+                    #echo $line
                     backupSiteFiles $1 $line
+                    (( i++ ))
+                    #backupSiteFiles $1 $line
                 done
 
 			#Пользователь $1 существует (конец)
@@ -693,4 +593,107 @@ dbBackupBasesOneUser() {
     #Параметры запуска отсутствуют (конец)
     fi
     #Конец проверки существования параметров запуска скрипта
+}
+
+
+#Создание бэкапа файлов сайта
+#$1-user ; $2-domain ; $3-path ;
+#return 0 - выполнено успешно, 1 - отсутствуют параметры запуска, 2 - пользователь не существует, 3 - каталог не существует,4 - пользователь отменил создание каталога
+backupSiteFiles() {
+    d=`date +%Y.%m.%d`;
+	dt=`date +%Y.%m.%d_%H.%M.%S`;
+	#Проверка на существование параметров запуска скрипта
+	if [ -n "$1" ] && [ -n "$2" ]
+	then
+	#Параметры запуска существуют
+		#Проверка существования системного пользователя "$1"
+			grep "^$1:" /etc/passwd >/dev/null
+			if  [ $? -eq 0 ]
+			then
+			#Пользователь $1 существует
+				#Проверка существования каталога "$HOMEPATHWEBUSERS/$1/$1_$2"
+				if [ -d $HOMEPATHWEBUSERS/$1/$1_$2 ] ; then
+				    #Каталог "$HOMEPATHWEBUSERS/$1/$1_$2" существует
+
+				    #Проверка на существование параметров запуска скрипта
+                        if [ -n "$3" ]
+                        then
+                        #Параметры запуска существуют
+                            #Проверка существования каталога "$2"
+                            if ! [ -d $3 ] ; then
+                                #Каталог "$2" не существует
+                                echo -e "${COLOR_RED} Каталог \"$3\" не найден. Создать его? Функция ${COLOR_GREEN}\"backupSiteFiles\"${COLOR_NC}"
+                                echo -n -e "Введите ${COLOR_BLUE}\"y\"${COLOR_NC} для создания каталога ${COLOR_YELLOW}\"$3\"${COLOR_NC}, для отмены операции - ${COLOR_BLUE}\"n\"${COLOR_NC}: "
+
+                                while read
+                                do
+                                echo -n ": "
+                                    case "$REPLY" in
+                                    y|Y)
+                                        mkdir -p "$3";
+                                        DESTINATION=$3
+                                        break;;
+                                    n|N)
+                                         return 4;;
+                                    esac
+                                done
+                                #Каталог "$2" не существует (конец)
+                            else
+                                DESTINATION=$3
+                            fi
+                            #Конец проверки существования каталога "$2"
+                        else
+                            DESTINATION=$BACKUPFOLDER_DAYS/$1/$2/$d/
+                        fi
+                        #Конец проверки существования параметров запуска скрипта
+
+
+                #Проверка существования каталога "$DESTINATION"
+                    if ! [ -d $DESTINATION ] ; then
+                        #Каталог "$DESTINATION" не существует
+                        mkdir -p "$DESTINATION"
+                        #Каталог "$DESTINATION" не существует (конец)
+                    fi
+                #Конец проверки существования каталога "$DESTINATION"
+                FILENAME=site.$1_$2_$dt.tar.gz
+                tar_folder_structure $HOMEPATHWEBUSERS/$1/$1_$2 $DESTINATION/$FILENAME
+                chModAndOwnFile $DESTINATION/$FILENAME $1 users 644
+                #Проверка существования файла "$DESTINATION/$FILENAME"
+                if [ -f $DESTINATION/$FILENAME ] ; then
+                    #Файл "$DESTINATION/$FILENAME" существует
+                    return 0
+                    #Файл "$DESTINATION/$FILENAME" существует (конец)
+                else
+                    #Файл "$DESTINATION/$FILENAME" не существует
+                    echo -e "${COLOR_RED}Произошла ошибка при создании бэкапа сайта ${COLOR_GREEN}\"$HOMEPATHWEBUSERS/$1/$1_$2\"${COLOR_RED} в архив ${COLOR_GREEN}\"$DESTINATION/$FILENAME\"${COLOR_NC}"
+                    #Файл "$DESTINATION/$FILENAME" не существует (конец)
+                fi
+                #Конец проверки существования файла "$DESTINATION/$FILENAME"
+
+
+				    #Каталог "$HOMEPATHWEBUSERS/$1/$1_$2" существует (конец)
+				else
+				    #Каталог "$HOMEPATHWEBUSERS/$1/$1_$2" не существует
+				    echo -e "${COLOR_RED}Каталог ${COLOR_GREEN}\"$HOMEPATHWEBUSERS/$1/$1_$2\"${COLOR_RED} не существует${COLOR_NC}. Ошибка выполнения функции ${COLOR_GREEN}\"backupSiteFiles\"${COLOR_NC}"
+				    return 3
+				    #Каталог "$HOMEPATHWEBUSERS/$1/$1_$2" не существует (конец)
+				fi
+				#Конец проверки существования каталога "$HOMEPATHWEBUSERS/$1/$1_$2"
+
+			#Пользователь $1 существует (конец)
+			else
+			#Пользователь $1 не существует
+			    echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует. Ошибка выполнения функции ${COLOR_GREEN}\"backupSiteFiles\"${COLOR_RED}${COLOR_NC}"
+				return 2
+			#Пользователь $1 не существует (конец)
+			fi
+		#Конец проверки существования системного пользователя $1
+	#Параметры запуска существуют (конец)
+	else
+	#Параметры запуска отсутствуют
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"backupSiteFiles\"${COLOR_RED} ${COLOR_NC}"
+		return
+	#Параметры запуска отсутствуют (конец)
+	fi
+	#Конец проверки существования параметров запуска скрипта
 }
