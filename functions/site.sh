@@ -31,21 +31,100 @@ declare -x -f viewSiteConfigsByName		#Вывод перечня сайтов у�
 declare -x -f viewSiteFoldersByName		#Вывод перечня сайтов указанного пользователя
                                         # $1 - имя пользователя
                                         #return 0  - выполнено успешно, 1 - не передан параметр, 2 - отсутствует каталог $HOMEPATHWEBUSERS/$1
-declare -x -f viewBackupsRange          #Вывод бэкапов конкретный день ($1-DATE)
-                                        #Проверка на существование параметров запуска скрипта
-                                        #return 0 - выполнено успешно, 1 - отсутствуют параметры
-                                        #2 - бэкапы за указанный диапазон отсутствуют
-declare -x -f viewBackupsToday          #Вывод бэкапов за сегодня
-                                        #return 0 - выполнено успешно, 1 - каталог не найден
-declare -x -f viewBackupsYestoday       #Вывод бэкапов за вчерашний день
-                                        #return 0 - выполнено успешно, 1 - каталог не найден
-declare -x -f viewBackupsWeek           #Вывод бэкапов за последнюю неделю
-                                        #return 0 - выполнено успешно, 1 - каталог не найден
-declare -x -f viewBackupsRangeInput     #Вывод бэкапов за указанный диапазон дат ($1-date1, $2-data2)
-                                        #Вывод бэкапов за указанный диапазон дат ($1-date1, $2-data2)
-                                        #return 0 - выполнено, 1 - отсутствуют параметры
+
 declare -x -f touchFileWithModAndOwn    #создание файла и применение прав к нему и владельца: #$1-путь к файлу ; $2-user ; $3-group ; $4-права доступ ;
                                         #return 0 - выполнено успешно, 1 - файл существовал, применены лишь права, 2 - пользователь не существует, 3 - группа не существует
+
+declare -x -f createSite_Laravel #Создание сайта: # $1 - домен ($DOMAIN), $2 - имя пользователя, $3 - путь к папке с сайтом,  $4 - шаблон виртуального хоста apache, $5 - шаблон виртуального хоста nginx
+
+
+
+#Создание сайта
+# $1 - домен ($DOMAIN), $2 - имя пользователя, $3 - путь к папке с сайтом,  $4 - шаблон виртуального хоста apache, $5 - шаблон виртуального хоста nginx
+createSite_Laravel() {
+	#Проверка на существование параметров запуска скрипта
+if [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ] && [ -n "$4" ] && [ -n "$5" ]
+then
+
+        cd $HOMEPATHWEBUSERS/$2
+        composer create-project --prefer-dist laravel/laravel $1
+
+        #make user
+        echo "Добавление веб пользователя $2_$1 с домашним каталогом: $3 для домена $1"
+        sudo mkdir -p $3
+        sudo useradd $2_$1 -N -d $3 -m -s /bin/false -g ftp-access -G www-data
+        #sudo adduser $2_$1 www-data
+        sudo passwd $2_$1
+        sudo cp /etc/skel/* $3
+        sudo rm -rf $3/public_html
+
+		cd $3
+		cp -a $3/.env.example $3/.env
+		php artisan key:generate
+		php artisan config:cache
+
+
+       #nginx
+       sudo cp -rf $TEMPLATES/nginx/$5 /etc/nginx/sites-available/$2_$1.conf
+       sudo echo "Замена переменных в файле /etc/nginx/sites-available/$2_$1.conf"
+       sudo grep '#__DOMAIN' -P -R -I -l  /etc/nginx/sites-available/$2_$1.conf | xargs sed -i 's/#__DOMAIN/'$1'/g' /etc/nginx/sites-available/$2_$1.conf
+	   sudo grep '#__USER' -P -R -I -l  /etc/nginx/sites-available/$2_$1.conf | xargs sed -i 's/#__USER/'$2'/g' /etc/nginx/sites-available/$2_$1.conf
+       sudo grep '#__PORT' -P -R -I -l  /etc/nginx/sites-available/$2_$1.conf | xargs sed -i 's/#__PORT/'$HTTPNGINXPORT'/g' /etc/nginx/sites-available/$2_$1.conf
+       sudo grep '#__HOMEPATHWEBUSERS' -P -R -I -l  /etc/nginx/sites-available/$2_$1.conf | xargs sed -i 's/'#__HOMEPATHWEBUSERS'/\/home\/webusers/g' /etc/nginx/sites-available/$2_$1.conf
+
+       sudo ln -s /etc/nginx/sites-available/$2_$1.conf /etc/nginx/sites-enabled/$2_$1.conf
+       sudo systemctl reload nginx
+
+        #apache2
+       sudo cp -rf $TEMPLATES/apache2/$4 /etc/apache2/sites-available/$2_$1.conf
+       sudo grep '#__DOMAIN' -P -R -I -l  /etc/apache2/sites-available/$2_$1.conf | xargs sed -i 's/#__DOMAIN/'$1'/g' /etc/apache2/sites-available/$2_$1.conf
+	   sudo grep '#__USER' -P -R -I -l  /etc/apache2/sites-available/$2_$1.conf | xargs sed -i 's/#__USER/'$2'/g' /etc/apache2/sites-available/$2_$1.conf
+       sudo grep '#__HOMEPATHWEBUSERS' -P -R -I -l  /etc/apache2/sites-available/$2_$1.conf | xargs sed -i 's/#__HOMEPATHWEBUSERS/\/home\/webusers/g' /etc/apache2/sites-available/$2_$1.conf
+       sudo grep '#__PORT' -P -R -I -l  /etc/apache2/sites-available/$2_$1.conf | xargs sed -i 's/#__PORT/'$HTTPAPACHEPORT'/g' /etc/apache2/sites-available/$2_$1.conf
+
+       sudo a2ensite $2_$1.conf
+       sudo systemctl reload apache2
+
+	   cp -rf $TEMPLATES/laravel/.gitignore $3/.gitignore
+
+       echo -e "\033[32m" Применение прав к папкам и каталогам. Немного подождите "\033[0;39m"
+
+        #chmod
+       sudo find $3 -type d -exec chmod 755 {} \;
+       sudo find $3/public -type d -exec chmod 755 {} \;
+       sudo find $3 -type f -exec chmod 644 {} \;
+       sudo find $3/public -type f -exec chmod 644 {} \;
+       sudo find $3/logs -type f -exec chmod 644 {} \;
+	   sudo find $3 -type d -exec chown $2:www-data {} \;
+	   sudo find $3 -type f -exec chown $2:www-data {} \;
+
+       sudo chown -R $2:www-data $3/logs
+       sudo chown -R $2:www-data $3/public
+       sudo chown -R $2:www-data $3/tmp
+
+
+       sudo chmod 777 $3/bootstrap/cache -R
+       sudo chmod 777 $3/storage -R
+
+	   cd $3
+		echo -e "\033[32m" Инициализация Git "\033[0;39m"
+	    git init
+		git add .
+		git commit -m "initial commit"
+
+else
+    echo "Возможные варианты шаблонов apache:"
+    ls $TEMPLATES/apache2/
+    echo "Возможные варианты шаблонов nginx:"
+    ls $TEMPLATES/nginx/
+    echo "--------------------------------------"
+    echo "Параметры запуска не найдены. Необходимы параметры: домен, имя пользователя,путь к папке с сайтом,название шаблона apache,название шаблона nginx."
+    echo "Например $0 domain.ru user /home/webusers/domain.ru php.conf php.conf"
+    FileParamsNotFound "$2" "Для запуска главного введите" "$SCRIPTS/menu"
+fi
+
+	#Конец проверки существования параметров запуска скрипта
+}
 
 
 
@@ -138,7 +217,7 @@ mkdirWithOwn() {
 		    	#Пользователь $2 существует (конец)
 		    	else
 		    	#Пользователь $2 не существует
-		    	    echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$2\"${COLOR_RED} не существует. Ошибка в функции ${COLOR_GREEN}\"mkdirWithOwn\"${COLOR_NC}"
+		    	    echo -e "\n${COLOR_RED}Пользователь ${COLOR_GREEN}\"$2\"${COLOR_RED} не существует. Ошибка в функции ${COLOR_GREEN}\"mkdirWithOwn\"${COLOR_NC}"
 		    	    return 2
 		    	#Пользователь $2 не существует (конец)
 		    	fi
@@ -157,98 +236,6 @@ mkdirWithOwn() {
 
 
 
-#Вывод бэкапов за сегодня
-#return 0 - выполнено успешно, 1 - каталог не найден
-viewBackupsToday(){
-	echo ""
-	DATE=$(date +%Y.%m.%d)
-	if [ -d "$BACKUPFOLDER_DAYS"/"$DATE"/"mysql" ] ; then
-		echo -e "${COLOR_YELLOW}"Список бэкапов за сегодня - $DATE" ${COLOR_NC}"
-		echo -e "${COLOR_BROWN}"$BACKUPFOLDER_DAYS/$DATE/mysql:" ${COLOR_NC}"
-		ls -l $BACKUPFOLDER_DAYS/$DATE/mysql
-		return 0
-	else
-		echo -e "${COLOR_RED}Бэкапы mysql за $(date --date today "+%Y.%m.%d") отсутствуют${COLOR_NC}"
-		return 1
-	fi
-
-}
-
-#Вывод бэкапов за вчерашний день
-#return 0 - выполнено успешно, 1 - каталог не найден
-viewBackupsYestoday(){
-	echo ""
-	DATE=$(date --date yesterday "+%Y.%m.%d")
-	 if [ -d "$BACKUPFOLDER_DAYS"/"$DATE"/"mysql" ] ; then
-		echo -e "${COLOR_YELLOW}"Список бэкапов за сегодня - $DATE" ${COLOR_NC}"
-		echo -e "${COLOR_BROWN}"$BACKUPFOLDER_DAYS/$DATE/mysql:" ${COLOR_NC}"
-		ls -l $BACKUPFOLDER_DAYS/$DATE/mysql
-		return 0
-	else
-		echo -e "${COLOR_RED}Бэкапы mysql за $(date --date yesterday "+%Y.%m.%d") отсутствуют${COLOR_NC}"
-		return 1
-	fi
-}
-
-#Вывод бэкапов за последнюю неделю
-#return 0 - выполнено успешно, 1 - каталог не найден
-viewBackupsWeek(){
-	echo ""
-	TODAY=$(date +%Y.%m.%d)
-	DATE=$(date --date='7 days ago' "+%Y.%m.%d")
-	echo -e "$COLOR_YELLOW"Список бэкапов за Неделю - $DATE-$TODAY" $COLOR_NC"
-
-	for ((i=0; i<7; i++))
-	do
-		DATE=$(date --date=''$i' days ago' "+%Y.%m.%d");
-		if [ -d "$BACKUPFOLDER_DAYS"/"$DATE" ] ; then
-			echo -e "$COLOR_BROWN"$DATE:" $COLOR_NC"
-			ls -l $BACKUPFOLDER_DAYS/$DATE/
-			return 0
-		else
-		    echo -e "${COLOR_RED}Каталог ${COLOR_GREEN}\"$BACKUPFOLDER_DAYS/$DATE/\"${COLOR_RED}не найден${COLOR_NC}"
-		    return 1
-		fi
-	done
-}
-
-
-#Вывод бэкапов за указанный диапазон дат ($1-date1, $2-data2)
-#return 0 - выполнено, 1 - отсутствуют параметры
-viewBackupsRangeInput(){
-    #Проверка на существование параметров запуска скрипта
-    if [ -n "$1" ] && [ -n "$2" ]
-    then
-    #Параметры запуска существуют
-        echo -e "$COLOR_YELLOW"Список бэкапов $(date --date $1 "+%Y.%m.%d") - $(date --date $2 "+%Y.%m.%d")" $COLOR_NC"
-        start_ts=$(date -d "$1" '+%s')
-        end_ts=$(date -d "$2" '+%s')
-        range=$(( ( end_ts - start_ts )/(60*60*24) ))
-        echo -e "$COLOR_BROWN" Базы данных mysql:" $COLOR_NC"
-        n=0
-        for ((i=0; i<${range#-}+1; i++))
-        do
-            DATE=$(date --date=''$i' days ago' "+%Y.%m.%d");
-            if [ -d "$BACKUPFOLDER_DAYS"/"$DATE" ] ; then
-                echo -e "$COLOR_BROWN"$DATE:" $COLOR_NC"
-                ls -l $BACKUPFOLDER_DAYS/$DATE/
-                n=$(($n+1))
-
-            fi
-
-        done
-        echo $n
-        return 0
-    #Параметры запуска существуют (конец)
-    else
-    #Параметры запуска отсутствуют
-        echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"viewBackupsRangeInput\"${COLOR_RED} ${COLOR_NC}"
-        return 1
-    #Параметры запуска отсутствуют (конец)
-    fi
-    #Конец проверки существования параметров запуска скрипта
-
-}
 
 #Смена разрешений на каталог и файлы, а также владельца
 #$1-путь к каталогу; $2-права на каталог ; $3-Права на файлы ; $4-Владелец-user ; $5-Владелец-группа ;
@@ -484,33 +471,7 @@ viewSiteFoldersByName(){
 	fi
 }
 
-#Вывод бэкапов конкретный день ($1-DATE)
-viewBackupsRange(){
-#Проверка на существование параметров запуска скрипта
-#return 0 - выполнено успешно, 1 - отсутствуют параметры
-#2 - бэкапы за указанный диапазон отсутствуют
-if [ -n "$1" ]
-then
-#Параметры запуска существуют
-    echo ''
-    if [ -d "$BACKUPFOLDER_DAYS"/"$1"/ ] ; then
-        echo -e "$COLOR_YELLOW"Список бэкапов $(date --date $1 "+%Y.%m.%d")" $COLOR_NC"
-        echo -e "$COLOR_BROWN"$1 - Базы данных mysql:" $COLOR_NC"
-        ls -l $BACKUPFOLDER_DAYS/$1/
-        return 0
-    else
-        echo -e "${COLOR_RED}Бэкапы за $(date --date $1 "+%Y.%m.%d") отсутствуют$COLOR_NC"
-        return 2
-    fi
-#Параметры запуска существуют (конец)
-else
-#Параметры запуска отсутствуют
-    echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"viewBackupsRange\"${COLOR_RED} ${COLOR_NC}"
-    return 1
-#Параметры запуска отсутствуют (конец)
-fi
-#Конец проверки существования параметров запуска скрипта
-}
+
 
 #создание файла и применение прав к нему и владельца
 #$1-путь к файлу ; $2-user ; $3-group ; $4-права доступ ;

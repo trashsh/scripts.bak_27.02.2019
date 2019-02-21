@@ -54,6 +54,11 @@ declare -x -f viewUserInGroupUsersByPartName            #Вывод списка
 declare -x -f viewUserInGroupByName						#Вывод групп, в которых состоит указанный пользователь
                                                         # $1 - имя пользователя
                                                         #return 0 - выполнено успешно, 1 - не передан параметр
+declare -x -f useraddFtp                                #Добавление пользователя ftp: ($1-user ; $2-path ;)
+                                                        #$1-user ; $2-path ; 3 - pass
+                                                        #return 0 - выполнено успешно, 1 - отсутствуют параметры запуска, 2 - пользователь уже существует
+                                                        #3 - каталог уже существует, 4 - произошла ошибка при создании пользователя
+
 
 #Отображение полной информации о пользователе
 #$1-user ;
@@ -90,9 +95,9 @@ viewUserFullInfo() {
 	#Конец проверки существования параметров запуска скрипта
 }
 
+####################ПОЛНОСТЬЮ ГОТОВО##########################
 
 
-#Проте
 #Вывод списка групп, в которых состоит пользователь
 #$1-user ;
 viewUserGroups() {
@@ -350,9 +355,9 @@ userAddSystem() {
                                 mkdir -p $HOMEPATHWEBUSERS/$username
                                 useradd -N -g users -G ftp-access -d $HOMEPATHWEBUSERS/$username -s /bin/bash $username
                                 echo "$username:$password" | chpasswd
-                                mkdirWithOwn $HOMEPATHWEBUSERS/$username/backups $username users 777
-                                mkdirWithOwn $HOMEPATHWEBUSERS/$username/backups/auto $username users 755
-                                mkdirWithOwn $HOMEPATHWEBUSERS/$username/backups/manually $username users 755
+                                mkdirWithOwn $HOMEPATHWEBUSERS/$username/.backups $username users 777
+                                mkdirWithOwn $HOMEPATHWEBUSERS/$username/.backups/auto $username users 755
+                                mkdirWithOwn $HOMEPATHWEBUSERS/$username/.backups/manually $username users 755
                                 touchFileWithModAndOwn $HOMEPATHWEBUSERS/$username/.bashrc $username users 644
                                 touchFileWithModAndOwn $HOMEPATHWEBUSERS/$username/.sudo_as_admin_successful $username users 644
                                 echo "source /etc/profile" >> $HOMEPATHWEBUSERS/$username/.bashrc
@@ -884,4 +889,67 @@ viewUserInGroupByName(){
 			echo -e "${COLOR_LIGHT_RED}Не передан параметр в функцию viewUserInGroupByName в файле $0. Выполнение скрипта аварийно завершено ${COLOR_NC}"
 			return 1
 		fi
+}
+
+
+#Добавление пользователя ftp
+#$1-user ; $2-path ; $3
+#return 0 - выполнено успешно, 1 - отсутствуют параметры запуска, 2 - пользователь уже существует
+#3 - каталог уже существует, 4 - произошла ошибка при создании пользователя
+useraddFtp() {
+	#Проверка на существование параметров запуска скрипта
+	if [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ]
+	then
+	#Параметры запуска существуют
+		#Проверка существования системного пользователя "$1"
+			grep "^$1:" /etc/passwd >/dev/null
+			if  [ $? -eq 0 ]
+			then
+			#Пользователь $1 существует
+				echo -e "${COLOR_RED}Пользователь ftp ${COLOR_GREEN}\"$1\"${COLOR_RED} уже существует. Ошибка выполнения функции ${COLOR_GREEN}\"useraddFtp\"${COLOR_RED}  ${COLOR_NC}"
+				return 2
+			#Пользователь $1 существует (конец)
+			else
+			    #Проверка существования каталога "$2"
+			    if [ -d $2 ] ; then
+			        #Каталог "$2" существует
+			        echo -e "${COLOR_RED}Каталог ${COLOR_GREEN}\"$2\"${COLOR_RED} уже существует. Ошибка выполнения функции ${COLOR_GREEN}\"useraddFtp\"${COLOR_RED}  ${COLOR_NC}"
+			        return 3
+			        #Каталог "$2" существует (конец)
+			    else
+			        #Каталог "$2" не существует
+			        useradd $1 -N -d $2 -m -s /bin/false -g ftp-access -G www-data
+                    echo "$1:$3" | chpasswd
+			        #Финальная проверка существования системного пользователя "$1"
+			        	grep "^$1:" /etc/passwd >/dev/null
+			        	if  [ $? -eq 0 ]
+			        	then
+			        	#Пользователь $1 существует
+			        		echo -e "${COLOR_GREEN}Пользователь ftp ${COLOR_YELLOW}\"$1\"${COLOR_GREEN} успешно добавлен с домашим каталогом ${COLOR_YELLOW}\"$2\"${COLOR_GREEN}  ${COLOR_NC}"
+			        		return 0
+			        	#Пользователь $1 существует (конец)
+			        	else
+			        	#Пользователь $1 не существует
+
+			        	    echo -e "${COLOR_RED}Произошла ошибка при создании пользователя ftp ${COLOR_GREEN}\"$1\"${COLOR_RED}. Ошибка выполнения функции ${COLOR_GREEN}\"useraddFtp\"${COLOR_NC}"
+			        	    return 4
+			        	#Пользователь $1 не существует (конец)
+			        	fi
+			        #Финальная проверка существования системного пользователя $1 (конец)
+			        #Каталог "$2" не существует (конец)
+			    fi
+			    #Конец проверки существования каталога "$2"
+
+
+			#Пользователь $1 не существует (конец)
+			fi
+		#Конец проверки существования системного пользователя $1
+	#Параметры запуска существуют (конец)
+	else
+	#Параметры запуска отсутствуют
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"useraddFtp\"${COLOR_RED} ${COLOR_NC}"
+		return 1
+	#Параметры запуска отсутствуют (конец)
+	fi
+	#Конец проверки существования параметров запуска скрипта    
 }
