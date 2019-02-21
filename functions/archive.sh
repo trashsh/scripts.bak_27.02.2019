@@ -45,7 +45,7 @@ tar_folder_structure() {
 		        #Каталог "`dirname $2`" существует (конец)
 		    else
 		        #Каталог "`dirname $2`" не существует   
-		        echo -e "${COLOR_RED} Каталог \"`dirname $2`\" не найден ${COLOR_NC}. Создать его?"
+		        echo -e "${COLOR_RED} Каталог \"`dirname $2`\" не найден. Создать его? Функция ${COLOR_GREEN}\"tar_folder_structure\"${COLOR_NC}"
 			echo -n -e "Введите ${COLOR_BLUE}\"y\"${COLOR_NC} для создания каталога ${COLOR_YELLOW}\"`dirname $2`\"${COLOR_NC}, для отмены операции - ${COLOR_BLUE}\"n\"${COLOR_NC}: "
 
 			while read
@@ -114,7 +114,7 @@ tar_folder_structure_remove() {
 		        #Каталог "`dirname $2`" существует (конец)
 		    else
 		        #Каталог "`dirname $2`" не существует
-		        echo -e "${COLOR_RED} Каталог \"`dirname $2`\" не найден ${COLOR_NC}. Создать его?"
+		        echo -e "${COLOR_RED} Каталог \"`dirname $2`\" не найден. Создать его? Функция ${COLOR_GREEN}\"tar_folder_structure_remove\"${COLOR_NC}"
 			echo -n -e "Введите ${COLOR_BLUE}\"y\"${COLOR_NC} для создания каталога ${COLOR_YELLOW}\"`dirname $2`\"${COLOR_NC}, для отмены операции - ${COLOR_BLUE}\"n\"${COLOR_NC}: "
 
 			while read
@@ -169,7 +169,7 @@ tar_folder_without_structure() {
 		        #Каталог "`dirname $2`" существует (конец)
 		    else
 		        #Каталог "`dirname $2`" не существует
-		        echo -e "${COLOR_RED} Каталог \"`dirname $2`\" не найден ${COLOR_NC}. Создать его?"
+		        echo -e "${COLOR_RED} Каталог \"`dirname $2`\" не найден. Создать его? Функция ${COLOR_GREEN}\"tar_folder_without_structure\"${COLOR_NC}"
 			echo -n -e "Введите ${COLOR_BLUE}\"y\"${COLOR_NC} для создания каталога ${COLOR_YELLOW}\"`dirname $2`\"${COLOR_NC}, для отмены операции - ${COLOR_BLUE}\"n\"${COLOR_NC}: "
 
 			while read
@@ -224,7 +224,7 @@ tar_folder_without_structure_remove() {
 		        #Каталог "`dirname $2`" существует (конец)
 		    else
 		        #Каталог "`dirname $2`" не существует
-		        echo -e "${COLOR_RED} Каталог \"`dirname $2`\" не найден ${COLOR_NC}. Создать его?"
+		        echo -e "${COLOR_RED} Каталог \"`dirname $2`\" не найден. Создать его? Функция ${COLOR_GREEN}\"tar_folder_without_structure_remove\"${COLOR_NC}"
 			echo -n -e "Введите ${COLOR_BLUE}\"y\"${COLOR_NC} для создания каталога ${COLOR_YELLOW}\"`dirname $2`\"${COLOR_NC}, для отмены операции - ${COLOR_BLUE}\"n\"${COLOR_NC}: "
 
 			while read
@@ -279,7 +279,7 @@ untar_without_structure() {
 		        #Каталог "$1" существует (конец)
 		    else
 		        #Каталог "$1" не существует   
-		        echo -e "${COLOR_RED} Каталог \"$1\" не найден ${COLOR_NC}. Создать его?"	
+		        echo -e "${COLOR_RED} Каталог \"$1\" не найден. Создать его? Функция ${COLOR_GREEN}\"untar_without_structure\"${COLOR_NC}"
 			echo -n -e "Введите ${COLOR_BLUE}\"y\"${COLOR_NC} для создания каталога ${COLOR_YELLOW}\"$1\"${COLOR_NC}, для отмены операции - ${COLOR_BLUE}\"n\"${COLOR_NC}: "
 		
 			while read
@@ -334,7 +334,7 @@ untar_with_structure() {
 		        #Каталог "$1" существует (конец)
 		    else
 		        #Каталог "$1" не существует
-		        echo -e "${COLOR_RED} Каталог \"$1\" не найден ${COLOR_NC}. Создать его?"
+		        echo -e "${COLOR_RED} Каталог \"$1\" не найден. Создать его? Функция ${COLOR_GREEN}\"untar_with_structure\"${COLOR_NC}"
 			echo -n -e "Введите ${COLOR_BLUE}\"y\"${COLOR_NC} для создания каталога ${COLOR_YELLOW}\"$1\"${COLOR_NC}, для отмены операции - ${COLOR_BLUE}\"n\"${COLOR_NC}: "
 
 			while read
@@ -393,7 +393,7 @@ tar_file_structure() {
 		        #Каталог "`dirname $2`" существует (конец)
 		    else
 		        #Каталог "`dirname $2`" не существует
-		    echo -e "${COLOR_RED} Каталог \"`dirname $2`\" не найден ${COLOR_NC}. Создать его?"
+		    echo -e "${COLOR_RED} Каталог \"`dirname $2`\" не найден. Создать его? Функция ${COLOR_GREEN}\"tar_file_structure\"${COLOR_NC}"
 			echo -n -e "Введите ${COLOR_BLUE}\"y\"${COLOR_NC} для создания каталога ${COLOR_YELLOW}\"`dirname $2`\"${COLOR_NC}, для отмены операции - ${COLOR_BLUE}\"n\"${COLOR_NC}: "
 
 			while read
@@ -462,7 +462,7 @@ tar_file_structure_remove() {
 		        #Каталог "`dirname $2`" существует (конец)
 		    else
 		        #Каталог "`dirname $2`" не существует
-		    echo -e "${COLOR_RED} Каталог \"`dirname $2`\" не найден ${COLOR_NC}. Создать его?"
+		    echo -e "${COLOR_RED} Каталог \"`dirname $2`\" не найден. Создать его? Функция ${COLOR_GREEN}\"tar_file_structure_remove\"${COLOR_NC}"
 			echo -n -e "Введите ${COLOR_BLUE}\"y\"${COLOR_NC} для создания каталога ${COLOR_YELLOW}\"`dirname $2`\"${COLOR_NC}, для отмены операции - ${COLOR_BLUE}\"n\"${COLOR_NC}: "
 
 			while read
@@ -531,7 +531,7 @@ tar_file_without_structure() {
 		        #Каталог "`dirname $2`" существует (конец)
 		    else
 		        #Каталог "`dirname $2`" не существует
-		    echo -e "${COLOR_RED} Каталог \"`dirname $2`\" не найден ${COLOR_NC}. Создать его?"
+		    echo -e "${COLOR_RED} Каталог \"`dirname $2`\" не найден. Создать его? Функция ${COLOR_GREEN}\"tar_file_without_structure\"${COLOR_NC}"
 			echo -n -e "Введите ${COLOR_BLUE}\"y\"${COLOR_NC} для создания каталога ${COLOR_YELLOW}\"`dirname $2`\"${COLOR_NC}, для отмены операции - ${COLOR_BLUE}\"n\"${COLOR_NC}: "
 
 			while read
@@ -600,7 +600,7 @@ tar_file_without_structure_remove() {
 		        #Каталог "`dirname $2`" существует (конец)
 		    else
 		        #Каталог "`dirname $2`" не существует
-		    echo -e "${COLOR_RED} Каталог \"`dirname $2`\" не найден ${COLOR_NC}. Создать его?"
+		    echo -e "${COLOR_RED} Каталог \"`dirname $2`\" не найден. Создать его? Фунция ${COLOR_GREEN}\"tar_file_without_structure_remove\"${COLOR_NC}"
 			echo -n -e "Введите ${COLOR_BLUE}\"y\"${COLOR_NC} для создания каталога ${COLOR_YELLOW}\"`dirname $2`\"${COLOR_NC}, для отмены операции - ${COLOR_BLUE}\"n\"${COLOR_NC}: "
 
 			while read

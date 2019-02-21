@@ -15,4 +15,5 @@ source $SCRIPTS/include/include.sh
 #dbBackupBasesOneUser $1 $2 $3
 #mysql -e "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME like 'lamer_%'" | tr -d "| " | grep -v SCHEMA_NAME
 #mysql -qfsBe "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='lamer'" | tr -d "| " | grep -v SCHEMA_NAME
+#backupSiteFiles $1 $2 $3
 backupSiteFiles $1 $2 $3
