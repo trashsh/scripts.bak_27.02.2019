@@ -51,7 +51,7 @@ backupUserSitesFiles() {
                     #array[$i]="$line"
                     #temp=$line
                     #echo $line
-                    backupSiteFiles $1 $line
+                    backupSiteFiles $1 $line $2
                     (( i++ ))
                     #backupSiteFiles $1 $line
                 done
@@ -606,58 +606,73 @@ backupSiteFiles() {
 	if [ -n "$1" ] && [ -n "$2" ]
 	then
 	#Параметры запуска существуют
-		#Проверка существования системного пользователя "$1"
-			grep "^$1:" /etc/passwd >/dev/null
-			if  [ $? -eq 0 ]
-			then
-			#Пользователь $1 существует
-				#Проверка существования каталога "$HOMEPATHWEBUSERS/$1/$1_$2"
-				if [ -d $HOMEPATHWEBUSERS/$1/$1_$2 ] ; then
-				    #Каталог "$HOMEPATHWEBUSERS/$1/$1_$2" существует
-
-				    #Проверка на существование параметров запуска скрипта
-                        if [ -n "$3" ]
-                        then
-                        #Параметры запуска существуют
-                            #Проверка существования каталога "$2"
-                            if ! [ -d $3 ] ; then
-                                #Каталог "$2" не существует
-                                echo -e "${COLOR_RED} Каталог \"$3\" не найден. Создать его? Функция ${COLOR_GREEN}\"backupSiteFiles\"${COLOR_NC}"
-                                echo -n -e "Введите ${COLOR_BLUE}\"y\"${COLOR_NC} для создания каталога ${COLOR_YELLOW}\"$3\"${COLOR_NC}, для отмены операции - ${COLOR_BLUE}\"n\"${COLOR_NC}: "
-
+	    #Проверка существования системного пользователя "$1"
+	    	grep "^$1:" /etc/passwd >/dev/null
+	    	if  [ $? -eq 0 ]
+	    	then
+	    	#Пользователь $1 существует
+                #Проверка существования каталога "$HOMEPATHWEBUSERS/$1/$1_$2"
+                if [ -d $HOMEPATHWEBUSERS/$1/$1_$2 ] ; then
+                    #Каталог "$HOMEPATHWEBUSERS/$1/$1_$2" существует    
+                    #Проверка на существование параметров запуска скрипта
+                    if [ -n "$3" ]
+                    then
+                    #Параметры запуска существуют
+                        #Проверка существования каталога "$3"
+                        if [ -d $3 ] ; then
+                            #Каталог "$3" существует
+                            DESTINATION=$3
+                            #Каталог "$3" существует (конец)
+                        else
+                            #Каталог "$3" не существует
+                            echo -n -e "${COLOR_YELLOW}Каталог ${COLOR_GREEN}\"$3\"${COLOR_YELLOW} не существует. Введите ${COLOR_BLUE}\"y\"${COLOR_YELLOW} для создания каталога или для отмены операции - ${COLOR_BLUE}\"n\"${COLOR_NC}: "
                                 while read
                                 do
-                                echo -n ": "
                                     case "$REPLY" in
-                                    y|Y)
-                                        mkdir -p "$3";
-                                        DESTINATION=$3
-                                        break;;
-                                    n|N)
-                                         return 4;;
+                                        y|Y)
+                                            mkdir -p "$3";
+                                            DESTINATION=$3;
+                                            break
+                                            ;;
+                                        n|N)
+                                            return 4
+                                            break
+                                            ;;
+                                        *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2
+                                           ;;
                                     esac
                                 done
-                                #Каталог "$2" не существует (конец)
-                            else
-                                DESTINATION=$3
-                            fi
-                            #Конец проверки существования каталога "$2"
-                        else
-                            DESTINATION=$BACKUPFOLDER_DAYS/$1/$2/$d/
+
+                            #Каталог "$3" не существует (конец)
                         fi
-                        #Конец проверки существования параметров запуска скрипта
+                        #Конец проверки существования каталога "$3"
 
+                    #Параметры запуска существуют (конец)
+                    else
+                    #Параметры запуска отсутствуют
+                        DESTINATION=$BACKUPFOLDER_DAYS/$1/$2/$d/
+                    #Параметры запуска отсутствуют (конец)
+                    fi
+                    #Конец проверки существования параметров запуска скрипта
+                    #Каталог "$HOMEPATHWEBUSERS/$1/$1_$2" существует (конец)
+                else
+                    #Каталог "$HOMEPATHWEBUSERS/$1/$1_$2" не существует   
+                    echo -e "${COLOR_RED}Каталог ${COLOR_GREEN}\"$HOMEPATHWEBUSERS/$1/$1_$2\"${COLOR_RED} не существует${COLOR_NC}"
+                    return 3
+                    #Каталог "$HOMEPATHWEBUSERS/$1/$1_$2" не существует (конец)
+                fi
+                #Конец проверки существования каталога "$HOMEPATHWEBUSERS/$1/$1_$2"
 
-                #Проверка существования каталога "$DESTINATION"
-                    if ! [ -d $DESTINATION ] ; then
+                if ! [ -d $DESTINATION ] ; then
                         #Каталог "$DESTINATION" не существует
                         mkdir -p "$DESTINATION"
                         #Каталог "$DESTINATION" не существует (конец)
-                    fi
-                #Конец проверки существования каталога "$DESTINATION"
+                fi
+
                 FILENAME=site.$1_$2_$dt.tar.gz
                 tar_folder_structure $HOMEPATHWEBUSERS/$1/$1_$2 $DESTINATION/$FILENAME
                 chModAndOwnFile $DESTINATION/$FILENAME $1 users 644
+
                 #Проверка существования файла "$DESTINATION/$FILENAME"
                 if [ -f $DESTINATION/$FILENAME ] ; then
                     #Файл "$DESTINATION/$FILENAME" существует
@@ -670,29 +685,20 @@ backupSiteFiles() {
                 fi
                 #Конец проверки существования файла "$DESTINATION/$FILENAME"
 
+	    	#Пользователь $1 существует (конец)
+	    	else
+	    	#Пользователь $1 не существует
+                echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует. Ошибка в функции ${COLOR_GREEN}\"backupSiteFiles\"${COLOR_RED}  ${COLOR_NC}"
+                return 2
 
-				    #Каталог "$HOMEPATHWEBUSERS/$1/$1_$2" существует (конец)
-				else
-				    #Каталог "$HOMEPATHWEBUSERS/$1/$1_$2" не существует
-				    echo -e "${COLOR_RED}Каталог ${COLOR_GREEN}\"$HOMEPATHWEBUSERS/$1/$1_$2\"${COLOR_RED} не существует${COLOR_NC}. Ошибка выполнения функции ${COLOR_GREEN}\"backupSiteFiles\"${COLOR_NC}"
-				    return 3
-				    #Каталог "$HOMEPATHWEBUSERS/$1/$1_$2" не существует (конец)
-				fi
-				#Конец проверки существования каталога "$HOMEPATHWEBUSERS/$1/$1_$2"
-
-			#Пользователь $1 существует (конец)
-			else
-			#Пользователь $1 не существует
-			    echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$1\"${COLOR_RED} не существует. Ошибка выполнения функции ${COLOR_GREEN}\"backupSiteFiles\"${COLOR_RED}${COLOR_NC}"
-				return 2
-			#Пользователь $1 не существует (конец)
-			fi
-		#Конец проверки существования системного пользователя $1
+	    	#Пользователь $1 не существует (конец)
+	    	fi
+	    #Конец проверки существования системного пользователя $1
 	#Параметры запуска существуют (конец)
 	else
 	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"backupSiteFiles\"${COLOR_RED} ${COLOR_NC}"
-		return
+	    echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"backupSiteFiles\"${COLOR_RED} ${COLOR_NC}"
+	    return 1
 	#Параметры запуска отсутствуют (конец)
 	fi
 	#Конец проверки существования параметров запуска скрипта
