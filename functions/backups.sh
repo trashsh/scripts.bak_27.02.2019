@@ -111,7 +111,7 @@ backupImportantFile() {
 
 }
 
-#
+#Полностью готово
 #Создание бэкапа указанной базы данных
 #$1-user, $2-dbname ; $3-В параметре $2 может быть установлен каталог выгрузки. По умолчанию грузится в $BACKUPFOLDER_DAYS\`date +%Y.%m.%d` ;
 #return 0 - выполнено успешно, 1 - отсутствутю параметры, 2 - отсутствует база данных, 3 - отменено пользователем создание каталога
@@ -161,6 +161,7 @@ dbBackupBase() {
 		    mysqldump --databases $2 > $FILENAME
 			tar_file_without_structure_remove $FILENAME $FILENAME.tar.gz
 			dbCheckExportedBase $2 $FILENAME.tar.gz
+			chModAndOwnFile $FILENAME.tar.gz $1 www-data 644
 		    #Каталог "$DESTINATION" существует (конец)
 		else
 		    #Каталог "$DESTINATION" не существует
@@ -444,13 +445,34 @@ dbBackupBases() {
 	d=`date +%Y.%m.%d`;
 	dt=`date +%Y.%m.%d_%H.%M`;
 
-	#Проверка на существование параметров запуска скрипта
+	databases=`mysql -e "SHOW DATABASES;" | tr -d "| " | grep -v Database`
+
+
+
+#выгрузка баз данных
+	for db in $databases; do
+		if [[ "$db" != "information_schema" ]] && [[ "$db" != "performance_schema" ]] && [[ "$db" != "mysql" ]] && [[ "$db" != _* ]] && [[ "$db" != "phpmyadmin" ]] && [[ "$db" != "sys" ]] ; then
+			echo -e "---\nВыгрузка базы данных MYSQL: ${COLOR_YELLOW}$db${COLOR_NC}"
+
+            user_fcut=${db%_*}
+            user=${user_fcut%_*}
+
+echo $db
+
+            domain_fcut=${db%_}
+            #domain=${domain_fcut##_*}
+
+
+            echo $domain_fcut
+
+
+            #Проверка на существование параметров запуска скрипта
 	if [ -n "$1" ]
 	then
 	#Параметры запуска существуют
 
 	    #Проверка существования файла "$1"
-	    if ! [ -f $1 ] ; then
+	    if ! [ -d $1 ] ; then
 	        #Файл "$1" не существует
 	        echo -e "${COLOR_RED} Каталог \"$1\" не найден для создания бэкапа всех баз данных mysql. Создать его? Функция ${COLOR_GREEN}\"dbBackupBases\"${COLOR_NC}"
 			echo -n -e "Введите ${COLOR_BLUE}\"y\"${COLOR_NC} для создания каталога ${COLOR_YELLOW}\"$1\"${COLOR_NC}, для отмены операции - ${COLOR_BLUE}\"n\"${COLOR_NC}: "
@@ -480,29 +502,38 @@ dbBackupBases() {
 	else
 	#Параметры запуска отсутствуют
 		#каталог устанавливается по умолчанию
-		DESTINATION=$BACKUPFOLDER_DAYS/$d
+		DESTINATION=$BACKUPFOLDER_DAYS/$user/$domain/$d
 	#Параметры запуска отсутствуют (конец)
 	fi
 	#Конец проверки существования параметров запуска скрипта
 
-    databases=`mysql -e "SHOW DATABASES;" | tr -d "| " | grep -v Database`
 
-    #Проверка существования каталога "$DESTINATION"
+     #Проверка существования каталога "$DESTINATION"
     if ! [ -d $DESTINATION ] ; then
         #Каталог "$DESTINATION" не существует
         mkdir -p "$DESTINATION"
     fi
     #Конец проверки существования каталога "$DESTINATION"
 
-#выгрузка баз данных
-	for db in $databases; do
-		if [[ "$db" != "information_schema" ]] && [[ "$db" != "performance_schema" ]] && [[ "$db" != "mysql" ]] && [[ "$db" != _* ]] && [[ "$db" != "phpmyadmin" ]] && [[ "$db" != "sys" ]] ; then
-			echo -e "---\nВыгрузка базы данных MYSQL: ${COLOR_YELLOW}$db${COLOR_NC}"
-			filename=mysql."$db"-$dt.sql
+
+
+
+
+
+
+
+
+
+
+
+#            echo $user
+           # echo $user
+			filename=mysql.$user-"$db"-$dt.sql
 			mysqldump --databases $db > $DESTINATION/$filename
 #архивация выгруженной базы и удаление оригинального файла sql
 			tar_file_without_structure_remove	$DESTINATION/$filename $DESTINATION/$filename.tar.gz
 #проверка на существование выгруженных и заархививанных баз данных
+            chModAndOwnFile $DESTINATION/$filename.tar.gz $user www-data 644
 			if  [ -f "$DESTINATION/$filename.tar.gz" ] ; then
 				echo -e "${COLOR_GREEN}Выгрузка базы данных MYSQL:${COLOR_NC} ${COLOR_YELLOW}$db${COLOR_NC} ${COLOR_GREEN}успешно завершилась в файл${COLOR_NC}${COLOR_YELLOW} \"$DESTINATION/$filename.tar.gz\"${COLOR_NC}\n---"
 			else
@@ -546,7 +577,7 @@ dbBackupBasesOneUser() {
                             y|Y)
                                 mkdir -p "$2";
                                 DESTINATION=$2
-                            echo $DESTINATION
+                                #echo $DESTINATION
                                 break;;
                             n|N)
                                  return 3;;
@@ -564,7 +595,7 @@ dbBackupBasesOneUser() {
                 #Параметры запуска существуют (конец)
                 else
                 #Параметры запуска отсутствуют
-                    DESTINATION=$BACKUPFOLDER_DAYS/$d/$1
+                    DESTINATION=$BACKUPFOLDER_DAYS/$1/
                 #Параметры запуска отсутствуют (конец)
                 fi
                 #Конец проверки существования параметров запуска скрипта
@@ -584,21 +615,21 @@ dbBackupBasesOneUser() {
                     for db in $databases; do
                         if [[ "$db" != "information_schema" ]] && [[ "$db" != "performance_schema" ]] && [[ "$db" != "mysql" ]] && [[ "$db" != _* ]] && [[ "$db" != "phpmyadmin" ]] && [[ "$db" != "sys" ]] ; then
                         dbase=$db | cut -d'_' -f 2
-                        echo $dbase
-                        dbBackupBase $db $BACKUPFOLDER_DAYS/$1/$d
+     #                   echo $dbase
+                        dbBackupBase $1 $db $DESTINATION
     #
     #
     #                        echo -e "---\nВыгрузка базы данных MYSQL: ${COLOR_YELLOW}$db${COLOR_NC}"
-    #                        filename=mysql."$db"-$dt.sql
+    #                         filename=mysql."$1"-"$db"-$dt.sql
     #                        mysqldump --databases $db > $DESTINATION/$filename
                 #архивация выгруженной базы и удаление оригинального файла sql
     #                        tar_file_without_structure_remove	$DESTINATION/$filename $DESTINATION/$filename.tar.gz
                 #проверка на существование выгруженных и заархививанных баз данных
-                            if  [ -f "$DESTINATION/$filename.tar.gz" ] ; then
-                                echo -e "${COLOR_GREEN}Выгрузка базы данных MYSQL:${COLOR_NC} ${COLOR_YELLOW}$db${COLOR_NC} ${COLOR_GREEN}успешно завершилась в файл${COLOR_NC}${COLOR_YELLOW} \"$DESTINATION/$filename.tar.gz\"${COLOR_NC}\n---"
-                            else
-                                echo -e "${COLOR_RED}Выгрузка базы данных: ${COLOR_NC}${COLOR_YELLOW}$db${COLOR_NC} ${COLOR_RED}завершилась с ошибкой${COLOR_NC}\n---"
-                            fi
+    #                        if  [ -f "$DESTINATION/$filename.tar.gz" ] ; then
+    #                            echo -e "${COLOR_GREEN}Выгрузка базы данных MYSQL:${COLOR_NC} ${COLOR_YELLOW}$db${COLOR_NC} ${COLOR_GREEN}успешно завершилась в файл${COLOR_NC}${COLOR_YELLOW} \"$DESTINATION/$filename.tar.gz\"${COLOR_NC}\n---"
+    #                        else
+    #                            echo -e "${COLOR_RED}Выгрузка базы данных: ${COLOR_NC}${COLOR_YELLOW}$db${COLOR_NC} ${COLOR_RED}завершилась с ошибкой${COLOR_NC}\n---"
+    #                        fi
                          fi
                     done
 
