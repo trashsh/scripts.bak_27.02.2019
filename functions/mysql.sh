@@ -1,6 +1,6 @@
 #!/bin/bash
 
-declare -x -f dbCheckExportedBase #Проверка успешности выгрузки базы данных mysql $1 в архив $2: ($1-Имя базы данных ; $2-Путь к архиву ;)
+
 declare -x -f dbChangeUserPassword #Смена пароля пользователю mysql: ($1-user ; $2-host ; $3-password ; $4-autentification type (mysql_native_password) ; )
 
 
@@ -9,9 +9,7 @@ declare -x -f dbChangeUserPassword #Смена пароля пользовате
 declare -x -f dbViewUserInfo #Вывести информацию о пользователе mysql. #$1-user ;
                              #return 0 - пользователь существует, 1 - пользователь не существует;
 
-declare -x -f dbCreateBase #Создание базы данных $1: ($1-dbname ; $2-CHARACTER SET (например utf8) ; $3-COLLATE (например utf8_general_ci) ;)
-                            #return 0 - выполнено успешно. 1 - не переданы параметры, 2 - база данных уже существует
-                            #3 - ошибка при проверке наличия базы после ее создания
+
 declare -x -f dbUseradd #Добавление пользователя mysql: ($1-user ; $2-password ; $3-host ; $4-autentification_type ; $5-usertype ;)
                         #return 0 - выполнено успешно, 1 - неверный параметр autentification_type, 2 - неверный параметр usertype, 3 - пользователь уже существует, 4 - ошибка после выполнения команды на создание пользователя, 5 - отсутствуют параметры запуска
 declare -x -f dbDropBase #Удаление базы данных mysql: ($1-dbname ; $2"drop"-подтверждение ;)
@@ -40,50 +38,7 @@ declare -x -f dbViewUserGrant #Вывод прав пользователя mysq
                               #return 0 - выполнено успешно, 1 - отсутствуют параметры, 2 - пользователь не существует
 
 
-#
-#Проверка успешности выгрузки базы данных mysql $1 в архив $3
-#$1-Имя базы данных ; $2 - успешные выгрузки отображаться не будут при передаче параметра "silent" $3-Путь к архиву ;
-#return 0 - файл существует, 1 - файл не существует
-dbCheckExportedBase() {
-	#Проверка на существование параметров запуска скрипта
-	if [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ]
-	then
 
-	#Параметры запуска существуют
-		#Проверка существования файла "$3"
-		if [ -f $3 ] ; then
-		    #Файл "$3" существует
-		    #Проверка параметров запуска скрипта
-		    if [ $2 = silent ]
-		    then
-		    #Параметры запуска существуют
-		        return 0
-		    #Параметры запуска существуют (конец)
-		    else
-		    #Параметры запуска отсутствуют
-		        echo -e "${COLOR_GREEN}Выгрузка базы данных MYSQL:${COLOR_NC} ${COLOR_YELLOW}\"$1\"${COLOR_NC} ${COLOR_GREEN}успешно завершилась в файл ${COLOR_NC}${COLOR_YELLOW} \"$3\"${COLOR_NC}\n---"
-		        return 0
-		    #Параметры запуска отсутствуют (конец)
-		    fi
-		    #Конец проверки параметров запуска скрипта
-
-		    #Файл "$3" существует (конец)
-		else
-		    #Файл "$3" не существует
-		    echo -e "${COLOR_RED}Выгрузка базы данных: ${COLOR_NC}${COLOR_YELLOW}\"$1\"${COLOR_NC}${COLOR_RED} в файл ${COLOR_YELLOW}\"$3\"${COLOR_NC}${COLOR_RED} завершилась с ошибкой. Указанный файл отсутствует${COLOR_NC}\n---"
-		    return 1
-		    #Файл "$3" не существует (конец)
-		fi
-		#Конец проверки существования файла "$3"
-	#Параметры запуска существуют (конец)
-	else
-	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"dbCheckExportedBase\"${COLOR_RED} ${COLOR_NC}"
-	#Параметры запуска отсутствуют (конец)
-	fi
-	#Конец проверки существования параметров запуска скрипта
-    
-}
 
 
 
@@ -114,7 +69,7 @@ dbChangeUserPassword() {
 	#Параметры запуска существуют (конец)
 	else
 	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"dbChangeUserPassword\"${COLOR_RED} ${COLOR_NC}"
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в функции ${COLOR_GREEN}\"dbChangeUserPassword\"${COLOR_RED} ${COLOR_NC}"
 	#Параметры запуска отсутствуют (конец)
 	fi
 	#Конец проверки существования параметров запуска скрипта
@@ -168,84 +123,13 @@ dbViewUserInfo() {
 	#Параметры запуска существуют (конец)
 	else
 	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"dbViewUserInfo\"${COLOR_RED} ${COLOR_NC}"
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в функции ${COLOR_GREEN}\"dbViewUserInfo\"${COLOR_RED} ${COLOR_NC}"
 	#Параметры запуска отсутствуют (конец)
 	fi
 	#Конец проверки существования параметров запуска скрипта
 }
 
-#
-#Создание базы данных $1
-#$1-dbname ; $2-CHARACTER SET (например utf8) ; $3-COLLATE (например utf8_general_ci) ; $4 - режим (normal/silent)
-#return 0 - выполнено успешно. 1 - не переданы параметры, 2 - база данных уже существует
-#3 - ошибка при проверке наличия базы после ее создания, 4 - ошибка в параметре mode - silent/normal
-dbCreateBase() {
-	#Проверка на существование параметров запуска скрипта
-	if [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ] && [ -n "$4" ] 
-	then
-	#Параметры запуска существуют
-	    #Проверка существования базы данных "$1"
-	    if [[ ! -z "`mysql -qfsBe "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='$1'" 2>&1`" ]];
-	    	then
-	    	#база $1 - существует
-	    		echo -e "${COLOR_RED}Ошибка создания базы данных. База данных ${COLOR_GREEN}\"$1\"${COLOR_RED} уже существует. Функция ${COLOR_GREEN}\"dbCreateBase\" ${COLOR_NC}"
-				return 2
-	    	#база $1 - существует (конец)	
-	    	else
-	    	#база $1 - не существует
-	    	     case "$4" in
-	    	     	silent)
-	    	     		mysql -e "CREATE DATABASE IF NOT EXISTS $1 CHARACTER SET $2 COLLATE $3;";
-	    	     		#Финальная проверка существования базы данных "$1"
-                         if [[ ! -z "`mysql -qfsBe "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='$1'" 2>&1`" ]];
-                            then
-                            #база $1 - существует
-                                return 0
-                            #база $1 - существует (конец)
-                            else
-                            #база $1 - не существует
-                                 echo -e "${COLOR_RED}База данных ${COLOR_GREEN}\"$1\"${COLOR_RED} не была создана.Функция ${COLOR_GREEN}\"dbCreateBase\"${COLOR_NC}"
-                                 return 3
-                            #база $1 - не существует (конец)
-                         fi
-                         #Финальная проверка существования базы данных $1 (конец)
-	    	     		;;
-	    	     	normal)
-	    	     		mysql -e "CREATE DATABASE IF NOT EXISTS $1 CHARACTER SET $2 COLLATE $3;";
-	    	     		#Финальная проверка существования базы данных "$1"
-                         if [[ ! -z "`mysql -qfsBe "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='$1'" 2>&1`" ]];
-                            then
-                            #база $1 - существует
-                                echo -e "${COLOR_GREEN}База данных ${COLOR_YELLOW}\"$1\"${COLOR_GREEN} успешно создана ${COLOR_NC}"
-                                return 0
-                            #база $1 - существует (конец)
-                            else
-                            #база $1 - не существует
-                                 echo -e "${COLOR_RED}База данных ${COLOR_GREEN}\"$1\"${COLOR_RED} не была создана.Функция ${COLOR_GREEN}\"dbCreateBase\"${COLOR_NC}"
-                                 return 3
-                            #база $1 - не существует (конец)
-                         fi
-                         #Финальная проверка существования базы данных $1 (конец)
 
-	    	     		;;
-	    	     	*)
-	    	     		echo -e "${COLOR_RED}Ошибка передачи параметра ${COLOR_GREEN}\"mode\"${COLOR_RED} в функцию ${COLOR_GREEN}\"dbCreateBase\"${COLOR_NC}";
-	    	     		return 4;;
-	    	     esac
-	    	#база $1 - не существует (конец)
-	    fi
-	    #конец проверки существования базы данных $1
-	    
-	    
-	#Параметры запуска существуют (конец)
-	else
-	#Параметры запуска отсутствуют
-	    echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"dbCreateBase\"${COLOR_RED} ${COLOR_NC}"
-	    return 1
-	#Параметры запуска отсутствуют (конец)
-	fi
-	#Конец проверки существования параметров запуска скрипта
-}
 
 #Добавление пользователя mysql
 #$1-user ; $2-password ; $3-host ; $4-autentification_type {pass,sha,socket}  ; $5-usertype ; {user, admin, adminGrant}
@@ -320,7 +204,7 @@ dbUseradd() {
 	#Параметры запуска существуют (конец)
 	else
 	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"dbUseradd\"${COLOR_RED} ${COLOR_NC}"
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в функции ${COLOR_GREEN}\"dbUseradd\"${COLOR_RED} ${COLOR_NC}"
 		return 5
 	#Параметры запуска отсутствуют (конец)
 	fi
@@ -380,7 +264,7 @@ dbDropBase() {
 	#Параметры запуска существуют (конец)
 	else
 	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"dbDropBase\"${COLOR_RED} ${COLOR_NC}"
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в функции ${COLOR_GREEN}\"dbDropBase\"${COLOR_RED} ${COLOR_NC}"
 		return 1
 	#Параметры запуска отсутствуют (конец)
 	fi
@@ -442,7 +326,7 @@ dbDropUser() {
 	#Параметры запуска существуют (конец)
 	else
 	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"dbDropUser\"${COLOR_RED} ${COLOR_NC}"
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в функции ${COLOR_GREEN}\"dbDropUser\"${COLOR_RED} ${COLOR_NC}"
 		return 1
 	#Параметры запуска отсутствуют (конец)
 	fi
@@ -489,7 +373,7 @@ dbSetFullAccessToBase() {
 	#Параметры запуска существуют (конец)
 	else
 	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"dbSetFullAccessToBase\"${COLOR_RED} ${COLOR_NC}"
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в функции ${COLOR_GREEN}\"dbSetFullAccessToBase\"${COLOR_RED} ${COLOR_NC}"
 		return 1
 	#Параметры запуска отсутствуют (конец)
 	fi
@@ -562,7 +446,7 @@ dbSetMyCnfFile() {
 	#Параметры запуска существуют (конец)
 	else
 	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"dbSetMyCnfFile\"${COLOR_RED} ${COLOR_NC}"
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в функции ${COLOR_GREEN}\"dbSetMyCnfFile\"${COLOR_RED} ${COLOR_NC}"
 		return 1
 	#Параметры запуска отсутствуют (конец)
 	fi
@@ -595,7 +479,7 @@ dbViewBasesByUsername() {
 	#Параметры запуска существуют (конец)
 	else
 	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"dbViewBasesByUsername\"${COLOR_RED} ${COLOR_NC}"
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в функции ${COLOR_GREEN}\"dbViewBasesByUsername\"${COLOR_RED} ${COLOR_NC}"
 		return 1
 	#Параметры запуска отсутствуют (конец)
 	fi
@@ -629,7 +513,7 @@ dbShowTables() {
 	#Параметры запуска существуют (конец)
 	else
 	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"dbShowTables\"${COLOR_RED} ${COLOR_NC}"
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в функции ${COLOR_GREEN}\"dbShowTables\"${COLOR_RED} ${COLOR_NC}"
 		return 1
 	#Параметры запуска отсутствуют (конец)
 	fi
@@ -662,7 +546,7 @@ dbViewAllUsersByContainName() {
 		#Параметры запуска существуют (конец)
 		else
 		#Параметры запуска отсутствуют
-		    echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"dbViewAllUsersByContainName\"${COLOR_RED} ${COLOR_NC}"
+		    echo -e "${COLOR_RED} Отсутствуют необходимые параметры в функции ${COLOR_GREEN}\"dbViewAllUsersByContainName\"${COLOR_RED} ${COLOR_NC}"
 		    return 1
 		#Параметры запуска отсутствуют (конец)
 		fi
@@ -709,7 +593,7 @@ dbViewBasesByTextContain() {
 	#Параметры запуска существуют (конец)
 	else
 	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"dbViewBasesByTextContain\"${COLOR_RED} ${COLOR_NC}"
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в функции ${COLOR_GREEN}\"dbViewBasesByTextContain\"${COLOR_RED} ${COLOR_NC}"
 		return 1
 	#Параметры запуска отсутствуют (конец)
 	fi
@@ -742,7 +626,7 @@ dbViewUserGrant() {
 	#Параметры запуска существуют (конец)
 	else
 	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"dbViewUserGrant\"${COLOR_RED} ${COLOR_NC}"
+		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в функции ${COLOR_GREEN}\"dbViewUserGrant\"${COLOR_RED} ${COLOR_NC}"
 		return 1
 	#Параметры запуска отсутствуют (конец)
 	fi
