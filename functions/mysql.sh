@@ -41,24 +41,40 @@ declare -x -f dbViewUserGrant #Вывод прав пользователя mysq
 
 
 #
-#Проверка успешности выгрузки базы данных mysql $1 в архив $2
-#$1-Имя базы данных ; $2-Путь к архиву ;
+#Проверка успешности выгрузки базы данных mysql $1 в архив $3
+#$1-Имя базы данных ; $2 - успешные выгрузки отображаться не будут при передаче параметра "silent" $3-Путь к архиву ;
+#return 0 - файл существует, 1 - файл не существует
 dbCheckExportedBase() {
 	#Проверка на существование параметров запуска скрипта
-	if [ -n "$1" ] && [ -n "$2" ]
+	if [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ]
 	then
+
 	#Параметры запуска существуют
-		#Проверка существования файла "$2"
-		if [ -f $2 ] ; then
-		    #Файл "$2" существует    
-		    echo -e "${COLOR_GREEN}Выгрузка базы данных MYSQL:${COLOR_NC} ${COLOR_YELLOW}\"$1\"${COLOR_NC} ${COLOR_GREEN}успешно завершилась в файл ${COLOR_NC}${COLOR_YELLOW} \"$2\"${COLOR_NC}\n---"
-		    #Файл "$2" существует (конец)
+		#Проверка существования файла "$3"
+		if [ -f $3 ] ; then
+		    #Файл "$3" существует
+		    #Проверка параметров запуска скрипта
+		    if [ $2 = silent ]
+		    then
+		    #Параметры запуска существуют
+		        return 0
+		    #Параметры запуска существуют (конец)
+		    else
+		    #Параметры запуска отсутствуют
+		        echo -e "${COLOR_GREEN}Выгрузка базы данных MYSQL:${COLOR_NC} ${COLOR_YELLOW}\"$1\"${COLOR_NC} ${COLOR_GREEN}успешно завершилась в файл ${COLOR_NC}${COLOR_YELLOW} \"$3\"${COLOR_NC}\n---"
+		        return 0
+		    #Параметры запуска отсутствуют (конец)
+		    fi
+		    #Конец проверки параметров запуска скрипта
+
+		    #Файл "$3" существует (конец)
 		else
-		    #Файл "$2" не существует   
-		    echo -e "${COLOR_RED}Выгрузка базы данных: ${COLOR_NC}${COLOR_YELLOW}\"$1\"${COLOR_NC}${COLOR_RED} в файл ${COLOR_YELLOW}\"$2\"${COLOR_NC}${COLOR_RED} завершилась с ошибкой. Указанный файл отсутствует${COLOR_NC}\n---"
-		    #Файл "$2" не существует (конец)
+		    #Файл "$3" не существует
+		    echo -e "${COLOR_RED}Выгрузка базы данных: ${COLOR_NC}${COLOR_YELLOW}\"$1\"${COLOR_NC}${COLOR_RED} в файл ${COLOR_YELLOW}\"$3\"${COLOR_NC}${COLOR_RED} завершилась с ошибкой. Указанный файл отсутствует${COLOR_NC}\n---"
+		    return 1
+		    #Файл "$3" не существует (конец)
 		fi
-		#Конец проверки существования файла "$2"
+		#Конец проверки существования файла "$3"
 	#Параметры запуска существуют (конец)
 	else
 	#Параметры запуска отсутствуют
@@ -160,48 +176,72 @@ dbViewUserInfo() {
 
 #
 #Создание базы данных $1
-#$1-dbname ; $2-CHARACTER SET (например utf8) ; $3-COLLATE (например utf8_general_ci) ;
+#$1-dbname ; $2-CHARACTER SET (например utf8) ; $3-COLLATE (например utf8_general_ci) ; $4 - режим (normal/silent)
 #return 0 - выполнено успешно. 1 - не переданы параметры, 2 - база данных уже существует
-#3 - ошибка при проверке наличия базы после ее создания
+#3 - ошибка при проверке наличия базы после ее создания, 4 - ошибка в параметре mode - silent/normal
 dbCreateBase() {
 	#Проверка на существование параметров запуска скрипта
-	if [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ]
+	if [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ] && [ -n "$4" ] 
 	then
 	#Параметры запуска существуют
-		#проверка существования базы данных "$1"
-		if [[ ! -z "`mysql -qfsBe "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='$1'" 2>&1`" ]];
-			then
-			#база $1 - существует
-				echo -e "${COLOR_RED}Ошибка создания базы данных. База данных ${COLOR_GREEN}\"$1\"${COLOR_RED} уже существует. Функция ${COLOR_GREEN}\"dbCreateBase\" ${COLOR_NC}"
+	    #Проверка существования базы данных "$1"
+	    if [[ ! -z "`mysql -qfsBe "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='$1'" 2>&1`" ]];
+	    	then
+	    	#база $1 - существует
+	    		echo -e "${COLOR_RED}Ошибка создания базы данных. База данных ${COLOR_GREEN}\"$1\"${COLOR_RED} уже существует. Функция ${COLOR_GREEN}\"dbCreateBase\" ${COLOR_NC}"
 				return 2
-			#база $1 - существует (конец)
-			else
-			#база $1 - не существует
-			     mysql -e "CREATE DATABASE IF NOT EXISTS $1 CHARACTER SET $2 COLLATE $3;"
+	    	#база $1 - существует (конец)	
+	    	else
+	    	#база $1 - не существует
+	    	     case "$4" in
+	    	     	silent)
+	    	     		mysql -e "CREATE DATABASE IF NOT EXISTS $1 CHARACTER SET $2 COLLATE $3;";
+	    	     		#Финальная проверка существования базы данных "$1"
+                         if [[ ! -z "`mysql -qfsBe "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='$1'" 2>&1`" ]];
+                            then
+                            #база $1 - существует
+                                return 0
+                            #база $1 - существует (конец)
+                            else
+                            #база $1 - не существует
+                                 echo -e "${COLOR_RED}База данных ${COLOR_GREEN}\"$1\"${COLOR_RED} не была создана.Функция ${COLOR_GREEN}\"dbCreateBase\"${COLOR_NC}"
+                                 return 3
+                            #база $1 - не существует (конец)
+                         fi
+                         #Финальная проверка существования базы данных $1 (конец)
+	    	     		;;
+	    	     	normal)
+	    	     		mysql -e "CREATE DATABASE IF NOT EXISTS $1 CHARACTER SET $2 COLLATE $3;";
+	    	     		#Финальная проверка существования базы данных "$1"
+                         if [[ ! -z "`mysql -qfsBe "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='$1'" 2>&1`" ]];
+                            then
+                            #база $1 - существует
+                                echo -e "${COLOR_GREEN}База данных ${COLOR_YELLOW}\"$1\"${COLOR_GREEN} успешно создана ${COLOR_NC}"
+                                return 0
+                            #база $1 - существует (конец)
+                            else
+                            #база $1 - не существует
+                                 echo -e "${COLOR_RED}База данных ${COLOR_GREEN}\"$1\"${COLOR_RED} не была создана.Функция ${COLOR_GREEN}\"dbCreateBase\"${COLOR_NC}"
+                                 return 3
+                            #база $1 - не существует (конец)
+                         fi
+                         #Финальная проверка существования базы данных $1 (конец)
 
-			     #Финальная проверка существования базы данных "$1"
-			     if [[ ! -z "`mysql -qfsBe "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='$1'" 2>&1`" ]];
-			     	then
-			     	#база $1 - существует
-			     		return 0
-			     	#база $1 - существует (конец)
-			     	else
-			     	#база $1 - не существует
-			     	     echo -e "${COLOR_RED}База данных ${COLOR_GREEN}\"$1\"${COLOR_RED} не была создана.Функция ${COLOR_GREEN}\"dbCreateBase\"${COLOR_NC}"
-			     	     return 3
-			     	#база $1 - не существует (конец)
-			     fi
-			     #Финальная проверка существования базы данных $1 (конец)
-
-			#база $1 - не существует (конец)
-		fi
-		#конец проверки существования базы данных $1
-
+	    	     		;;
+	    	     	*)
+	    	     		echo -e "${COLOR_RED}Ошибка передачи параметра ${COLOR_GREEN}\"mode\"${COLOR_RED} в функцию ${COLOR_GREEN}\"dbCreateBase\"${COLOR_NC}";
+	    	     		return 4;;
+	    	     esac
+	    	#база $1 - не существует (конец)
+	    fi
+	    #конец проверки существования базы данных $1
+	    
+	    
 	#Параметры запуска существуют (конец)
 	else
 	#Параметры запуска отсутствуют
-		echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"dbCreateBase\"${COLOR_RED} ${COLOR_NC}"
-		return 1
+	    echo -e "${COLOR_RED} Отсутствуют необходимые параметры в фукнции ${COLOR_GREEN}\"dbCreateBase\"${COLOR_RED} ${COLOR_NC}"
+	    return 1
 	#Параметры запуска отсутствуют (конец)
 	fi
 	#Конец проверки существования параметров запуска скрипта
