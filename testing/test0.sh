@@ -19,4 +19,4 @@ source $SCRIPTS/include/include.sh
 #backupUserSitesFiles $1 $2 $3
 #dbBackupBasesOneUser $1 $2 $3
 #dbBackupBase $1 $2 $3 $4
-dbCreateBase $1 $2 $3 $4
+dbBackupBase $1 $2 $3 $4

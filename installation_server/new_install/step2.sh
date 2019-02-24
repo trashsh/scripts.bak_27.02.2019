@@ -8,6 +8,7 @@ sed -i '$ a source $SCRIPTS/include/include.sh'  /root/.bashrc
 sed -i '$ a source $SCRIPTS/external_scripts/dev-shell-essentials-master/dev-shell-essentials.sh'  /root/.bashrc
 sed -i '$ a source $SCRIPTS/external_scripts/dev-shell-essentials-master/dev-shell-essentials.sh'  /etc/profile
 sed -i '$ a export LINE=\"----------------------------------------------------------------------------------------------"'  /etc/profile
+
 source ~/.bashrc
 source /etc/profile
 
@@ -27,3 +28,6 @@ apt-get install p7zip-rar p7zip-full
 
 sed -i '$ a export sshAdminKeyFilePath=\"\/my\/scripts\/.config\/settings\/ssh\/keys\/lamer\"'  /etc/profile
 sed -i "$ a source $SCRIPTS/include/include.sh"  /etc/profile
+
+sed -i '$ a export DATEFORMAT=`date +%Y.%m.%d`'  /etc/profile
+sed -i '$ a export DATETIMEFORMAT=`date +%Y.%m.%d_%H.%M.%S`'  /etc/profile
