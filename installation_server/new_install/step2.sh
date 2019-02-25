@@ -30,4 +30,6 @@ sed -i '$ a export sshAdminKeyFilePath=\"\/my\/scripts\/.config\/settings\/ssh\/
 sed -i "$ a source $SCRIPTS/include/include.sh"  /etc/profile
 
 sed -i '$ a export DATEFORMAT=`date +%Y.%m.%d`'  /etc/profile
-sed -i '$ a export DATETIMEFORMAT=`date +%Y.%m.%d_%H.%M.%S`'  /etc/profile
+sed -i '$ a export DATETIMEFORMAT=`date +%Y.%m.%d-%H.%M.%S`'  /etc/profile
+sed -i '$ a export DATETIMESQLFORMAT=`date +%Y-%m-%d\ %T`'  /etc/profile
+sed -i '$ a export WEBSERVER_DB=lamer_webserver'  /etc/profile

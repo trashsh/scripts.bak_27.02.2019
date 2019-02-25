@@ -24,7 +24,6 @@ declare -x -f existGroup                                #Существует л
                                                         #Если передан параметр $2, равный 1, то выведется текст сообщения о существовании группы
                                                         #$1-group
                                                         #return 0 - группа $1 существует, 1 - группа $1 не существует
-declare -x -f userAddSystem #Добавление системного пользователя: ($1-user ;)
 declare -x -f viewGroupUsersAccessAll					#Вывод всех пользователей группы users. #$1 - может быть выведен дополнительно текст, предшествующий выводу списка пользователей
 declare -x -f userExistInGroup                          #состоит ли пользователь $1 в группе $2
                                                         #функция возвращает значение 0-если пользователь состоит в группе "$2", 1- если не состоит в группе "$2"
@@ -308,109 +307,6 @@ viewGroupSudoAccessByName(){
 	fi
 }
 
-#Готово. Можно добавить доп.функционал
-#Добавление системного пользователя
-#$1-user ;
-#return 0 - выполнено успешно, 1 - пользователь уже существует
-#2 - пользователь отменил создание пользователя
-userAddSystem() {
-	viewGroupUsersAccessAll
-	#Проверка на существование параметров запуска скрипта
-	if [ -n "$1" ]
-	then
-	#Параметры запуска существуют
-	    username=$1
-
-	else
-	    echo -e -n "${COLOR_BLUE}"Введите имя пользователя: "${COLOR_NC}"
-		read username
-	fi
-	    grep "^$username:" /etc/passwd >/dev/null
-
-	    #Проверка на успешность выполнения предыдущей команды
-	    if [ $? -eq 0 ]
-	    	then
-	    		#Пользователь уже существует
-	    		echo -e "${COLOR_RED}Пользователь ${COLOR_GREEN}\"$username\"${COLOR_RED} уже существует${COLOR_NC}"
-	    		return 1
-	    		#Пользователь уже существует (конец)
-	    else
-                #Пользователь не существует и будет добавлен
-                echo -n -e "${COLOR_YELLOW}Подтвердите добавление пользователя ${COLOR_GREEN}\"$username\"${COLOR_YELLOW} введя ${COLOR_BLUE}\"y\"${COLOR_YELLOW}, или для отмены операции ${COLOR_BLUE}\"n\"${COLOR_NC}: "
-                while read
-                do
-                    case "$REPLY" in
-                        y|Y)
-                            echo -e "${COLOR_YELLOW}Выполнение операций по созданию пользователя ${COLOR_GREEN}\"$username\"${COLOR_NC}"
-                            echo -n -e "${COLOR_YELLOW}Установите пароль пользователя ${COLOR_GREEN}$username: ${COLOR_NC}: "
-                            read password
-
-                            #Проверка на пустое значение переменной
-                            if [[ -z "$password" ]]; then
-                                #переменная имеет пустое значение
-                                echo -e "${COLOR_RED}"Пароль не может быть пустым. Отмена создания пользователя"${COLOR_NC}"
-                                #переменная имеет пустое значение (конец)
-                            else
-                                #переменная имеет не пустое значение
-                                mkdir -p $HOMEPATHWEBUSERS/$username
-                                useradd -N -g users -G ftp-access -d $HOMEPATHWEBUSERS/$username -s /bin/bash $username
-                                echo "$username:$password" | chpasswd
-                                mkdirWithOwn $HOMEPATHWEBUSERS/$username/.backups $username users 777
-                                mkdirWithOwn $HOMEPATHWEBUSERS/$username/.backups/auto $username users 755
-                                mkdirWithOwn $HOMEPATHWEBUSERS/$username/.backups/manually $username users 755
-                                touchFileWithModAndOwn $HOMEPATHWEBUSERS/$username/.bashrc $username users 644
-                                touchFileWithModAndOwn $HOMEPATHWEBUSERS/$username/.sudo_as_admin_successful $username users 644
-                                echo "source /etc/profile" >> $HOMEPATHWEBUSERS/$username/.bashrc
-                                sed -i '$ a source $SCRIPTS/include/include.sh'  $HOMEPATHWEBUSERS/$username/.bashrc
-                                dbSetMyCnfFile $username $password
-                                chModAndOwnFile $HOMEPATHWEBUSERS/$username/.my.cnf $username users 600
-                                #chModAndOwnFolderAndFiles $HOMEPATHWEBUSERS/$username 755 644 $username users
-                                #добавление в группу sudo
-                                userAddToGroup $username sudo 1
-
-                                echo -n -e "${COLOR_YELLOW}Введите ${COLOR_BLUE}\"g\"${COLOR_NC}${COLOR_YELLOW} для генерации ssh-ключа, ${COLOR_GREEN}\"i\"${COLOR_NC}${COLOR_YELLOW} - для импорта существующего на сервер ключа, ${COLOR_BLUE}\"q\"${COLOR_YELLOW} - для отмены добавления ssh-ключа${COLOR_NC}: "
-                                	while read
-                                	do
-                                    	echo -n ": "
-                                    	case "$REPLY" in
-                                	    	g|G) sshKeyGenerateToUser $username;
-                                	    	     sshKeyAddToUser $username 0 $sshAdminKeyFilePath;
-                                		    	break;;
-                                		    i|I)
-                                                sshKeyAddToUser $username 1;
-                                                sshKeyAddToUser $username 0 $sshAdminKeyFilePath;
-                                		    	break;;
-                                		    q|Q)
-                                                return 2;
-                                			    break;;
-                                	    esac
-                                	done
-
-                                echo -e "${COLOR_GREEN}Пользователь ${COLOR_YELLOW}\"$username\"${COLOR_GREEN} успешно добавлен${COLOR_YELLOW}\"\"${COLOR_GREEN} ${COLOR_NC}"
-
-                                viewUserFullInfo $username
-                            fi
-                            #Проверка на пустое значение переменной (конец)
-
-                            break
-                            ;;
-                        n|N)
-                            echo -e "${COLOR_RED}Отмена создания пользователя ${COLOR_GREEN}\"$username\"${COLOR_NC}"
-                            return 2
-                            break
-                            ;;
-                        *) echo -n "Команда не распознана: ('$REPLY'). Повторите ввод:" >&2
-                           ;;
-                    esac
-                done
-
-	##Здесь описать порядок действий при создании пользователя
-	return 0
-                #Пользователь не существует и будет добавлен (конец)
-	    fi
-	    #Конец проверки на успешность выполнения предыдущей команды
-	#Параметры запуска существуют (конец)
-}
 
 #Полностью проверно
 #состоит ли пользователь $1 в группе $2

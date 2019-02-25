@@ -1,4 +1,5 @@
 #!/bin/bash
+source $SCRIPTS/include/include.sh
 source /etc/profile
 source ~/.bashrc
 echo ''
