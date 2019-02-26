@@ -1,4 +1,5 @@
 #!/bin/bash
+source /etc/profile
 source $SCRIPTS/include/include.sh
 #source $SCRIPTS/functions/users.sh
 
@@ -20,5 +21,5 @@ source $SCRIPTS/include/include.sh
 #dbBackupBasesOneUser $1 $2 $3
 #dbBackupBase $1 $2 $3 $4
 #userAddSystem $1 $2 $3 $4 $5 $6 $7
-dbAddRecordToDb $1 $2 $3 $4 $5 $6 $7
+userAddSystem $1 $2 $3 $4 $5 $6 $7
 echo $?

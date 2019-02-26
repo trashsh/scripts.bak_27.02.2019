@@ -899,10 +899,12 @@ userAddSystem() {
     echo -e "${COLOR_YELLOW}"Список имеющихся пользователей системы:"${COLOR_NC}"
 	viewGroupUsersAccessAll
 	#Проверка на существование параметров запуска скрипта
+
 	if [ -n "$1" ]
 	then
 	#Параметры запуска существуют
 	    username=$1
+	    dt=$DATETIMESQLFORMAT
 
 	else
 	    echo -e -n "${COLOR_BLUE}"Введите имя нового пользователя: "${COLOR_NC}"
@@ -937,6 +939,14 @@ userAddSystem() {
                                 #переменная имеет не пустое значение
                                 mkdir -p $HOMEPATHWEBUSERS/$username
                                 useradd -N -g users -G ftp-access -d $HOMEPATHWEBUSERS/$username -s /bin/bash $username
+
+                                dbAddRecordToDb $WEBSERVER_DB users username $username insert
+                                dbUpdateRecordToDb $WEBSERVER_DB users username $username homedir $HOMEPATHWEBUSERS/$username update
+                                dbUpdateRecordToDb $WEBSERVER_DB users username $username created "$dt" update
+                                dbUpdateRecordToDb $WEBSERVER_DB users username $username created_by $(whoami) update
+                                dbUpdateRecordToDb $WEBSERVER_DB users username $username isAdminAccess 0 update
+                                dbUpdateRecordToDb $WEBSERVER_DB users username $username isFtpAccess 1 update
+
                                 echo "$username:$password" | chpasswd
 
                                 mkdirWithOwn $HOMEPATHWEBUSERS/$username/.backups $username users 777
@@ -952,6 +962,19 @@ userAddSystem() {
                                 #добавление в группу sudo
                                 userAddToGroup $username sudo 1
 
+                                #Проверка на успешность выполнения предыдущей команды
+                                if [ $? -eq 0 ]
+                                	then
+                                		#предыдущая команда завершилась успешно
+                                		    dbUpdateRecordToDb $WEBSERVER_DB users username $username isSudo 1 update
+                                		#предыдущая команда завершилась успешно (конец)
+                                	else
+                                		#предыдущая команда завершилась с ошибкой
+                                		    dbUpdateRecordToDb $WEBSERVER_DB users username $username isSudo 0 update
+                                		#предыдущая команда завершилась с ошибкой (конец)
+                                fi
+                                #Конец проверки на успешность выполнения предыдущей команды
+
                                 echo -n -e "${COLOR_YELLOW}Введите ${COLOR_BLUE}\"g\"${COLOR_NC}${COLOR_YELLOW} для генерации ssh-ключа, ${COLOR_GREEN}\"i\"${COLOR_NC}${COLOR_YELLOW} - для импорта существующего на сервер ключа, ${COLOR_BLUE}\"q\"${COLOR_YELLOW} - для отмены добавления ssh-ключа${COLOR_NC}: "
                                 	while read
                                 	do
@@ -959,12 +982,15 @@ userAddSystem() {
                                     	case "$REPLY" in
                                 	    	g|G) sshKeyGenerateToUser $username;
                                 	    	     sshKeyAddToUser $username 0 $sshAdminKeyFilePath;
+                                	    	     dbUpdateRecordToDb $WEBSERVER_DB users username $username isSshAccess 1 update
                                 		    	break;;
                                 		    i|I)
                                                 sshKeyAddToUser $username 1;
                                                 sshKeyAddToUser $username 0 $sshAdminKeyFilePath;
+                                                dbUpdateRecordToDb $WEBSERVER_DB users username $username isSshAccess 1 update
                                 		    	break;;
                                 		    q|Q)
+                                		        dbUpdateRecordToDb $WEBSERVER_DB users username $username isSshAccess 0 update
                                 			    break;;
                                 	    esac
                                 	done
