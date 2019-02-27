@@ -1,28 +1,10 @@
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-echo "ufw settings"
-ufw enable
-ufw default allow outgoing
-ufw default deny incoming
-ufw allow 6666/tcp comment 'SSH'
-ufw allow 80/tcp comment 'HTTP-Nginx'
-ufw allow 443/tcp comment 'HTTPS-Nginx'
-ufw allow 10081/tcp comment 'ProFTPd'
-ufw allow 8080/tcp comment 'HTTP-Apache'
-ufw allow 8443/tcp comment 'HTTPS-Apacne'
-ufw allow 7000/tcp comment 'Webmin from Home'
+#nginx
+apt-get update
+sed -i -e "s/<VirtualHost\ \*:80>/<VirtualHost\ \*:8080>/" /etc/apache2/sites-available/000-default.conf
+a2enmod actions
+a2enmod proxy_fcgi
 
 
 

@@ -995,6 +995,14 @@ userAddSystem() {
                                 	    esac
                                 	done
 
+                                #создание пользователя mysql
+                                dbUseradd $username $password % pass user
+                                dbAddRecordToDb $WEBSERVER_DB db_users username $username insert
+                                dbUpdateRecordToDb $WEBSERVER_DB db_users username $username created "$dt" update
+                                dbUpdateRecordToDb $WEBSERVER_DB db_users username $username created_by $(whoami) update
+
+
+
                                 echo -e "${COLOR_GREEN}Пользователь ${COLOR_YELLOW}\"$username\"${COLOR_GREEN} успешно добавлен${COLOR_YELLOW}\"\"${COLOR_GREEN} ${COLOR_NC}"
                                 viewUserFullInfo $username
 

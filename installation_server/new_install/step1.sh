@@ -120,6 +120,9 @@ sed -i -e "s/# GROUP=100/GROUP=100/" /etc/default/useradd
 echo "install soft"
 apt -y install mc git git-core composer  wget zip unzip unrar arj putty-tools nano ufw proftpd  
 
+groupadd admin-access
+groupadd ftp-access
+
 echo "ssh settings"
 groupadd ssh-access
 usermod -G ssh-access -a root
@@ -149,25 +152,7 @@ tar -czvf $BACKUPFOLDER_INSTALLED/mysql.tar.gz /etc/mysql
 mysql_secure_installation
 service mysql restart
 
-echo "create user"
-source /etc/profile
-$SCRIPTS/users/useradd_system.sh $USERLAMER
-mkdir -p $HOMEPATHWEBUSERS/$USERLAMER/.ssh
-touch $HOMEPATHWEBUSERS/$USERLAMER/.ssh/authorized_keys
-#usermod -G ssh-access -a $USERLAMER
 
-#sed -i '$ a \\nssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAp2FS7uz8Y5lo+022MmRgwiFEmlZfK9WKdamw2DH3blowO0736Z7H4PPcx8PGSxOfeBcl6iZ+G+ukNKrDLBY0EPqc6jNE9966zvdE9N2ws9NfNZD+7+26JARRlkYnqIuUIqCiO0bz1eICyDV+1TwZ7anKxUgG+dfbFIjSdfeodSVHMeNaT8NCcYho1lWXgwy6q7h3k8EikS0qLqQmWOAPRrKUPXpsIzQTS8ll5B27U+w0OV0E222W4NOWHIbWDTorFxhqV7B4L+Z8+eao2en3i75Qng9YEe5l09HN33oQe2SsU6CfpeN0+FqwWaUT/hsYU2qS80U2oK5DGKA6vgk8rQ== myvds_lamer'  $HOMEPATHWEBUSERS/$USERLAMER/.ssh/authorized_keys
-cp $SETTINGS/ssh/keys/lamer $HOMEPATHWEBUSERS/$USERLAMER/.ssh/authorized_keys
-
-chmod 700 $HOMEPATHWEBUSERS/$USERLAMER/.ssh
-chmod 600 $HOMEPATHWEBUSERS/$USERLAMER/.ssh/authorized_keys
-chown $USERLAMER:users $HOMEPATHWEBUSERS/$USERLAMER/.ssh
-chown $USERLAMER:users $HOMEPATHWEBUSERS/$USERLAMER/.ssh/authorized_keys
-  service ssh restart
-
-echo "ftp settings"
-groupadd ftp-access
-usermod -G ftp-access -a $USERLAMER
   
 echo "install apache2"
 apt -y install apache2
@@ -275,6 +260,7 @@ apt -y install webmin
 tar -czvf $BACKUPFOLDER_INSTALLED/webmin.tar.gz /etc/webmin/
 sed -i -e "s/port=10000/port=7000/" /etc/webmin/miniserv.conf
 sed -i -e "s/listen=10000/listen=7000/" /etc/webmin/miniserv.conf
+service webmin restart
 
 a2enmod proxy
 a2enmod ssl
@@ -298,3 +284,24 @@ sed -i -e "s/Port\t\t\t\t21/Port\t\t\t\t10081/" /etc/proftpd/proftpd.conf
 echo '/bin/false' >> /etc/shells
 #AuthUserFile /etc/proftpd/ftpd.passwd
 service proftpd restart
+
+
+echo "create user"
+source /etc/profile
+$SCRIPTS/users/useradd_system.sh $USERLAMER
+mkdir -p $HOMEPATHWEBUSERS/$USERLAMER/.ssh
+touch $HOMEPATHWEBUSERS/$USERLAMER/.ssh/authorized_keys
+#usermod -G ssh-access -a $USERLAMER
+
+#sed -i '$ a \\nssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAp2FS7uz8Y5lo+022MmRgwiFEmlZfK9WKdamw2DH3blowO0736Z7H4PPcx8PGSxOfeBcl6iZ+G+ukNKrDLBY0EPqc6jNE9966zvdE9N2ws9NfNZD+7+26JARRlkYnqIuUIqCiO0bz1eICyDV+1TwZ7anKxUgG+dfbFIjSdfeodSVHMeNaT8NCcYho1lWXgwy6q7h3k8EikS0qLqQmWOAPRrKUPXpsIzQTS8ll5B27U+w0OV0E222W4NOWHIbWDTorFxhqV7B4L+Z8+eao2en3i75Qng9YEe5l09HN33oQe2SsU6CfpeN0+FqwWaUT/hsYU2qS80U2oK5DGKA6vgk8rQ== myvds_lamer'  $HOMEPATHWEBUSERS/$USERLAMER/.ssh/authorized_keys
+cp $SETTINGS/ssh/keys/lamer $HOMEPATHWEBUSERS/$USERLAMER/.ssh/authorized_keys
+
+chmod 700 $HOMEPATHWEBUSERS/$USERLAMER/.ssh
+chmod 600 $HOMEPATHWEBUSERS/$USERLAMER/.ssh/authorized_keys
+chown $USERLAMER:users $HOMEPATHWEBUSERS/$USERLAMER/.ssh
+chown $USERLAMER:users $HOMEPATHWEBUSERS/$USERLAMER/.ssh/authorized_keys
+  service ssh restart
+
+echo "ftp settings"
+groupadd ftp-access
+usermod -G ftp-access -a $USERLAMER
